@@ -54,8 +54,6 @@ public class Asteroids extends Game {
 				break;
 			}
 		}
-
-		fps.log();
 	}
 
 	@Override

@@ -26,12 +26,17 @@ public abstract class Entity {
 	public Color color = Color.WHITE;	
 	public boolean alive = true;
 
-	protected Polygon polygon = null;
+	private final Polygon polygon = new Polygon();
 	
 	public float[] getVertices() {
 		return polygon.getTransformedVertices();
 	}
 
+	public void setVertices(float[] vertices) {
+		polygon.setVertices(vertices);
+		updateVertices();
+	}
+	
 	public void updateVertices() {
 		polygon.setPosition(location.x, location.y);
 		polygon.setRotation((float)Math.toDegrees(-rotation));

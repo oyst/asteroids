@@ -1,7 +1,5 @@
 package uk.co.alexoyston.asteroids.simulation;
 
-import com.badlogic.gdx.math.Polygon;
-
 public class Bullet extends Entity {
 
 	public Bullet() {
@@ -14,8 +12,7 @@ public class Bullet extends Entity {
 			width, height,
 			height, 0
 		};
-		polygon = new Polygon();
-		polygon.setVertices(vertices);
+		setVertices(vertices);
 		
 		maxAge = 1;
 	}

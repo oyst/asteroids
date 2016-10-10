@@ -1,5 +1,7 @@
 package uk.co.alexoyston.asteroids;
 
+import java.util.Vector;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -55,13 +57,14 @@ public class Renderer implements Disposable {
 			float vx = entity.velocity.x;
 			float vy = entity.velocity.y;
 
-			float[] triangles = entity.getTriangles();
-			for (int i = 0; i < triangles.length; i += 6) {
-				shapeRenderer.setColor(Color.VIOLET);
+			shapeRenderer.setColor(Color.VIOLET);
+			float[][] triangles = entity.getTriangles();
+			for (int i = 0; i < triangles.length; i++) {
+				float[] triangle = triangles[i];
 				shapeRenderer.triangle(
-						triangles[i + 0], triangles[i + 1],
-						triangles[i + 2], triangles[i + 3],
-						triangles[i + 4], triangles[i + 5]);
+						triangles[i][0], triangle[1],
+						triangles[i][2], triangle[3],
+						triangles[i][4], triangle[5]);
 			}
 
 			// Debug direction

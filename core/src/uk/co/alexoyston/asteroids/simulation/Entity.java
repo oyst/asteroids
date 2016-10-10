@@ -30,7 +30,7 @@ public abstract class Entity {
 
 	protected final Polygon polygon = new Polygon();
 	private final EarClippingTriangulator triangulator = new EarClippingTriangulator();
-	private float[] triangles;	
+	private float[][] triangles;
 	// pointIndexes contains indexes of polygons points
 	// Each index points to the X coordinate, with the Y coordninate just being the index + 1
 	// Every 3 indexes represent the 3 X coordinates needed to make up a triangle
@@ -45,7 +45,7 @@ public abstract class Entity {
 		updateVertices();
 		
 		pointIndexes = triangulator.computeTriangles(vertices);
-		triangles = new float[pointIndexes.size * 2];
+		triangles = new float[pointIndexes.size * 2][6];
 		// Multiply by 2 to skip over Y coords
 		for (int i = 0; i < pointIndexes.size; i++)
 			pointIndexes.mul(i, (short) 2);
@@ -109,15 +109,22 @@ public abstract class Entity {
 	 * 
 	 * @return array of coordinates
 	 */
-	public float[] getTriangles() {
+	public float[][] getTriangles() {
 		float[] points = getVertices();
 
-		for (int i = 0; i < pointIndexes.size; i++) {
-			int index = pointIndexes.get(i);
-			triangles[i*2] = points[index];
-			triangles[i*2 + 1] = points[index + 1];
-		}
+		for (int i = 0; i < pointIndexes.size / 3; i++) {
+			int index = pointIndexes.get(i * 3);
+			triangles[i][0] = points[index];
+			triangles[i][1] = points[index + 1];
 
+			index = pointIndexes.get(i * 3 + 1);
+			triangles[i][2] = points[index];
+			triangles[i][3] = points[index + 1];
+
+			index = pointIndexes.get(i * 3 + 2);
+			triangles[i][4] = points[index];
+			triangles[i][5] = points[index + 1];
+		}
 		return triangles;
 	}
 }

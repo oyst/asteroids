@@ -25,4 +25,8 @@ public class Bullet extends Entity {
 		}
 		return false;
 	}
+
+	@Override
+	public void collision(Entity other) {
+	}
 }

@@ -9,6 +9,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ShortArray;
 
 public abstract class Entity {
+	private static final EntityListener nullListener = new EntityListener() {
+		@Override
+		public void requestEntity(Entity entity) {
+		}
+	};
+
 	public float maxSpeed = 1000;
 	public float maxRotationSpeed = 4.5f;
 	public float maxAge = Float.MAX_VALUE;
@@ -36,7 +42,9 @@ public abstract class Entity {
 	// Each index points to the X coordinate, with the Y coordninate just being the index + 1
 	// Every 3 indexes represent the 3 X coordinates needed to make up a triangle
 	private ShortArray pointIndexes;
-	
+
+	protected EntityListener entityListener = Entity.nullListener;
+
 	public float[] getVertices() {
 		return polygon.getTransformedVertices();
 	}
@@ -51,7 +59,7 @@ public abstract class Entity {
 		for (int i = 0; i < pointIndexes.size; i++)
 			pointIndexes.mul(i, (short) 2);
 	}
-	
+
 	public void updateVertices() {
 		polygon.setPosition(location.x, location.y);
 		polygon.setRotation((float)Math.toDegrees(-rotation));
@@ -81,7 +89,7 @@ public abstract class Entity {
 		bounds.width = maxX - minX;
 		bounds.height = maxY - minY;
 	}
-	
+
 	/**
 	 * A personal update for any non-standard updates covered by the Simulation
 	 * 
@@ -90,7 +98,7 @@ public abstract class Entity {
 	 */
 	public void update(float delta) {
 	}
-	
+
 	/**
 	 * Check for collision between this Entity and another
 	 *
@@ -117,6 +125,14 @@ public abstract class Entity {
 	}
 
 	/**
+	 * Called when a collision occurs between this Entity and another
+	 * 
+	 * @param other
+	 * 			The entity collided with
+	 */
+	public abstract void collision(Entity other);
+
+	/**
 	 * Return an array of float[6]'s, each containing the coordinates to make up a single polygon triangle
 	 * The float[6] is ordered as [x1, y1, x2, y2, x3, y3]
 	 * 
@@ -139,5 +155,9 @@ public abstract class Entity {
 			triangles[i][5] = points[index + 1];
 		}
 		return triangles;
+	}
+
+	public final void registerListener(EntityListener listener) {
+		entityListener = listener;
 	}
 }

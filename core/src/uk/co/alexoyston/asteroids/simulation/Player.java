@@ -25,13 +25,13 @@ public class Player extends Entity {
 		drag = 0.3f;
 	}
 
-	public Entity shoot() {
+	public void shoot() {
 		if (weaponTemp > 100 - shotHeat)
-			return null;
+			return;
 
 		long now = System.currentTimeMillis();
 		if (now - prevShot < reloadTime)
-			return null;
+			return;
 		prevShot = now;
 
 		weaponTemp += shotHeat;
@@ -46,9 +46,9 @@ public class Player extends Entity {
 		float cosRotation = (float) Math.cos(rotation);
 		bullet.velocity.set(sinRotation * shotSpeed, cosRotation * shotSpeed);
 
-		return bullet;
+		entityListener.requestEntity(bullet);
 	}
-	
+
 	@Override
 	public void update(float delta) {
 		weaponTemp -= coolDown * delta;
@@ -60,5 +60,9 @@ public class Player extends Entity {
 			return super.collides(other);
 		}
 		return false;
+	}
+
+	@Override
+	public void collision(Entity other) {
 	}
 }

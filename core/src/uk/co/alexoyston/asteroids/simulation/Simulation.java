@@ -8,10 +8,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Disposable;
 
-public class Simulation implements Disposable {
+public class Simulation implements Disposable, EntityListener {
 
 	private static final String TAG = Simulation.class.getName();
 	public LinkedList<Entity> entities = new LinkedList<Entity>();
+	private LinkedList<Entity> waitingEntities = new LinkedList<Entity>();
 	public ArrayList<Player> players = new ArrayList<Player>();
 
 	private boolean paused = false;
@@ -39,6 +40,7 @@ public class Simulation implements Disposable {
 		player.center.set(60, 60);
 		entities.add(player);
 		players.add(player);
+		player.registerListener(this);
 		return id;
 	}
 
@@ -46,6 +48,9 @@ public class Simulation implements Disposable {
 		if (paused)
 			return;
 
+		entities.addAll(waitingEntities);
+		waitingEntities.clear();
+		
 		for (Entity entity : entities) {
 			// Update location, center and velocity
 			float ax_d = entity.acceleration.x * delta;
@@ -113,8 +118,10 @@ public class Simulation implements Disposable {
 			Entity entity = i.next();
 			while (j.hasNext()) {
 				Entity other = j.next();
-				if (entity.collides(other))
-					; //TODO: Act
+				if (entity.collides(other)) {
+					entity.collision(other);
+					other.collision(entity);
+				}
 			}
 		}
 
@@ -152,8 +159,12 @@ public class Simulation implements Disposable {
 
 	public void playerShoot(int playerId) {
 		 Player player = players.get(playerId);
-		 Entity bullet = player.shoot();
-		 if (bullet != null)
-		 entities.add(bullet);
+		 player.shoot();
+	}
+
+	@Override
+	public void requestEntity(Entity entity) {
+		waitingEntities.add(entity);
+		entity.registerListener(this);
 	}
 }

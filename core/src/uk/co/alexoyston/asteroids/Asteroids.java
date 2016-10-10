@@ -44,6 +44,7 @@ public class Asteroids extends Game {
 				break;
 
 			case EXIT:
+				Gdx.app.log(TAG, "Closing");
 				Gdx.app.exit();
 				break;
 

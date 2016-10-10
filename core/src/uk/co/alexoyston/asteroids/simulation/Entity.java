@@ -102,6 +102,13 @@ public abstract class Entity {
 		return false;
 	}
 
+	/**
+	 * Return an array coordinates making up the polygons triangles
+	 * The array is ordered as x1, y1, x2, y2, x3, y3, ... 
+	 * with each 3 sets of (x, y) pairs making up a triangle
+	 * 
+	 * @return array of coordinates
+	 */
 	public float[] getTriangles() {
 		float[] points = getVertices();
 

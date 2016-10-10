@@ -2,6 +2,7 @@ package uk.co.alexoyston.asteroids.simulation;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.EarClippingTriangulator;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -99,13 +100,25 @@ public abstract class Entity {
 	 * @return true if the two collide, false otherwise
 	 */
 	public boolean collides(Entity other) {
+
+		// Bounding box collision detection
+		if (!Intersector.overlaps(bounds, other.bounds))
+			return false;
+
+		// Triangle collision detection
+		for (float[] triangle : getTriangles()) {
+			for (float[] otherTriangle : other.getTriangles()) {
+				if (Intersector.overlapConvexPolygons(triangle, otherTriangle, null))
+					return true;
+			}
+		}
+
 		return false;
 	}
 
 	/**
-	 * Return an array coordinates making up the polygons triangles
-	 * The array is ordered as x1, y1, x2, y2, x3, y3, ... 
-	 * with each 3 sets of (x, y) pairs making up a triangle
+	 * Return an array of float[6]'s, each containing the coordinates to make up a single polygon triangle
+	 * The float[6] is ordered as [x1, y1, x2, y2, x3, y3]
 	 * 
 	 * @return array of coordinates
 	 */

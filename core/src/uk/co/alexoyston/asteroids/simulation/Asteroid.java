@@ -50,4 +50,9 @@ public class Asteroid extends Entity {
 		
 		setVertices(vertices);
 	}
+
+	@Override
+	public boolean collides(Entity other) {
+		return false;
+	}
 }

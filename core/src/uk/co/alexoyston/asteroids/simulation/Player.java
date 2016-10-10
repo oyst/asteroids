@@ -53,4 +53,12 @@ public class Player extends Entity {
 	public void update(float delta) {
 		weaponTemp -= coolDown * delta;
 	}
+
+	@Override
+	public boolean collides(Entity other) {
+		if (other instanceof Asteroid){
+			return super.collides(other);
+		}
+		return false;
+	}
 }

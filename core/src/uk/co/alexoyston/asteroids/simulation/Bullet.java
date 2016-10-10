@@ -16,4 +16,9 @@ public class Bullet extends Entity {
 		
 		maxAge = 1;
 	}
+
+	@Override
+	public boolean collides(Entity other) {
+		return false;
+	}
 }

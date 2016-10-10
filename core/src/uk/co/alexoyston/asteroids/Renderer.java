@@ -28,8 +28,8 @@ public class Renderer implements Disposable {
 		shapeRenderer.begin(ShapeType.Line);
 
 		for (Entity entity : simulation.entities) {
-			shapeRenderer.setColor(entity.getColor());
-			shapeRenderer.polygon(entity.getPolyVertices());
+			shapeRenderer.setColor(entity.color);
+			shapeRenderer.polygon(entity.getVertices());
 		}
 
 		shapeRenderer.end();
@@ -40,20 +40,18 @@ public class Renderer implements Disposable {
 
 		for (Entity entity : simulation.entities) {
 			// Debug
-			float sinRotation = (float) Math.sin(entity.getRotation());
-			float cosRotation = (float) Math.cos(entity.getRotation());
-			float cx = entity.getCenterX();
-			float cy = entity.getCenterY();
-			float minX = entity.getMinX();
-			float minY = entity.getMinY();
-			float maxX = entity.getMaxX();
-			float maxY = entity.getMaxY();
-			float x = entity.getX();
-			float y = entity.getY();
-			float width = maxX - minX;
-			float height = maxY - minY;
-			float vx = entity.getVelocity().x;
-			float vy = entity.getVelocity().y;
+			float sinRotation = (float) Math.sin(entity.rotation);
+			float cosRotation = (float) Math.cos(entity.rotation);
+			float cx = entity.center.x;
+			float cy = entity.center.y;
+			float minX = entity.bounds.x;
+			float minY = entity.bounds.y;
+			float x = entity.location.x;
+			float y = entity.location.y;
+			float width = entity.bounds.width;
+			float height = entity.bounds.height;
+			float vx = entity.velocity.x;
+			float vy = entity.velocity.y;
 
 			// Debug direction
 			shapeRenderer.setColor(Color.CYAN);

@@ -28,5 +28,6 @@ public class Bullet extends Entity {
 
 	@Override
 	public void collision(Entity other) {
+		alive = false;
 	}
 }

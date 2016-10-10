@@ -51,6 +51,9 @@ public class Asteroid extends Entity {
 		setVertices(vertices);
 	}
 
+	public void split() {
+	}
+
 	@Override
 	public boolean collides(Entity other) {
 		if (other instanceof Player || other instanceof Bullet) {
@@ -61,5 +64,6 @@ public class Asteroid extends Entity {
 
 	@Override
 	public void collision(Entity other) {
+		split();
 	}
 }

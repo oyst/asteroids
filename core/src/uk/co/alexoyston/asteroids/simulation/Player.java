@@ -49,6 +49,9 @@ public class Player extends Entity {
 		entityListener.requestEntity(bullet);
 	}
 
+	public void die() {
+	}
+
 	@Override
 	public void update(float delta) {
 		weaponTemp -= coolDown * delta;
@@ -64,5 +67,6 @@ public class Player extends Entity {
 
 	@Override
 	public void collision(Entity other) {
+		die();
 	}
 }

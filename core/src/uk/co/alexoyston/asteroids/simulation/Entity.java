@@ -126,7 +126,7 @@ public abstract class Entity {
 
 	/**
 	 * Called when a collision occurs between this Entity and another
-	 * 
+	 *
 	 * @param other
 	 * 			The entity collided with
 	 */

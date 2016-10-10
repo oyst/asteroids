@@ -50,8 +50,24 @@ public class Simulation implements Disposable, EntityListener {
 
 		entities.addAll(waitingEntities);
 		waitingEntities.clear();
-		
-		for (Entity entity : entities) {
+
+		ListIterator<Entity> i;
+		ListIterator<Entity> j;
+
+		i = entities.listIterator();
+		while (i.hasNext()) {
+			Entity entity = i.next();
+
+			// Update age
+			entity.age += delta;
+			if (entity.age > entity.maxAge)
+				entity.alive = false;
+			
+			if (!entity.alive) {
+				i.remove();
+				continue;
+			}
+			
 			// Update location, center and velocity
 			float ax_d = entity.acceleration.x * delta;
 			float ay_d = entity.acceleration.y * delta;
@@ -69,11 +85,6 @@ public class Simulation implements Disposable, EntityListener {
 
 			entity.rotation += entity.rotationSpeed * delta;
 			entity.rotation %= (Math.PI) * 2;
-
-			// Update age
-			entity.age += delta;
-			if (entity.age > entity.maxAge)
-				entity.alive = false;
 
 			// Reset acceleration to 0 after each update
 			entity.acceleration.set(0, 0);
@@ -111,8 +122,7 @@ public class Simulation implements Disposable, EntityListener {
 		// Collision detection
 		// This needs to be its own iteration to give every entity
 		// the chance to update first
-		ListIterator<Entity> i = entities.listIterator();
-		ListIterator<Entity> j;
+		i = entities.listIterator();
 		while (i.hasNext()) {
 			j = entities.listIterator(i.nextIndex());
 			Entity entity = i.next();

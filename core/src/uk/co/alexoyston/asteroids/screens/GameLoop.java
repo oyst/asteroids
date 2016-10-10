@@ -86,7 +86,10 @@ public class GameLoop extends BaseScreen {
 	 */
 	@Override
 	public void draw(float delta) {
-		renderer.render(simulation, delta);
+		renderer.clear();
+		renderer.renderEntities(simulation, delta);
+		renderer.renderDebug(simulation, delta);
+		
 		if (paused) {
 			float width;
 			float height;

@@ -9,15 +9,16 @@ public abstract class Entity {
 	public float maxSpeed = 1000;
 	public float maxRotationSpeed = 4.5f;
 	public float maxAge = Float.MAX_VALUE;
+	public float drag = 0;
 
 	// Entity state
-	public Vector2 location = new Vector2(); // Top-left coordinate
-	public Vector2 center = new Vector2(); // Centre of rotation
+	public final Vector2 location = new Vector2(); // Top-left coordinate
+	public final Vector2 center = new Vector2(); // Centre of rotation
 	public float rotation = 0; // Current rotation in rad
-	public Vector2 velocity = new Vector2(); // Current velocity in px/s
-	public Vector2 acceleration = new Vector2();
+	public final Vector2 velocity = new Vector2(); // Current velocity in px/s
+	public final Vector2 acceleration = new Vector2();
 	
-	public Rectangle bounds = new Rectangle();
+	public final Rectangle bounds = new Rectangle();
 
 	public float rotationSpeed = 0; // Clockwise rotation in rad/s
 	public long age = 0; // Age in s
@@ -33,8 +34,8 @@ public abstract class Entity {
 
 	public void updateVertices() {
 		polygon.setPosition(location.x, location.y);
-		polygon.setRotation(rotation);
-		polygon.setOrigin(location.x - center.x, location.y - center.y);
+		polygon.setRotation((float)Math.toDegrees(-rotation));
+		polygon.setOrigin(center.x - location.x, center.y - location.y);
 
 		float minX = Float.MAX_VALUE;
 		float minY = Float.MAX_VALUE;

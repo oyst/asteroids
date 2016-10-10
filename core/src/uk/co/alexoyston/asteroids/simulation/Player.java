@@ -16,5 +16,7 @@ public class Player extends Entity {
 		};
 		polygon = new Polygon();
 		polygon.setVertices(vertices);
+		
+		drag = 0.3f;
 	}
 }

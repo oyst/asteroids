@@ -1,7 +1,5 @@
 package uk.co.alexoyston.asteroids.simulation;
 
-import java.util.LinkedList;
-
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Polygon;
@@ -17,12 +15,12 @@ public abstract class Entity {
 	protected Vector2 center = new Vector2(); // Centre of rotation
 	protected float rotation = 0; // Current rotation in rad
 	protected Vector2 velocity = new Vector2(); // Current velocity in px/ms
-	
+
 	protected float minX;
 	protected float minY;
 	protected float maxX;
 	protected float maxY;
-	
+
 	protected float rotationSpeed = 0; // Clockwise rotation in rad/ms
 	protected long age = 0; // Age in ms
 
@@ -85,11 +83,11 @@ public abstract class Entity {
 	public float[] getPolyVertices() {
 		return polygon.getTransformedVertices();
 	}
-	
+
 	public Color getColor() {
 		return color;
 	}
-	
+
 	public float getMinX() {
 		return minX;
 	}
@@ -201,11 +199,11 @@ public abstract class Entity {
 			}
 			x_coord = !x_coord;
 		}
-		
+
 		polygon.setPosition(location.x, location.y);
 		polygon.setRotation(rotation);
 		polygon.setOrigin(location.x - center.x, location.y - center.y);
-		
+
 		// Update age
 		age += delta;
 		if (age > maxAge)

@@ -1,7 +1,5 @@
 package uk.co.alexoyston.asteroids.simulation;
 
-import java.util.Vector;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.EarClippingTriangulator;
 import com.badlogic.gdx.math.Polygon;
@@ -31,7 +29,12 @@ public abstract class Entity {
 	public boolean alive = true;
 
 	protected final Polygon polygon = new Polygon();
-	public Vector<Polygon> triangles = new Vector<Polygon>();
+	private final EarClippingTriangulator triangulator = new EarClippingTriangulator();
+	private float[] triangles;	
+	// pointIndexes contains indexes of polygons points
+	// Each index points to the X coordinate, with the Y coordninate just being the index + 1
+	// Every 3 indexes represent the 3 X coordinates needed to make up a triangle
+	private ShortArray pointIndexes;
 	
 	public float[] getVertices() {
 		return polygon.getTransformedVertices();
@@ -40,6 +43,12 @@ public abstract class Entity {
 	public void setVertices(float[] vertices) {
 		polygon.setVertices(vertices);
 		updateVertices();
+		
+		pointIndexes = triangulator.computeTriangles(vertices);
+		triangles = new float[pointIndexes.size * 2];
+		// Multiply by 2 to skip over Y coords
+		for (int i = 0; i < pointIndexes.size; i++)
+			pointIndexes.mul(i, (short) 2);
 	}
 	
 	public void updateVertices() {
@@ -93,34 +102,13 @@ public abstract class Entity {
 		return false;
 	}
 
-	public float[] getTriangles()
-	{
-		EarClippingTriangulator triangulator = new EarClippingTriangulator();
+	public float[] getTriangles() {
 		float[] points = getVertices();
 
-		// triangulator returns an array of indexes into points
-		// Every 3 items in the array are the 3 points in our polygon which
-		// make up a triangle
-		ShortArray pointArray = triangulator.computeTriangles(points);
-
-		// So the number of triangles is the number of points / 3. Not 6!
-		System.out.println("Num of triangle points: " + pointArray.size);
-		System.out.println("Num of triangles: " + pointArray.size / 3);
-
-		// we need to multiply by 2 so that there is a space for the X and Y
-		float[] triangles = new float[pointArray.size * 2];
-
-		for (int i = 0; i < pointArray.size; i += 3) {
-			// More multiplication by 2 to get to the x,y coords
-			int p1 = pointArray.get(i) * 2;
-			int p2 = pointArray.get(i + 1) * 2;
-			int p3 = pointArray.get(i + 2) * 2;
-			triangles[i * 2 + 0] = points[p1];
-			triangles[i * 2 + 1] = points[p1 + 1];
-			triangles[i * 2 + 2] = points[p2];
-			triangles[i * 2 + 3] = points[p2 + 1];
-			triangles[i * 2 + 4] = points[p3];
-			triangles[i * 2 + 5] = points[p3 + 1];
+		for (int i = 0; i < pointIndexes.size; i++) {
+			int index = pointIndexes.get(i);
+			triangles[i*2] = points[index];
+			triangles[i*2 + 1] = points[index + 1];
 		}
 
 		return triangles;

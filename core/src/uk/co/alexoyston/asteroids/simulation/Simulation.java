@@ -85,8 +85,6 @@ public class Simulation implements Disposable {
 			else if (entity.bounds.x + entity.bounds.width < bounds.x) {
 				boundsOffsetX = (bounds.width + entity.bounds.width);
 			}
-			System.out.println(entity.bounds);
-			System.out.println(bounds);
 
 			if (entity.bounds.y > bounds.y + bounds.height)
 				boundsOffsetY = -(bounds.height + entity.bounds.height);
@@ -135,9 +133,9 @@ public class Simulation implements Disposable {
 	}
 
 	public void playerShoot(int playerId) {
-		// Player player = players.get(playerId);
-		// Entity bullet = player.shoot();
-		// if (bullet != null)
-		// entities.add(bullet);
+		 Player player = players.get(playerId);
+		 Entity bullet = player.shoot();
+		 if (bullet != null)
+		 entities.add(bullet);
 	}
 }

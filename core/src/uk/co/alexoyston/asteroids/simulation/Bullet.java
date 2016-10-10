@@ -10,8 +10,9 @@ public class Bullet extends Entity {
 			0, 0,
 			width, 0,
 			width, height,
-			height, 0
+			0, height
 		};
+
 		setVertices(vertices);
 		
 		maxAge = 1;

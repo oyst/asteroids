@@ -25,9 +25,9 @@ public class MainMenu extends BaseScreen {
 
 	@Override
 	public void update(float delta) {
-		if (Gdx.input.isKeyPressed(Keys.SPACE)) {
+		if (Gdx.input.isKeyJustPressed(Keys.SPACE)) {
 			nextState = State.GAME_LOOP;
-		} else if (Gdx.input.isKeyPressed(Keys.ESCAPE)) {
+		} else if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
 			nextState = State.EXIT;
 		}
 	}

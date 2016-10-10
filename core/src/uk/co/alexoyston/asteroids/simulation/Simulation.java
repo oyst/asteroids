@@ -2,6 +2,7 @@ package uk.co.alexoyston.asteroids.simulation;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.ListIterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
@@ -100,6 +101,21 @@ public class Simulation implements Disposable {
 			entity.update(delta);
 
 			entity.updateVertices();
+		}
+
+		// Collision detection
+		// This needs to be its own iteration to give every entity
+		// the chance to update first
+		ListIterator<Entity> i = entities.listIterator();
+		ListIterator<Entity> j;
+		while (i.hasNext()) {
+			j = entities.listIterator(i.nextIndex());
+			Entity entity = i.next();
+			while (j.hasNext()) {
+				Entity other = j.next();
+				if (entity.collides(other))
+					; //TODO: Act
+			}
 		}
 
 	}

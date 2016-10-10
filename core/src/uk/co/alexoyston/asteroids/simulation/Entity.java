@@ -76,4 +76,15 @@ public abstract class Entity {
 	public void update(float delta) {
 	}
 	
+	/**
+	 * Check for collision between this Entity and another
+	 *
+	 * @param other
+	 * 			The Entity to check collision against
+	 *
+	 * @return true if the two collide, false otherwise
+	 */
+	public boolean collides(Entity other) {
+		return false;
+	}
 }

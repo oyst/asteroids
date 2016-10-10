@@ -5,7 +5,11 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.DelaunayTriangulator;
+import com.badlogic.gdx.math.EarClippingTriangulator;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.ShortArray;
 
 import uk.co.alexoyston.asteroids.simulation.Entity;
 import uk.co.alexoyston.asteroids.simulation.Simulation;
@@ -50,6 +54,15 @@ public class Renderer implements Disposable {
 			float height = entity.bounds.height;
 			float vx = entity.velocity.x;
 			float vy = entity.velocity.y;
+
+			float[] triangles = entity.getTriangles();
+			for (int i = 0; i < triangles.length; i += 6) {
+				shapeRenderer.setColor(Color.VIOLET);
+				shapeRenderer.triangle(
+						triangles[i + 0], triangles[i + 1],
+						triangles[i + 2], triangles[i + 3],
+						triangles[i + 4], triangles[i + 5]);
+			}
 
 			// Debug direction
 			shapeRenderer.setColor(Color.CYAN);

@@ -1,9 +1,13 @@
 package uk.co.alexoyston.asteroids.simulation;
 
+import java.util.Vector;
+
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.EarClippingTriangulator;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.ShortArray;
 
 public abstract class Entity {
 	public float maxSpeed = 1000;
@@ -26,7 +30,8 @@ public abstract class Entity {
 	public Color color = Color.WHITE;	
 	public boolean alive = true;
 
-	private final Polygon polygon = new Polygon();
+	protected final Polygon polygon = new Polygon();
+	public Vector<Polygon> triangles = new Vector<Polygon>();
 	
 	public float[] getVertices() {
 		return polygon.getTransformedVertices();
@@ -86,5 +91,38 @@ public abstract class Entity {
 	 */
 	public boolean collides(Entity other) {
 		return false;
+	}
+
+	public float[] getTriangles()
+	{
+		EarClippingTriangulator triangulator = new EarClippingTriangulator();
+		float[] points = getVertices();
+
+		// triangulator returns an array of indexes into points
+		// Every 3 items in the array are the 3 points in our polygon which
+		// make up a triangle
+		ShortArray pointArray = triangulator.computeTriangles(points);
+
+		// So the number of triangles is the number of points / 3. Not 6!
+		System.out.println("Num of triangle points: " + pointArray.size);
+		System.out.println("Num of triangles: " + pointArray.size / 3);
+
+		// we need to multiply by 2 so that there is a space for the X and Y
+		float[] triangles = new float[pointArray.size * 2];
+
+		for (int i = 0; i < pointArray.size; i += 3) {
+			// More multiplication by 2 to get to the x,y coords
+			int p1 = pointArray.get(i) * 2;
+			int p2 = pointArray.get(i + 1) * 2;
+			int p3 = pointArray.get(i + 2) * 2;
+			triangles[i * 2 + 0] = points[p1];
+			triangles[i * 2 + 1] = points[p1 + 1];
+			triangles[i * 2 + 2] = points[p2];
+			triangles[i * 2 + 3] = points[p2 + 1];
+			triangles[i * 2 + 4] = points[p3];
+			triangles[i * 2 + 5] = points[p3 + 1];
+		}
+
+		return triangles;
 	}
 }

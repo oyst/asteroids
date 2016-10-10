@@ -134,4 +134,10 @@ public class Simulation implements Disposable {
 		player.rotationSpeed = 3f;
 	}
 
+	public void playerShoot(int playerId) {
+		// Player player = players.get(playerId);
+		// Entity bullet = player.shoot();
+		// if (bullet != null)
+		// entities.add(bullet);
+	}
 }

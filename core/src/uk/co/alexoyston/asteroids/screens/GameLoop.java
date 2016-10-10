@@ -81,6 +81,8 @@ public class GameLoop extends BaseScreen {
 			simulation.playerRotLeft(0);
 		if (Gdx.input.isKeyPressed(Keys.RIGHT))
 			simulation.playerRotRight(0);
+		if (Gdx.input.isKeyJustPressed(Keys.SPACE))
+			simulation.playerShoot(0);
 		simulation.update(delta);
 	}
 

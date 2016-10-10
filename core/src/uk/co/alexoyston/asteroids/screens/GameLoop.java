@@ -75,6 +75,12 @@ public class GameLoop extends BaseScreen {
 	 */
 	@Override
 	public void update(float delta) {
+		if (Gdx.input.isKeyPressed(Keys.UP))
+			simulation.playerFwd(0);
+		if (Gdx.input.isKeyPressed(Keys.LEFT))
+			simulation.playerRotLeft(0);
+		if (Gdx.input.isKeyPressed(Keys.RIGHT))
+			simulation.playerRotRight(0);
 		simulation.update(delta);
 	}
 

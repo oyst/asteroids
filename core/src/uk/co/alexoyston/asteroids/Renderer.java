@@ -1,17 +1,11 @@
 package uk.co.alexoyston.asteroids;
 
-import java.util.Vector;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.math.DelaunayTriangulator;
-import com.badlogic.gdx.math.EarClippingTriangulator;
-import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.ShortArray;
 
 import uk.co.alexoyston.asteroids.simulation.Entity;
 import uk.co.alexoyston.asteroids.simulation.Simulation;

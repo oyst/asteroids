@@ -40,8 +40,6 @@ public class Renderer implements Disposable {
 
 		for (Entity entity : simulation.entities) {
 			// Debug
-			float sinRotation = (float) Math.sin(entity.rotation);
-			float cosRotation = (float) Math.cos(entity.rotation);
 			float cx = entity.center.x;
 			float cy = entity.center.y;
 			float minX = entity.bounds.x;
@@ -55,10 +53,7 @@ public class Renderer implements Disposable {
 
 			// Debug direction
 			shapeRenderer.setColor(Color.CYAN);
-			shapeRenderer.line(cx, cy, cx, cy - 10);
-			shapeRenderer.line(cx, cy, cx + sinRotation * 10, cy - cosRotation * 10);
-			// shapeRenderer.arc(cx - 10, cy - 10, 10, 270, (float)
-			// Math.toDegrees(entity.getRotation())- 90);
+			shapeRenderer.arc(cx, cy, 10, 90, -(float)Math.toDegrees(entity.rotation), 10);
 
 			// Debug bound
 			shapeRenderer.setColor(Color.RED);
@@ -66,18 +61,19 @@ public class Renderer implements Disposable {
 
 			// Debug center
 			shapeRenderer.setColor(Color.GREEN);
-			shapeRenderer.line(cx - 2, cy, cx + 2, cy);
-			shapeRenderer.line(cx, cy - 2, cx, cy + 2);
+			shapeRenderer.x(cx, cy, 2);
 
 			// Debug location
 			shapeRenderer.setColor(Color.RED);
-			shapeRenderer.line(x - 2, y, x + 2, y);
-			shapeRenderer.line(x, y - 2, x, y + 2);
+			shapeRenderer.x(x, y, 2);
 
 			// Debug velocity
 			shapeRenderer.setColor(Color.ORANGE);
-			shapeRenderer.line(cx, cy, cx + vx * 10, cy + vy * 10);
+			shapeRenderer.line(cx, cy, cx + vx, cy + vy);
 		}
+
+		shapeRenderer.setColor(Color.CORAL);
+		shapeRenderer.rect(simulation.bounds.x, simulation.bounds.y, simulation.bounds.width, simulation.bounds.height);
 
 		shapeRenderer.end();
 	}

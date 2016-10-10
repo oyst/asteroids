@@ -8,7 +8,8 @@ import com.badlogic.gdx.Screen;
  */
 public abstract class BaseScreen implements Screen {
 	protected Game game;
-	protected State nextScreen = State.UNSET;
+	protected State nextState = State.UNSET;
+	protected boolean paused;
 
 	public BaseScreen(Game game) {
 		this.game = game;
@@ -19,15 +20,15 @@ public abstract class BaseScreen implements Screen {
 	public abstract void draw(float delta);
 
 	public final boolean finished() {
-		return (nextScreen != State.UNSET);
+		return (nextState != State.UNSET);
 	}
 
 	public State nextScreen() {
-		return nextScreen;
+		return nextState;
 	}
 
 	@Override
-	public void render(float delta) {
+	public final void render(float delta) {
 		update(delta);
 		draw(delta);
 	}
@@ -42,10 +43,12 @@ public abstract class BaseScreen implements Screen {
 
 	@Override
 	public void pause() {
+		paused = true;
 	}
 
 	@Override
 	public void resume() {
+		paused = false;
 	}
 
 	@Override

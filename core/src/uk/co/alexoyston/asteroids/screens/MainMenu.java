@@ -26,7 +26,7 @@ public class MainMenu extends BaseScreen {
 	@Override
 	public void update(float delta) {
 		if (Gdx.input.isKeyPressed(Keys.SPACE)) {
-			nextScreen = State.GAME_LOOP;
+			nextState = State.GAME_LOOP;
 		}
 	}
 
@@ -34,7 +34,7 @@ public class MainMenu extends BaseScreen {
 	public void draw(float delta) {
 		float width;
 		float height;
-
+		
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		batch.begin();

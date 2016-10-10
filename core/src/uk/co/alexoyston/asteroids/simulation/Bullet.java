@@ -19,6 +19,9 @@ public class Bullet extends Entity {
 
 	@Override
 	public boolean collides(Entity other) {
+		if (other instanceof Asteroid) {
+			return super.collides(other);
+		}
 		return false;
 	}
 }

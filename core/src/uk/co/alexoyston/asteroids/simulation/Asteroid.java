@@ -53,6 +53,9 @@ public class Asteroid extends Entity {
 
 	@Override
 	public boolean collides(Entity other) {
+		if (other instanceof Player || other instanceof Bullet) {
+			return super.collides(other);
+		}
 		return false;
 	}
 }

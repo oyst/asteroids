@@ -7,6 +7,7 @@ public class Player extends Entity {
 	protected final float shotSpeed = 600f;
 	protected final float shotHeat = 30;
 	protected final float reloadTime = 0.03f;
+	protected final float coolDown = 20;
 
 	public Player() {
 		float width = 20;
@@ -46,5 +47,10 @@ public class Player extends Entity {
 		bullet.velocity.set(sinRotation * shotSpeed, cosRotation * shotSpeed);
 
 		return bullet;
+	}
+	
+	@Override
+	public void update(float delta) {
+		weaponTemp -= coolDown * delta;
 	}
 }

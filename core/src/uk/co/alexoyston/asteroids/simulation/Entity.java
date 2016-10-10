@@ -66,4 +66,14 @@ public abstract class Entity {
 		bounds.width = maxX - minX;
 		bounds.height = maxY - minY;
 	}
+	
+	/**
+	 * A personal update for any non-standard updates covered by the Simulation
+	 * 
+	 * @param delta
+	 * 			Seconds since last update
+	 */
+	public void update(float delta) {
+	}
+	
 }

@@ -97,6 +97,8 @@ public class Simulation implements Disposable {
 			entity.center.x += boundsOffsetX;
 			entity.center.y += boundsOffsetY;
 
+			entity.update(delta);
+
 			entity.updateVertices();
 		}
 

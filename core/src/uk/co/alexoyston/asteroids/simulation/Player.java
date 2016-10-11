@@ -4,11 +4,11 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Player extends Entity {
 
-	private long prevShot = 0;
+	private float deltaSinceShot = 0;
 	protected float weaponTemp = 0;
 	protected final float shotSpeed = 600f;
 	protected final float shotHeat = 30;
-	protected final float reloadTime = 0.03f;
+	protected final float reloadTime = 0.3f;
 	protected final float coolDown = 20;
 
 	public Player() {
@@ -33,10 +33,9 @@ public class Player extends Entity {
 		if (weaponTemp > 100 - shotHeat)
 			return;
 
-		long now = System.currentTimeMillis();
-		if (now - prevShot < reloadTime)
+		if (deltaSinceShot < reloadTime)
 			return;
-		prevShot = now;
+		deltaSinceShot = 0;
 
 		weaponTemp += shotHeat;
 
@@ -57,6 +56,7 @@ public class Player extends Entity {
 	@Override
 	public void update(float delta) {
 		weaponTemp -= coolDown * delta;
+		deltaSinceShot += delta;
 	}
 
 	@Override

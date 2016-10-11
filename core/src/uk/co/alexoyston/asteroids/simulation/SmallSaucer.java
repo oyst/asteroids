@@ -6,11 +6,11 @@ public class SmallSaucer extends Entity {
 
 	private float speed = 35;
 	private float angle = (float) Math.PI / 6;
-	private long freqAngleChange = 1000; // Milliseconds
-	private long lastAngleChange = 0;
+	private float turnFreq = 1; 
+	private float deltaSinceTurn = 0;
 
-	private long freqShot = 700;
-	private long lastShot = 0;
+	private float reloadTime = 0.7f;
+	private float deltaSinceShot = 0;
 	private float shotSpeed = 250;
 
 	public SmallSaucer() {
@@ -43,11 +43,13 @@ public class SmallSaucer extends Entity {
 
 	@Override
 	public void update(float delta) {
-		long now = System.currentTimeMillis();
-		if (now - lastAngleChange < freqAngleChange)
+		deltaSinceShot += delta;
+		deltaSinceTurn += delta;
+
+		if (deltaSinceTurn < turnFreq)
 			return;
 
-		lastAngleChange = now;
+		deltaSinceTurn = 0;
 
 		float r = (float)Math.random();
 		if (r < 0.33f)
@@ -61,11 +63,10 @@ public class SmallSaucer extends Entity {
 	}
 
 	public void shoot(float targetX, float targetY) {
-		long now = System.currentTimeMillis();
-		if (now - lastShot < freqShot)
+		if (deltaSinceShot < reloadTime)
 			return;
 
-		lastShot = now;
+		deltaSinceShot = 0;
 
 		Bullet bullet = new Bullet();
 		float angle = (float)(Math.atan2(targetX - location.x, targetY - location.y));

@@ -7,6 +7,10 @@ public class SmallSaucer extends Entity {
 	private long freqAngleChange = 1000; // Milliseconds
 	private long lastAngleChange = 0;
 
+	private long freqShot = 700;
+	private long lastShot = 0;
+	private float shotSpeed = 250;
+
 	public SmallSaucer() {
 		int width = 25;
 		int height = 15;
@@ -56,10 +60,27 @@ public class SmallSaucer extends Entity {
 	}
 
 	public void shoot(float targetX, float targetY) {
+		long now = System.currentTimeMillis();
+		if (now - lastShot < freqShot)
+			return;
+
+		lastShot = now;
+
+		Bullet bullet = new Bullet();
+		bullet.location.set(location.x + center.x, location.y + center.y);
+		bullet.velocity.set(targetX - location.x, targetY - location.y);
+		bullet.velocity.nor().scl(shotSpeed);
+
+		entityListener.requestEntity(bullet);
 	}
 
 	@Override
 	public void collision(Entity other) {
+	}
+
+	@Override
+	public boolean collides(Entity other) {
+		return false;
 	}
 
 }

@@ -39,7 +39,8 @@ public class Simulation implements Disposable, EntityListener {
 	}
 
 	public void nextLevel() {
-		for (int i = 0; i < (asteroidStartNum + level); i++) {
+		level++;
+		for (int i = 0; i < (asteroidStartNum); i++) {
 			Asteroid asteroid = new Asteroid(asteroidStartSize);
 			float x, y, vx, vy;
 
@@ -70,7 +71,6 @@ public class Simulation implements Disposable, EntityListener {
 			asteroid.velocity.set(vx, vy);
 			requestEntity(asteroid);
 		}
-		level++;
 	}
 
 	/**

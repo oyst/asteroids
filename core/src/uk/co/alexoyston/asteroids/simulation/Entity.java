@@ -15,8 +15,6 @@ public abstract class Entity {
 		}
 	};
 
-	public float maxSpeed = 1000;
-	public float maxRotationSpeed = 4.5f;
 	public float maxAge = Float.MAX_VALUE;
 	public float drag = 0;
 

@@ -40,7 +40,7 @@ public class Simulation implements Disposable, EntityListener {
 
 	public void nextLevel() {
 		level++;
-		for (int i = 0; i < (asteroidStartNum); i++) {
+		for (int i = 0; i < (asteroidStartNum + level); i++) {
 			Asteroid asteroid = new Asteroid(asteroidStartSize);
 			float x, y, vx, vy;
 

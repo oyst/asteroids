@@ -17,6 +17,13 @@ public class Simulation implements Disposable, EntityListener {
 
 	private boolean paused = false;
 
+	private int level = 0;
+
+	private int asteroidStartNum = 4;
+	private int asteroidStartSize = 2;
+	private float asteroidMinSpeed = 15;
+	private float asteroidMaxSpeed = 25;
+
 	public final Rectangle bounds;
 
 	public Simulation() {
@@ -25,6 +32,45 @@ public class Simulation implements Disposable, EntityListener {
 		// Find out why and if there is a way to fix it
 		bounds = new Rectangle(1, 1, Gdx.graphics.getWidth() - 2, Gdx.graphics.getHeight() - 2);
 		addPlayer();
+
+		level = 0;
+
+		nextLevel();
+	}
+
+	public void nextLevel() {
+		for (int i = 0; i < (asteroidStartNum + level); i++) {
+			Asteroid asteroid = new Asteroid(asteroidStartSize);
+			float x, y, vx, vy;
+
+			// Start in a random direction
+			double angle = Math.random() * 2 * Math.PI;
+			float sinAngle = (float) Math.sin(angle);
+			float cosAngle = (float) Math.cos(angle);
+
+			// Random bounded velocity
+			vx = sinAngle * (asteroidMinSpeed + (float) Math.random() * (asteroidMaxSpeed - asteroidMinSpeed));
+			vy = cosAngle * (asteroidMinSpeed + (float) Math.random() * (asteroidMaxSpeed - asteroidMinSpeed));
+
+			// We want to come from either the top/bottom or left/right
+			// The stochasticity of the velocity should even out the left:right
+			// and top:bottom pairs
+			if (Math.random() > 0.5) {
+				// From the top/bottom so y is fixed
+				x = bounds.getX() + (float) Math.random() * bounds.getWidth();
+				y = bounds.getHeight();
+			} else {
+				// From the left/right so x is fixed
+				x = bounds.getWidth();
+				y = bounds.getY() + (float) Math.random() * bounds.getHeight();
+			}
+
+			asteroid.location.set(x, y);
+			asteroid.center.set(x + asteroid.bounds.width/2, y + asteroid.bounds.height/2);
+			asteroid.velocity.set(vx, vy);
+			requestEntity(asteroid);
+		}
+		level++;
 	}
 
 	/**
@@ -38,9 +84,8 @@ public class Simulation implements Disposable, EntityListener {
 		Player player = new Player();
 		player.location.set(50, 50);
 		player.center.set(60, 60);
-		entities.add(player);
 		players.add(player);
-		player.registerListener(this);
+		requestEntity(player);
 		return id;
 	}
 

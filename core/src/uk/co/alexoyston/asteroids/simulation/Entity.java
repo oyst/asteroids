@@ -30,7 +30,7 @@ public abstract class Entity {
 	public final Rectangle bounds = new Rectangle();
 
 	public float rotationSpeed = 0; // Clockwise rotation in rad/s
-	public long age = 0; // Age in s
+	public float age = 0; // Age in s
 
 	public Color color = Color.WHITE;	
 	public boolean alive = true;

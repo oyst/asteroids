@@ -21,8 +21,8 @@ public abstract class Entity {
 	public float drag = 0;
 
 	// Entity state
-	public final Vector2 location = new Vector2(); // Top-left coordinate
-	public final Vector2 center = new Vector2(); // Centre of rotation
+	public final Vector2 location = new Vector2(); // Bottom-left coordinate
+	public final Vector2 center = new Vector2(); // Centre of rotation relative to the location
 	public float rotation = 0; // Current rotation in rad
 	public final Vector2 velocity = new Vector2(); // Current velocity in px/s
 	public final Vector2 acceleration = new Vector2();
@@ -63,7 +63,7 @@ public abstract class Entity {
 	public void updateVertices() {
 		polygon.setPosition(location.x, location.y);
 		polygon.setRotation((float)Math.toDegrees(-rotation));
-		polygon.setOrigin(center.x - location.x, center.y - location.y);
+		polygon.setOrigin(center.x, center.y);
 
 		float minX = Float.MAX_VALUE;
 		float minY = Float.MAX_VALUE;

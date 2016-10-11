@@ -14,8 +14,10 @@ public class Bullet extends Entity {
 		};
 
 		setVertices(vertices);
-		
+
 		maxAge = 1;
+
+		center.set(width/2, height/2);
 	}
 
 	@Override

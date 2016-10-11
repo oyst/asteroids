@@ -40,12 +40,12 @@ public class Renderer implements Disposable {
 
 		for (Entity entity : simulation.entities) {
 			// Debug
-			float cx = entity.center.x;
-			float cy = entity.center.y;
 			float minX = entity.bounds.x;
 			float minY = entity.bounds.y;
 			float x = entity.location.x;
 			float y = entity.location.y;
+			float cx = x + entity.center.x;
+			float cy = y + entity.center.y;
 			float width = entity.bounds.width;
 			float height = entity.bounds.height;
 			float vx = entity.velocity.x;

@@ -26,6 +26,8 @@ public class SmallSaucer extends Entity {
 		};
 
 		setVertices(vertices);
+
+		center.set(width/2, height/2);
 	}
 
 	@Override

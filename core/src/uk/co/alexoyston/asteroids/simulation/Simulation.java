@@ -67,7 +67,7 @@ public class Simulation implements Disposable, EntityListener {
 			}
 
 			asteroid.location.set(x, y);
-			asteroid.center.set(x + asteroid.bounds.width/2, y + asteroid.bounds.height/2);
+//			asteroid.center.set(x + asteroid.bounds.width/2, y + asteroid.bounds.height/2);
 			asteroid.velocity.set(vx, vy);
 			requestEntity(asteroid);
 		}
@@ -83,7 +83,7 @@ public class Simulation implements Disposable, EntityListener {
 		Gdx.app.log(TAG, "Player " + id + " added");
 		Player player = new Player();
 		player.location.set(50, 50);
-		player.center.set(60, 60);
+//		player.center.set(60, 60);
 		players.add(player);
 		requestEntity(player);
 		return id;
@@ -116,14 +116,9 @@ public class Simulation implements Disposable, EntityListener {
 			// Update location, center and velocity
 			float ax_d = entity.acceleration.x * delta;
 			float ay_d = entity.acceleration.y * delta;
-			float x_offset = entity.velocity.x * delta + ax_d * delta * 0.5f;
-			float y_offset = entity.velocity.y * delta + ay_d * delta * 0.5f;
 
-			entity.location.x += x_offset;
-			entity.location.y += y_offset;
-
-			entity.center.x += x_offset;
-			entity.center.y += y_offset;
+			entity.location.x += entity.velocity.x * delta + ax_d * delta * 0.5f;
+			entity.location.y += entity.velocity.y * delta + ay_d * delta * 0.5f;
 
 			entity.velocity.x += ax_d;
 			entity.velocity.y += ay_d;
@@ -139,25 +134,15 @@ public class Simulation implements Disposable, EntityListener {
 			entity.velocity.y -= entity.velocity.y * entity.drag * delta;
 
 			// Bounds check
-			float boundsOffsetX = 0;
-			float boundsOffsetY = 0;
-
 			if (entity.bounds.x > bounds.x + bounds.width)
-				boundsOffsetX = -(bounds.width + entity.bounds.width);
-			else if (entity.bounds.x + entity.bounds.width < bounds.x) {
-				boundsOffsetX = (bounds.width + entity.bounds.width);
-			}
+				entity.location.x -= (bounds.width + entity.bounds.width);
+			else if (entity.bounds.x + entity.bounds.width < bounds.x)
+				entity.location.x += (bounds.width + entity.bounds.width);
 
 			if (entity.bounds.y > bounds.y + bounds.height)
-				boundsOffsetY = -(bounds.height + entity.bounds.height);
+				entity.location.y -= (bounds.height + entity.bounds.height);
 			else if (entity.bounds.y + entity.bounds.height < bounds.y)
-				boundsOffsetY = (bounds.height + entity.bounds.height);
-
-			entity.location.x += boundsOffsetX;
-			entity.location.y += boundsOffsetY;
-
-			entity.center.x += boundsOffsetX;
-			entity.center.y += boundsOffsetY;
+				entity.location.y += (bounds.height + entity.bounds.height);
 
 			entity.update(delta);
 

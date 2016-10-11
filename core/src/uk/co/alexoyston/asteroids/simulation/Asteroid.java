@@ -51,6 +51,9 @@ public class Asteroid extends Entity {
 			vertices[i] *= (this.numSplits + 1);
 		
 		setVertices(vertices);
+
+		center.x = bounds.width / 2;
+		center.y = bounds.height / 2;
 	}
 
 	public void split() {
@@ -71,7 +74,6 @@ public class Asteroid extends Entity {
 			float vy = (velocity.y + splitBoost) * cosAngle;
 
 			child.location.set(location);
-			child.center.set(location.x + child.bounds.width/2, location.y + child.bounds.height/2);
 			child.velocity.set(vx, vy);
 
 			entityListener.requestEntity(child);

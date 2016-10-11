@@ -21,7 +21,9 @@ public class Player extends Entity {
 		};
 		
 		setVertices(vertices);
-		
+
+		center.set(width/2, height/2);
+
 		drag = 0.3f;
 	}
 
@@ -37,10 +39,8 @@ public class Player extends Entity {
 		weaponTemp += shotHeat;
 
 		Bullet bullet = new Bullet();
-		bullet.location.x = center.x - bullet.bounds.width / 2;
-		bullet.location.y = center.y - bullet.bounds.height / 2;
-		bullet.center.x = center.x;
-		bullet.center.y = center.y;
+		bullet.location.x = location.x + center.x - bullet.bounds.width / 2;
+		bullet.location.y = location.y + center.y - bullet.bounds.height / 2;
 
 		float sinRotation = (float) Math.sin(rotation);
 		float cosRotation = (float) Math.cos(rotation);

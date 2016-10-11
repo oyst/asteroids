@@ -65,6 +65,11 @@ public class GameLoop extends BaseScreen {
 		batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
 		Gdx.input.setInputProcessor(playInputAdapter);
+
+		simulation.addPlayer(
+			simulation.bounds.x + simulation.bounds.width / 2,
+			simulation.bounds.y + simulation.bounds.height / 2
+		);
 	}
 
 	/**

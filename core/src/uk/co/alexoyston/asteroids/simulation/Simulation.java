@@ -31,7 +31,6 @@ public class Simulation implements Disposable, EntityListener {
 		// bounds checks
 		// Find out why and if there is a way to fix it
 		bounds = new Rectangle(1, 1, Gdx.graphics.getWidth() - 2, Gdx.graphics.getHeight() - 2);
-		addPlayer();
 
 		level = 0;
 
@@ -77,11 +76,11 @@ public class Simulation implements Disposable, EntityListener {
 	 * 
 	 * @return The ID of the player to be used when requesting movement
 	 */
-	public int addPlayer() {
+	public int addPlayer(float x, float y) {
 		int id = players.size();
 		Gdx.app.log(TAG, "Player " + id + " added");
 		Player player = new Player();
-		player.location.set(50, 50);
+		player.location.set(x - player.bounds.width / 2, y - player.bounds.height / 2);
 		players.add(player);
 		requestEntity(player);
 		return id;

@@ -180,6 +180,20 @@ public class Simulation implements Disposable, EntityListener {
 			}
 		}
 
+		if (fieldClear())
+			nextLevel();
+	}
+
+	public boolean fieldClear() {
+		// Check if the field is clear
+		ListIterator<Entity> i = entities.listIterator();
+		while (i.hasNext()) {
+			Entity entity = i.next();
+			if (entity instanceof Player || entity instanceof Bullet)
+				continue;
+			return false;
+		}
+		return true;
 	}
 
 	public void pause() {

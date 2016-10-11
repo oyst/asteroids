@@ -1,5 +1,7 @@
 package uk.co.alexoyston.asteroids.simulation;
 
+import com.badlogic.gdx.math.Vector2;
+
 public class SmallSaucer extends Entity {
 
 	private float speed = 35;
@@ -55,8 +57,7 @@ public class SmallSaucer extends Entity {
 		else
 			angle = 0;
 
-		velocity.x = (float) Math.cos(angle) * speed;
-		velocity.y = (float) Math.sin(angle) * speed;
+		velocity.setAngleRad(angle).setLength(speed);
 	}
 
 	public void shoot(float targetX, float targetY) {
@@ -67,9 +68,13 @@ public class SmallSaucer extends Entity {
 		lastShot = now;
 
 		Bullet bullet = new Bullet();
-		bullet.location.set(location.x + center.x, location.y + center.y);
-		bullet.velocity.set(targetX - location.x, targetY - location.y);
-		bullet.velocity.nor().scl(shotSpeed).add(velocity);
+		float angle = (float)(Math.atan2(targetX - location.x, targetY - location.y));
+
+		Vector2 shotVelocity = new Vector2(shotSpeed, 0).setAngleRad((float)Math.PI/2 - angle);
+		bullet.velocity.set(shotVelocity);
+
+		Vector2 radius = new Vector2(bounds.width/2, bounds.height/2).setAngleRad((float)Math.PI/2 - angle);
+		bullet.location.set(location).add(center).add(radius);
 
 		entityListener.requestEntity(bullet);
 	}
@@ -80,7 +85,7 @@ public class SmallSaucer extends Entity {
 
 	@Override
 	public boolean collides(Entity other) {
-		return false;
+		return super.collides(other);
 	}
 
 }

@@ -1,5 +1,7 @@
 package uk.co.alexoyston.asteroids.simulation;
 
+import com.badlogic.gdx.math.Vector2;
+
 public class Player extends Entity {
 
 	private long prevShot = 0;
@@ -39,12 +41,12 @@ public class Player extends Entity {
 		weaponTemp += shotHeat;
 
 		Bullet bullet = new Bullet();
-		bullet.location.x = location.x + center.x - bullet.bounds.width / 2;
-		bullet.location.y = location.y + center.y - bullet.bounds.height / 2;
 
-		float sinRotation = (float) Math.sin(rotation);
-		float cosRotation = (float) Math.cos(rotation);
-		bullet.velocity.set(velocity.x + sinRotation * shotSpeed, velocity.y + cosRotation * shotSpeed);
+		Vector2 shotVelocity = new Vector2(shotSpeed, 0).setAngleRad((float)Math.PI/2 - rotation);
+		bullet.velocity.set(velocity).add(shotVelocity);
+
+		Vector2 radius = new Vector2(bounds.width/2, bounds.height/2).setAngleRad((float)Math.PI/2 - rotation);
+		bullet.location.set(location).add(center).add(radius);
 
 		entityListener.requestEntity(bullet);
 	}
@@ -59,10 +61,9 @@ public class Player extends Entity {
 
 	@Override
 	public boolean collides(Entity other) {
-		if (other instanceof Asteroid){
-			return super.collides(other);
-		}
-		return false;
+		if (other instanceof Player)
+			return false;
+		return super.collides(other);
 	}
 
 	@Override

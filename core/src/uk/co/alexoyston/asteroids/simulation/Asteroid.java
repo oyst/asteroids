@@ -52,8 +52,7 @@ public class Asteroid extends Entity {
 		
 		setVertices(vertices);
 
-		center.x = bounds.width / 2;
-		center.y = bounds.height / 2;
+		center.set(bounds.width/2, bounds.height/2);
 	}
 
 	public void split() {
@@ -67,14 +66,10 @@ public class Asteroid extends Entity {
 			Asteroid child = new Asteroid(numSplits);
 
 			// Get an extra boost in a random direction
-			double angle = Math.random() * 2 * Math.PI;
-			float sinAngle = (float) Math.sin(angle);
-			float cosAngle = (float) Math.cos(angle);
-			float vx = (velocity.x + splitBoost) * sinAngle;
-			float vy = (velocity.y + splitBoost) * cosAngle;
-
+			float angle = (float) (Math.random() * 2 * Math.PI);
 			child.location.set(location);
-			child.velocity.set(vx, vy);
+			child.velocity.set(velocity).add(splitBoost, splitBoost).setAngleRad(angle);
+			child.rotation = angle;
 
 			entityListener.requestEntity(child);
 		}
@@ -82,10 +77,9 @@ public class Asteroid extends Entity {
 
 	@Override
 	public boolean collides(Entity other) {
-		if (other instanceof Player || other instanceof Bullet) {
-			return super.collides(other);
-		}
-		return false;
+		if (other instanceof Asteroid)
+			return false;
+		return super.collides(other);
 	}
 
 	@Override

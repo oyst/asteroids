@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 public class Asteroid extends Entity {
 	private int numSplits;
+	private float splitBoost = 7;
+
 	private static final ArrayList<float[]> asteroidShapes = new ArrayList<float[]>();
 	
 	static {
@@ -52,6 +54,28 @@ public class Asteroid extends Entity {
 	}
 
 	public void split() {
+		numSplits--;
+		alive = false;
+
+		if (numSplits < 0)
+			return;
+
+		for (int i = 0; i < 2; i++) {
+			Asteroid child = new Asteroid(numSplits);
+
+			// Get an extra boost in a random direction
+			double angle = Math.random() * 2 * Math.PI;
+			float sinAngle = (float) Math.sin(angle);
+			float cosAngle = (float) Math.cos(angle);
+			float vx = (velocity.x + splitBoost) * sinAngle;
+			float vy = (velocity.y + splitBoost) * cosAngle;
+
+			child.location.set(location);
+			child.center.set(location.x + child.bounds.width/2, location.y + child.bounds.height/2);
+			child.velocity.set(vx, vy);
+
+			entityListener.requestEntity(child);
+		}
 	}
 
 	@Override

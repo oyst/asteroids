@@ -44,7 +44,7 @@ public class Player extends Entity {
 
 		float sinRotation = (float) Math.sin(rotation);
 		float cosRotation = (float) Math.cos(rotation);
-		bullet.velocity.set(sinRotation * shotSpeed, cosRotation * shotSpeed);
+		bullet.velocity.set(velocity.x + sinRotation * shotSpeed, velocity.y + cosRotation * shotSpeed);
 
 		entityListener.requestEntity(bullet);
 	}

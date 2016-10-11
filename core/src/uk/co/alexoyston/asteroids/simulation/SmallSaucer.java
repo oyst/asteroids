@@ -69,7 +69,7 @@ public class SmallSaucer extends Entity {
 		Bullet bullet = new Bullet();
 		bullet.location.set(location.x + center.x, location.y + center.y);
 		bullet.velocity.set(targetX - location.x, targetY - location.y);
-		bullet.velocity.nor().scl(shotSpeed);
+		bullet.velocity.nor().scl(shotSpeed).add(velocity);
 
 		entityListener.requestEntity(bullet);
 	}

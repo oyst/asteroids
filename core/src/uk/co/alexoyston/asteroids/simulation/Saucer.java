@@ -76,7 +76,7 @@ public class Saucer extends Entity {
 		vy = (float) Math.cos(angle) * shotSpeed;
 
 		bullet.location.set(location.x + center.x, location.y + center.y);
-		bullet.velocity.set(vx, vy);
+		bullet.velocity.set(velocity.x + vx, velocity.y + vy);
 
 		entityListener.requestEntity(bullet);
 	}

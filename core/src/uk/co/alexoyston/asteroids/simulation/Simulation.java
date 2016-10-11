@@ -67,7 +67,6 @@ public class Simulation implements Disposable, EntityListener {
 			}
 
 			asteroid.location.set(x, y);
-//			asteroid.center.set(x + asteroid.bounds.width/2, y + asteroid.bounds.height/2);
 			asteroid.velocity.set(vx, vy);
 			requestEntity(asteroid);
 		}
@@ -83,7 +82,6 @@ public class Simulation implements Disposable, EntityListener {
 		Gdx.app.log(TAG, "Player " + id + " added");
 		Player player = new Player();
 		player.location.set(50, 50);
-//		player.center.set(60, 60);
 		players.add(player);
 		requestEntity(player);
 		return id;
@@ -99,6 +97,20 @@ public class Simulation implements Disposable, EntityListener {
 		ListIterator<Entity> i;
 		ListIterator<Entity> j;
 
+		// AI
+		i = entities.listIterator();
+		while (i.hasNext()) {
+			Entity entity = i.next();
+			if (entity instanceof SmallSaucer) {
+				SmallSaucer saucer = (SmallSaucer)entity;
+				if (!players.isEmpty()) {
+					int index = (int) (Math.random() * players.size());
+					Player player = players.get(index);
+					saucer.shoot(player.location.x, player.location.y);
+				}
+			}
+		}
+
 		i = entities.listIterator();
 		while (i.hasNext()) {
 			Entity entity = i.next();
@@ -110,6 +122,8 @@ public class Simulation implements Disposable, EntityListener {
 			
 			if (!entity.alive) {
 				i.remove();
+				if (entity instanceof Player)
+					players.remove(entity);
 				continue;
 			}
 			

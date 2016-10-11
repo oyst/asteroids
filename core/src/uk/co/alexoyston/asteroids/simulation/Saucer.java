@@ -2,6 +2,11 @@ package uk.co.alexoyston.asteroids.simulation;
 
 public class Saucer extends Entity {
 
+	private float speed = 35;
+	private float angle = (float) Math.PI / 6;
+	private long freqAngleChange = 1000; // Milliseconds
+	private long lastAngleChange = 0;
+
 	public Saucer() {
 		int width = 40;
 		int height = 20;
@@ -28,6 +33,26 @@ public class Saucer extends Entity {
 		setVertices(vertices);
 
 		center.set(width/2, height/2);
+	}
+
+	@Override
+	public void update(float delta) {
+		long now = System.currentTimeMillis();
+		if (now - lastAngleChange < freqAngleChange)
+			return;
+
+		lastAngleChange = now;
+
+		float r = (float)Math.random();
+		if (r < 0.33f)
+			angle = (float)Math.PI / 6;
+		else if (r < 0.66f)
+			angle = -(float)Math.PI / 6;
+		else
+			angle = 0;
+
+		velocity.x = (float) Math.cos(angle) * speed;
+		velocity.y = (float) Math.sin(angle) * speed;
 	}
 
 	@Override

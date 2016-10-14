@@ -23,7 +23,7 @@ public class Simulation implements Disposable, EntityListener {
 	private int asteroidStartSize = 2;
 	private float asteroidMinSpeed = 15;
 	private float asteroidMaxSpeed = 25;
-	
+
 	private int saucersOnField = 0;
 	private int saucersMax = 1;
 	private float saucersProbSmall = 0.3f;
@@ -111,7 +111,7 @@ public class Simulation implements Disposable, EntityListener {
 			Entity saucer;
 			if (Math.random() < saucersProbSmall)
 				saucer = new SmallSaucer();
-			else 
+			else
 				saucer = new Saucer();
 			saucer.location.y = bounds.y + (float)Math.random() * bounds.height;
 			saucer.location.x = (Math.random() < 0.5) ? bounds.x - saucer.bounds.width : bounds.width;
@@ -119,7 +119,7 @@ public class Simulation implements Disposable, EntityListener {
 			requestEntity(saucer);
 			saucersOnField++;
 		}
-		
+
 		// AI
 		i = entities.listIterator();
 		while (i.hasNext()) {
@@ -142,7 +142,7 @@ public class Simulation implements Disposable, EntityListener {
 			entity.age += delta;
 			if (entity.age > entity.maxAge)
 				entity.alive = false;
-			
+
 			if (!entity.alive) {
 				i.remove();
 				if (entity instanceof Player)
@@ -151,7 +151,7 @@ public class Simulation implements Disposable, EntityListener {
 					saucersOnField--;
 				continue;
 			}
-			
+
 			// Update location, center and velocity
 			float ax_d = entity.acceleration.x * delta;
 			float ay_d = entity.acceleration.y * delta;
@@ -185,14 +185,14 @@ public class Simulation implements Disposable, EntityListener {
 			else if (entity.bounds.y + entity.bounds.height < bounds.y)
 				offsetY = (bounds.height + entity.bounds.height);
 
-			//TODO: Refactor this 
+			//TODO: Refactor this
 			// Remove the saucers if they go out of bounds
 			if ((entity instanceof Saucer || entity instanceof SmallSaucer) &&
 				(offsetX != 0 || offsetY != 0)) {
 				i.remove();
 				saucersOnField--;
 			}
-			
+
 			entity.location.add(offsetX, offsetY);
 
 			entity.update(delta);

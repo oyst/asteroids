@@ -209,10 +209,10 @@ public class Simulation implements Disposable, EntityListener {
 			Entity entity = i.next();
 			while (j.hasNext()) {
 				Entity other = j.next();
-				if (entity.collides(other)) {
+				if (entity.collides(other))
 					entity.collision(other);
+				if (other.collides(entity))
 					other.collision(entity);
-				}
 			}
 		}
 

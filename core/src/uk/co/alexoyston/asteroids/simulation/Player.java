@@ -80,6 +80,8 @@ public class Player extends Entity {
 
 	@Override
 	public boolean collides(Entity other) {
+		if (spawnProtectRemaining > 0)
+			return false;
 		if (other instanceof Player)
 			return false;
 		return super.collides(other);
@@ -87,8 +89,6 @@ public class Player extends Entity {
 
 	@Override
 	public void collision(Entity other) {
-		if (spawnProtectRemaining > 0)
-			return;
 		respawn();
 	}
 }

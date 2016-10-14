@@ -11,6 +11,11 @@ public class Player extends Entity {
 	protected final float reloadTime = 0.3f;
 	protected final float coolDown = 20;
 
+	protected final Vector2 spawnLocation = new Vector2(0, 0);
+	private final float spawnProtectDuration = 1f;
+	private float spawnProtectRemaining = 0f;
+	protected int remainingLives = 3;
+
 	public Player() {
 		float width = 20;
 		float height = 20;
@@ -27,6 +32,22 @@ public class Player extends Entity {
 		center.set(width/2, height/2);
 
 		drag = 0.3f;
+	}
+
+	public void respawn() {
+		if (remainingLives <= 0) {
+			alive = false;
+			return;
+		}
+		remainingLives--;
+		location.set(spawnLocation);
+		weaponTemp = 0;
+		deltaSinceShot = 0;
+		velocity.setZero();
+		acceleration.setZero();
+		rotation = 0;
+		rotationSpeed = 0;
+		spawnProtectRemaining = spawnProtectDuration;
 	}
 
 	public void shoot() {
@@ -50,13 +71,11 @@ public class Player extends Entity {
 		entityListener.requestEntity(bullet);
 	}
 
-	public void die() {
-	}
-
 	@Override
 	public void update(float delta) {
 		weaponTemp -= coolDown * delta;
 		deltaSinceShot += delta;
+		spawnProtectRemaining = Math.max(spawnProtectRemaining - delta, 0);
 	}
 
 	@Override
@@ -68,6 +87,8 @@ public class Player extends Entity {
 
 	@Override
 	public void collision(Entity other) {
-		die();
+		if (spawnProtectRemaining > 0)
+			return;
+		respawn();
 	}
 }

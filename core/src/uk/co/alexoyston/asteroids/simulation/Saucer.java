@@ -72,10 +72,9 @@ public class Saucer extends Entity {
 
 		Bullet bullet = new Bullet();
 
-		Vector2 shotVelocity = new Vector2(shotSpeed, 0).setAngleRad(angle);
-		bullet.velocity.set(shotVelocity);
+		bullet.velocity.setToRandomDirection().scl(shotSpeed);
 
-		Vector2 radius = new Vector2(bounds.width/2, bounds.height/2).setAngleRad(angle);
+		Vector2 radius = new Vector2(bounds.width/2, bounds.height/2).setAngleRad(bullet.velocity.angleRad());
 		bullet.location.set(location).add(center).add(radius);
 
 		entityListener.requestEntity(bullet);

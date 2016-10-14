@@ -23,6 +23,12 @@ public class Simulation implements Disposable, EntityListener {
 	private int asteroidStartSize = 2;
 	private float asteroidMinSpeed = 15;
 	private float asteroidMaxSpeed = 25;
+	
+	private int saucersOnField = 0;
+	private int saucersMax = 1;
+	private float saucersProbSmall = 0.3f;
+	private float saucersFreq = 0.5f;
+	private float saucersSpeed = 25;
 
 	public final Rectangle bounds;
 
@@ -81,12 +87,16 @@ public class Simulation implements Disposable, EntityListener {
 		Gdx.app.log(TAG, "Player " + id + " added");
 		Player player = new Player();
 		player.location.set(x - player.bounds.width / 2, y - player.bounds.height / 2);
+		player.spawnLocation.set(player.location);
 		players.add(player);
 		requestEntity(player);
 		return id;
 	}
 
 	public void update(float delta) {
+		//TODO: Refactor the whole update loop
+		// Maybe separate lists for each entity type??
+		
 		if (paused)
 			return;
 
@@ -96,6 +106,20 @@ public class Simulation implements Disposable, EntityListener {
 		ListIterator<Entity> i;
 		ListIterator<Entity> j;
 
+		// Add saucers
+		if (Math.random() < saucersFreq * delta && saucersOnField < saucersMax) {
+			Entity saucer;
+			if (Math.random() < saucersProbSmall)
+				saucer = new SmallSaucer();
+			else 
+				saucer = new Saucer();
+			saucer.location.y = bounds.y + (float)Math.random() * bounds.height;
+			saucer.location.x = (Math.random() < 0.5) ? bounds.x - saucer.bounds.width : bounds.width;
+			saucer.velocity.x = saucersSpeed;
+			requestEntity(saucer);
+			saucersOnField++;
+		}
+		
 		// AI
 		i = entities.listIterator();
 		while (i.hasNext()) {
@@ -123,6 +147,8 @@ public class Simulation implements Disposable, EntityListener {
 				i.remove();
 				if (entity instanceof Player)
 					players.remove(entity);
+				if (entity instanceof Saucer || entity instanceof SmallSaucer)
+					saucersOnField--;
 				continue;
 			}
 			
@@ -147,15 +173,27 @@ public class Simulation implements Disposable, EntityListener {
 			entity.velocity.y -= entity.velocity.y * entity.drag * delta;
 
 			// Bounds check
+			float offsetX = 0;
+			float offsetY = 0;
 			if (entity.bounds.x > bounds.x + bounds.width)
-				entity.location.x -= (bounds.width + entity.bounds.width);
+				offsetX = -(bounds.width + entity.bounds.width);
 			else if (entity.bounds.x + entity.bounds.width < bounds.x)
-				entity.location.x += (bounds.width + entity.bounds.width);
+				offsetX = (bounds.width + entity.bounds.width);
 
 			if (entity.bounds.y > bounds.y + bounds.height)
-				entity.location.y -= (bounds.height + entity.bounds.height);
+				offsetY = -(bounds.height + entity.bounds.height);
 			else if (entity.bounds.y + entity.bounds.height < bounds.y)
-				entity.location.y += (bounds.height + entity.bounds.height);
+				offsetY = (bounds.height + entity.bounds.height);
+
+			//TODO: Refactor this 
+			// Remove the saucers if they go out of bounds
+			if ((entity instanceof Saucer || entity instanceof SmallSaucer) &&
+				(offsetX != 0 || offsetY != 0)) {
+				i.remove();
+				saucersOnField--;
+			}
+			
+			entity.location.add(offsetX, offsetY);
 
 			entity.update(delta);
 

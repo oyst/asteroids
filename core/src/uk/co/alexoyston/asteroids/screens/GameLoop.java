@@ -17,6 +17,7 @@ public class GameLoop extends BaseScreen {
 	private Renderer renderer;
 	private InputAdapter playInputAdapter;
 	private InputAdapter pauseInputAdapter;
+	private InputAdapter gameOverInputAdapter;
 
 	private final BitmapFont font = new BitmapFont();
 	private final SpriteBatch batch = new SpriteBatch();
@@ -28,6 +29,9 @@ public class GameLoop extends BaseScreen {
 
 	private final static String RESUME_GAME = "Press <SPACE> to resume";
 	private final static String EXIT_GAME = "Press <ESC> to exit";
+	private final static String GAME_OVER = "Game over";
+
+	private boolean gameOver = false;
 
 	public GameLoop(Game game) {
 		super(game);
@@ -62,6 +66,18 @@ public class GameLoop extends BaseScreen {
 			}
 		};
 
+		gameOverInputAdapter = new InputAdapter() {
+			@Override
+			public boolean keyDown(int keycode) {
+				switch (keycode) {
+				case KEY_EXIT:
+					nextState = State.MAIN_MENU;
+					break;
+				}
+				return false;
+			}
+		};
+
 		batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
 		Gdx.input.setInputProcessor(playInputAdapter);
@@ -80,6 +96,11 @@ public class GameLoop extends BaseScreen {
 	 */
 	@Override
 	public void update(float delta) {
+		if (gameOver) {
+			simulation.update(delta);
+			return;
+		}
+
 		if (Gdx.input.isKeyPressed(Keys.UP))
 			simulation.playerFwd(0);
 		if (Gdx.input.isKeyPressed(Keys.LEFT))
@@ -88,7 +109,11 @@ public class GameLoop extends BaseScreen {
 			simulation.playerRotRight(0);
 		if (Gdx.input.isKeyJustPressed(Keys.SPACE))
 			simulation.playerShoot(0);
+
 		simulation.update(delta);
+
+		if (simulation.players.isEmpty())
+			gameOver();
 	}
 
 	/**
@@ -120,6 +145,24 @@ public class GameLoop extends BaseScreen {
 			font.draw(batch, EXIT_GAME, (Gdx.graphics.getWidth() - width) / 2, Gdx.graphics.getHeight() / 2 - height);
 
 			batch.end();
+
+		} else if (gameOver) {
+			float width;
+			float height;
+
+			batch.begin();
+
+			layout.setText(font, GAME_OVER);
+			width = layout.width;
+			height = layout.height;
+			font.draw(batch, GAME_OVER, (Gdx.graphics.getWidth() - width) / 2, Gdx.graphics.getHeight() / 2 + 1.5f * height);
+
+			layout.setText(font, EXIT_GAME);
+			width = layout.width;
+			height = layout.height;
+			font.draw(batch, EXIT_GAME, (Gdx.graphics.getWidth() - width) / 2, Gdx.graphics.getHeight() / 2 - 1.5f * height);
+
+			batch.end();
 		}
 	}
 
@@ -138,6 +181,11 @@ public class GameLoop extends BaseScreen {
 		super.pause();
 		simulation.pause();
 		Gdx.input.setInputProcessor(pauseInputAdapter);
+	}
+
+	public void gameOver() {
+		gameOver = true;
+		Gdx.input.setInputProcessor(gameOverInputAdapter);
 	}
 
 	@Override

@@ -68,7 +68,7 @@ public class SmallSaucer extends Entity {
 
 		deltaSinceShot = 0;
 
-		Bullet bullet = new Bullet();
+		Bullet bullet = new Bullet(this);
 		float angle = (float)(Math.atan2(targetX - location.x, targetY - location.y));
 
 		Vector2 shotVelocity = new Vector2(shotSpeed, 0).setAngleRad((float)Math.PI/2 - angle);
@@ -82,6 +82,7 @@ public class SmallSaucer extends Entity {
 
 	@Override
 	public void collision(Entity other) {
+		alive = false;
 	}
 
 	@Override

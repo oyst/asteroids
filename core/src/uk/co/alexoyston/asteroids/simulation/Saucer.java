@@ -70,7 +70,7 @@ public class Saucer extends Entity {
 
 		deltaSinceShot = 0;
 
-		Bullet bullet = new Bullet();
+		Bullet bullet = new Bullet(this);
 
 		bullet.velocity.setToRandomDirection().scl(shotSpeed);
 
@@ -82,6 +82,7 @@ public class Saucer extends Entity {
 
 	@Override
 	public void collision(Entity other) {
+		alive = false;
 	}
 
 	@Override

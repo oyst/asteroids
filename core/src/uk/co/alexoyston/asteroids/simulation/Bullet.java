@@ -2,7 +2,9 @@ package uk.co.alexoyston.asteroids.simulation;
 
 public class Bullet extends Entity {
 
-	public Bullet() {
+	private Entity owner;
+
+	public Bullet(Entity owner) {
 		int width = 2;
 		int height = 2;
 
@@ -14,6 +16,8 @@ public class Bullet extends Entity {
 		};
 
 		setVertices(vertices);
+
+		this.owner = owner;
 
 		maxAge = 1;
 
@@ -30,5 +34,8 @@ public class Bullet extends Entity {
 	@Override
 	public void collision(Entity other) {
 		alive = false;
+		if (owner instanceof Player) {
+			((Player)owner).addHitScore(other);
+		}
 	}
 }

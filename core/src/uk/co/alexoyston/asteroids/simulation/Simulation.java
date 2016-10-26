@@ -267,6 +267,11 @@ public class Simulation implements Disposable, EntityListener {
 		 player.shoot();
 	}
 
+	public int getScore(int playerId) {
+		Player player = players.get(playerId);
+		return player.getScore();
+	}
+
 	@Override
 	public void requestEntity(Entity entity) {
 		waitingEntities.add(entity);

@@ -16,6 +16,8 @@ public class Player extends Entity {
 	private float spawnProtectRemaining = 0f;
 	protected int remainingLives = 3;
 
+	private int score = 0;
+
 	public Player() {
 		float width = 20;
 		float height = 20;
@@ -60,7 +62,7 @@ public class Player extends Entity {
 
 		weaponTemp += shotHeat;
 
-		Bullet bullet = new Bullet();
+		Bullet bullet = new Bullet(this);
 
 		Vector2 shotVelocity = new Vector2(shotSpeed, 0).setAngleRad((float)Math.PI/2 - rotation);
 		bullet.velocity.set(velocity).add(shotVelocity);
@@ -90,5 +92,18 @@ public class Player extends Entity {
 	@Override
 	public void collision(Entity other) {
 		respawn();
+	}
+
+	public void addHitScore(Entity hit) {
+		if (hit instanceof Asteroid)
+			score += 10;
+		if (hit instanceof Saucer)
+			score += 20;
+		if (hit instanceof SmallSaucer)
+			score += 30;
+	}
+
+	public int getScore() {
+		return score;
 	}
 }

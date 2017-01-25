@@ -36,7 +36,7 @@ public class GameLoop extends BaseScreen {
 	public GameLoop(Game game) {
 		super(game);
 
-		simulation = new Simulation();
+		simulation = new Simulation(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		renderer = new Renderer(simulation);
 
 		playInputAdapter = new InputAdapter() {

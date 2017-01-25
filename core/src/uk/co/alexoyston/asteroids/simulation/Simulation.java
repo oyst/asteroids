@@ -32,11 +32,11 @@ public class Simulation implements Disposable, EntityListener {
 
 	public final Rectangle bounds;
 
-	public Simulation() {
+	public Simulation(int worldWidth, int worldHeight) {
 		// TODO: Having the x,y of bounds == 0, 0 causes a problem with the
 		// bounds checks
 		// Find out why and if there is a way to fix it
-		bounds = new Rectangle(1, 1, Gdx.graphics.getWidth() - 2, Gdx.graphics.getHeight() - 2);
+		bounds = new Rectangle(1, 1, worldWidth - 2, worldHeight - 2);
 
 		level = 0;
 
@@ -84,7 +84,7 @@ public class Simulation implements Disposable, EntityListener {
 	 */
 	public int addPlayer(float x, float y) {
 		int id = players.size();
-		Gdx.app.log(TAG, "Player " + id + " added");
+		//Gdx.app.log(TAG, "Player " + id + " added");
 		Player player = new Player();
 		player.location.set(x - player.bounds.width / 2, y - player.bounds.height / 2);
 		player.spawnLocation.set(player.location);
@@ -233,12 +233,12 @@ public class Simulation implements Disposable, EntityListener {
 	}
 
 	public void pause() {
-		Gdx.app.log(TAG, "Paused");
+		//Gdx.app.log(TAG, "Paused");
 		paused = true;
 	}
 
 	public void resume() {
-		Gdx.app.log(TAG, "Resumed");
+		//Gdx.app.log(TAG, "Resumed");
 		paused = false;
 	}
 

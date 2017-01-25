@@ -3,7 +3,18 @@ package uk.co.alexoyston.asteroids.simple_rl;
 import java.util.ArrayList;
 import java.util.List;
 
-protected class AsteroidsStateModel implements FullStateModel{
+import burlap.mdp.core.StateTransitionProb;
+import burlap.mdp.core.action.Action;
+import burlap.mdp.core.state.State;
+import burlap.mdp.singleagent.model.statemodel.FullStateModel;
+
+import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.ACTION_FWD;
+import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.ACTION_ROT_RIGHT;
+import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.ACTION_ROT_LEFT;
+import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.ACTION_SHOOT;
+import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.ACTION_NO_OP;
+
+class AsteroidsStateModel implements FullStateModel{
 	protected double [][] transitionProbs;
 
 	public AsteroidsStateModel() {

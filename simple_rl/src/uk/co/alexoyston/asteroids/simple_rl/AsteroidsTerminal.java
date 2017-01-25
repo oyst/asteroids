@@ -1,6 +1,9 @@
 package uk.co.alexoyston.asteroids.simple_rl;
 
-public static class AsteroidsTerminal implements TerminalFunction {
+import burlap.mdp.core.TerminalFunction;
+import burlap.mdp.core.state.State;
+
+class AsteroidsTerminal implements TerminalFunction {
 
 	public AsteroidsTerminal(){
 	}

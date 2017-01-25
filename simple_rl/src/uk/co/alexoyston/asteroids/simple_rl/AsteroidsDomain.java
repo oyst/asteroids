@@ -1,28 +1,21 @@
 package uk.co.alexoyston.asteroids.simple_rl;
 
+import java.awt.Graphics2D;
+
 import burlap.mdp.auxiliary.DomainGenerator;
-import burlap.mdp.core.StateTransitionProb;
 import burlap.mdp.core.TerminalFunction;
-import burlap.mdp.core.action.Action;
 import burlap.mdp.core.action.UniversalActionType;
 import burlap.mdp.core.state.State;
 import burlap.mdp.singleagent.SADomain;
-import burlap.mdp.singleagent.environment.SimulatedEnvironment;
+import burlap.mdp.singleagent.environment.Environment;
 import burlap.mdp.singleagent.model.FactoredModel;
 import burlap.mdp.singleagent.model.RewardFunction;
-import burlap.mdp.singleagent.model.statemodel.FullStateModel;
 import burlap.shell.visual.VisualExplorer;
 import burlap.visualizer.StatePainter;
 import burlap.visualizer.StateRenderLayer;
 import burlap.visualizer.Visualizer;
 
-import java.awt.*;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.List;
-
-public class AsteroidsDomain implements DomainGenerator {
+class AsteroidsDomain implements DomainGenerator {
 
 	public static final String ACTION_FWD = "fwd";
 	public static final String ACTION_ROT_RIGHT = "rot_right";
@@ -64,43 +57,7 @@ public class AsteroidsDomain implements DomainGenerator {
 	}
 
 	public class WallPainter implements StatePainter {
-
 		public void paint(Graphics2D g2, State s, float cWidth, float cHeight) {
-
-			//walls will be filled in black
-			g2.setColor(Color.BLACK);
-
-			//set up floats for the width and height of our domain
-			float fWidth = AsteroidsDomain.this.map.length;
-			float fHeight = AsteroidsDomain.this.map[0].length;
-
-			//determine the width of a single cell
-			//on our canvas such that the whole map can be painted
-			float width = cWidth / fWidth;
-			float height = cHeight / fHeight;
-
-			//pass through each cell of our map and if it's a wall, paint a black rectangle on our
-			//cavas of dimension widthxheight
-			for(int i = 0; i < AsteroidsDomain.this.map.length; i++){
-				for(int j = 0; j < AsteroidsDomain.this.map[0].length; j++){
-
-					//is there a wall here?
-					if(AsteroidsDomain.this.map[i][j] == 1){
-
-						//left coordinate of cell on our canvas
-						float rx = i*width;
-
-						//top coordinate of cell on our canvas
-						//coordinate system adjustment because the java canvas
-						//origin is in the top left instead of the bottom right
-						float ry = cHeight - height - j*height;
-
-						//paint the rectangle
-						g2.fill(new Rectangle2D.Float(rx, ry, width, height));
-
-					}
-				}
-			}
 		}
 	}
 
@@ -108,7 +65,6 @@ public class AsteroidsDomain implements DomainGenerator {
 
 		AsteroidsDomain gen = new AsteroidsDomain();
 		SADomain domain = gen.generateDomain();
-		State initialState = new AsteroidsState(0, 0);
 		Environment env = new AsteroidsEnvironment();
 
 		Visualizer v = gen.getVisualizer();

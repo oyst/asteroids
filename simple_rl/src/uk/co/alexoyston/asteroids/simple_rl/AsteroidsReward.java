@@ -1,6 +1,10 @@
 package uk.co.alexoyston.asteroids.simple_rl;
 
-public static class AsteroidsReward implements RewardFunction {
+import burlap.mdp.core.action.Action;
+import burlap.mdp.core.state.State;
+import burlap.mdp.singleagent.model.RewardFunction;
+
+class AsteroidsReward implements RewardFunction {
 
 	public AsteroidsReward(){
 	}

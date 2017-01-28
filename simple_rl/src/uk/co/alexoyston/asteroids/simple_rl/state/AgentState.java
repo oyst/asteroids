@@ -20,10 +20,10 @@ public class AgentState implements ObjectInstance {
 	public float width = 0f;
 	public float height = 0f;
 
-	public int lives = 0;
+	public int alive = 0;
 	public int score = 0;
 
-	private static final List<Object> keys = Arrays.<Object>asList(VAR_X, VAR_Y, VAR_WIDTH, VAR_HEIGHT, VAR_VELOCITY_X, VAR_VELOCITY_Y, VAR_ROTATION, VAR_SCORE, VAR_LIVES);
+	private static final List<Object> keys = Arrays.<Object>asList(VAR_X, VAR_Y, VAR_WIDTH, VAR_HEIGHT, VAR_VELOCITY_X, VAR_VELOCITY_Y, VAR_ROTATION, VAR_SCORE, VAR_ALIVE);
 
 	public AgentState() {
 	}
@@ -40,7 +40,7 @@ public class AgentState implements ObjectInstance {
 		this(x, y, width, height, rot, vx, vy, lives, 0);
 	}
 
-	public AgentState(float x, float y, float width, float height, float rot, float vx, float vy, int lives, int score) {
+	public AgentState(float x, float y, float width, float height, float rot, float vx, float vy, int alive, int score) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -48,7 +48,7 @@ public class AgentState implements ObjectInstance {
 		this.rot = rot;
 		this.vx = vx;
 		this.vy = vy;
-		this.lives = lives;
+		this.alive = alive;
 		this.score = 0;
 	}
 
@@ -73,8 +73,8 @@ public class AgentState implements ObjectInstance {
 			return vy;
 		} else if (variableKey.equals(VAR_ROTATION)) {
 			return rot;
-		} else if (variableKey.equals(VAR_LIVES)) {
-			return lives;
+		} else if (variableKey.equals(VAR_ALIVE)) {
+			return alive;
 		} else if (variableKey.equals(VAR_SCORE)) {
 			return score;
 		}
@@ -83,7 +83,7 @@ public class AgentState implements ObjectInstance {
 
 	@Override
 	public AgentState copy() {
-		return new AgentState(x, y, width, height, rot, vx, vy, lives, score);
+		return new AgentState(x, y, width, height, rot, vx, vy, alive, score);
 	}
 
 	@Override

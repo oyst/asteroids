@@ -14,7 +14,7 @@ public class Player extends Entity {
 	protected final Vector2 spawnLocation = new Vector2(0, 0);
 	private final float spawnProtectDuration = 1f;
 	private float spawnProtectRemaining = 0f;
-	protected int remainingLives = 3;
+	protected int remainingLives = 0;
 
 	private int score = 0;
 

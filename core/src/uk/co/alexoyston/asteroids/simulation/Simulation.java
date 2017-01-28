@@ -25,18 +25,21 @@ public class Simulation implements Disposable, EntityListener {
 	private float asteroidMaxSpeed = 25;
 
 	private int saucersOnField = 0;
-	private int saucersMax = 1;
+	private int saucersMax = 0;
 	private float saucersProbSmall = 0.3f;
 	private float saucersFreq = 0.5f;
 	private float saucersSpeed = 25;
 
 	public final Rectangle bounds;
+	
+	private PhysicsParams params;
 
-	public Simulation(int worldWidth, int worldHeight) {
+	public Simulation(PhysicsParams params) {
+		this.params = params;
 		// TODO: Having the x,y of bounds == 0, 0 causes a problem with the
 		// bounds checks
 		// Find out why and if there is a way to fix it
-		bounds = new Rectangle(1, 1, worldWidth - 2, worldHeight - 2);
+		bounds = new Rectangle(1, 1, this.params.worldWidth - 2, this.params.worldHeight - 2);
 
 		level = 0;
 

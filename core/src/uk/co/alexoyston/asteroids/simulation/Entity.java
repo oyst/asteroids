@@ -46,6 +46,16 @@ public abstract class Entity {
 	public float[] getVertices() {
 		return polygon.getTransformedVertices();
 	}
+	
+	public float[][] getSepVertices() {
+		float[] vertices = polygon.getVertices();
+		float[][] points = new float[vertices.length / 2][2];
+		for (int i = 0; i < vertices.length; i += 2) {
+			points[0][i / 2] = vertices[i];
+			points[1][i / 2] = vertices[i+1];
+		}
+		return points;
+	}
 
 	public void setVertices(float[] vertices) {
 		polygon.setVertices(vertices);

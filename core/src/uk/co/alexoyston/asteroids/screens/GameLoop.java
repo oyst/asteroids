@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.InputAdapter;
 
 import uk.co.alexoyston.asteroids.Renderer;
+import uk.co.alexoyston.asteroids.simulation.PhysicsParams;
 import uk.co.alexoyston.asteroids.simulation.Simulation;
 
 public class GameLoop extends BaseScreen {
@@ -35,8 +36,12 @@ public class GameLoop extends BaseScreen {
 
 	public GameLoop(Game game) {
 		super(game);
-
-		simulation = new Simulation(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		
+		PhysicsParams params = new PhysicsParams();
+		params.worldWidth = Gdx.graphics.getWidth();
+		params.worldHeight = Gdx.graphics.getHeight();
+		
+		simulation = new Simulation(params);
 		renderer = new Renderer(simulation);
 
 		playInputAdapter = new InputAdapter() {

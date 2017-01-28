@@ -1,29 +1,15 @@
-// Apply the java plugin to add support for Java
-apply plugin: 'java'
+sourceCompatibility = 1.8
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+sourceSets.main.java.srcDirs = [ "src/" ]
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+project.ext.mainClassName = "uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain"
+
+task run(dependsOn: classes, type: JavaExec) {
+    main = project.mainClassName
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
 }
 
-version = '1.0'
-ext {
-    gdxVersion = '1.9.4'
-    roboVMVersion = '2.2.0'
-    box2DLightsVersion = '1.4'
-    ashleyVersion = '1.7.0'
-    aiVersion = '1.8.0'
-}
-dependencies {
-    compile 'org.slf4j:slf4j-api:1.7.13'
-    compile group: 'edu.brown.cs.burlap', name: 'burlap', version: '3.0.1'
-    testCompile group: 'junit', name: 'junit', version: '4.12'    
-    compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-    compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-    compile "com.badlogicgames.ashley:ashley:$ashleyVersion"
-    compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
-    compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-    compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
+eclipse.project {
+    name = "simple_rl"
 }

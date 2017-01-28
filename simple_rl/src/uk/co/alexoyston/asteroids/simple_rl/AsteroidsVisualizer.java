@@ -33,7 +33,7 @@ public class AsteroidsVisualizer {
     
 	public static Visualizer getVisualizer(Environment env){
 		Visualizer visualizer = getVisualizer();
-		visualizer.addRenderLayer(getEnvRenderLayer(env));
+//		visualizer.addRenderLayer(getEnvRenderLayer(env));
 		return visualizer;
 	}
 		
@@ -48,7 +48,9 @@ public class AsteroidsVisualizer {
 		layer.addStatePainter(ooStatePainter);
 
 		ooStatePainter.addObjectClassPainter(CLASS_AGENT, new AgentPainter());
-		ooStatePainter.addObjectClassPainter(CLASS_ASTEROID, new AsteroidPainter());
+		ooStatePainter.addObjectClassPainter(CLASS_ASTEROID, new EnemyPainter());
+		ooStatePainter.addObjectClassPainter(CLASS_SAUCER, new EnemyPainter());
+		ooStatePainter.addObjectClassPainter(CLASS_BULLET, new ThreatPainter());
 		
 		return layer;
 	}
@@ -83,7 +85,6 @@ public class AsteroidsVisualizer {
 			g2.fillRect(0, 0, 5, 5);
 			
 			for (VisualEntity entity : env.getVisualEntities()) {
-				g2.setColor(entity.color);
 				
 				Path2D.Float poly = new Path2D.Float();
 				poly.moveTo(entity.vertices[0], entity.vertices[1]);
@@ -110,21 +111,20 @@ public class AsteroidsVisualizer {
 			float width = (float) ob.get(VAR_WIDTH);
 			float height = (float) ob.get(VAR_HEIGHT);
 						
-			g2.setColor(Color.BLACK);
+			g2.setColor(Color.RED);
 
 			Path2D.Float poly = new Path2D.Float();
 			poly.moveTo(x, y);
 			poly.lineTo(x + width, y);
 			poly.lineTo(x + width, y + height);
 			poly.lineTo(x, y + height);
-			poly.lineTo(x, y);
 			poly.closePath();
 			
 			g2.draw(poly);
 		}
 	}
 	
-	public static class AsteroidPainter implements ObjectPainter {
+	public static class EnemyPainter implements ObjectPainter {
 		
 		@Override
 		public void paintObject(Graphics2D g2, OOState s, ObjectInstance ob, float cWidth, float cHeight) {
@@ -136,18 +136,37 @@ public class AsteroidsVisualizer {
 			float width = (float) ob.get(VAR_WIDTH);
 			float height = (float) ob.get(VAR_HEIGHT);
 						
-			g2.setColor(Color.BLACK);
+			g2.setColor(Color.CYAN);
 
 			Path2D.Float poly = new Path2D.Float();
 			poly.moveTo(x, y);
 			poly.lineTo(x + width, y);
 			poly.lineTo(x + width, y + height);
 			poly.lineTo(x, y + height);
-			poly.lineTo(x, y);
 			poly.closePath();
 			
 			g2.draw(poly);
 		}
 	}
+	
+	public static class ThreatPainter implements ObjectPainter {
+		
+		@Override
+		public void paintObject(Graphics2D g2, OOState s, ObjectInstance ob, float cWidth, float cHeight) {
+			g2.setColor(Color.MAGENTA);
+			g2.fillRect(10, 0, 5, 5);
 
+			float x = (float) ob.get(VAR_X);
+			float y = (float) ob.get(VAR_Y);
+
+			Path2D.Float poly = new Path2D.Float();
+			poly.moveTo(x, y);
+			poly.lineTo(x + 2, y);
+			poly.lineTo(x + 2, y + 2);
+			poly.lineTo(x, y + 2);
+			poly.closePath();
+			
+			g2.fill(poly);
+		}
+	}
 }

@@ -45,7 +45,8 @@ public class Asteroid extends Entity {
 		
 		int index = (int) (Math.random() * asteroidShapes.size());
 	
-		float[] vertices = asteroidShapes.get(index).clone();
+		float[] vertices = new float[asteroidShapes.get(index).length];
+		System.arraycopy(asteroidShapes.get(index), 0, vertices, 0, asteroidShapes.get(index).length);
 		
 		for (int i = 0; i < vertices.length; i++) 
 			vertices[i] *= (this.numSplits + 1);

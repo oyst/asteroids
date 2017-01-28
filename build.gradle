@@ -3,6 +3,7 @@ buildscript {
         mavenLocal()
         mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+	    maven { url "https://oss.sonatype.org/content/repositories/releases/" }
         jcenter()
     }
     dependencies {
@@ -22,6 +23,7 @@ allprojects {
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
         aiVersion = '1.8.0'
+        burlapVersion = '3.0.1'
     }
 
     repositories {
@@ -68,6 +70,15 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         compile "com.badlogicgames.ashley:ashley:$ashleyVersion"
+    }
+}
+
+project(":simple_rl") {
+    apply plugin: "java"
+
+    dependencies {
+        compile project(":core")
+    	compile "edu.brown.cs.burlap:burlap:$burlapVersion"
     }
 }
 

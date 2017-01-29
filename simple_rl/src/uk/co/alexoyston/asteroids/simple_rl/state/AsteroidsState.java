@@ -22,7 +22,7 @@ public class AsteroidsState implements MutableOOState {
 
 	public AgentState agent;
 	public List<EnemyState.Asteroid> asteroids;
-	public List<ThreatState.Bullet> bullets;
+	public List<EnemyState.Bullet> bullets;
 	public List<EnemyState.Saucer> saucers;
 
 	public AsteroidsState() {
@@ -31,11 +31,11 @@ public class AsteroidsState implements MutableOOState {
 	public AsteroidsState(AgentState agent) {
 		this.agent = agent;
 		this.asteroids = new ArrayList<EnemyState.Asteroid>();
-		this.bullets = new ArrayList<ThreatState.Bullet>();
+		this.bullets = new ArrayList<EnemyState.Bullet>();
 		this.saucers = new ArrayList<EnemyState.Saucer>();
 	}
 
-	public AsteroidsState(AgentState agent, List<EnemyState.Asteroid> asteroids, List<ThreatState.Bullet> bullets, List<EnemyState.Saucer> saucers) {
+	public AsteroidsState(AgentState agent, List<EnemyState.Asteroid> asteroids, List<EnemyState.Bullet> bullets, List<EnemyState.Saucer> saucers) {
 		this.agent = agent;
 		this.asteroids = asteroids;
 		this.bullets = bullets;
@@ -50,8 +50,8 @@ public class AsteroidsState implements MutableOOState {
 		else if (o instanceof EnemyState.Asteroid) {
 			touchAsteroids().add((EnemyState.Asteroid)o);
 		}
-		else if (o instanceof ThreatState.Bullet) {
-			touchBullets().add((ThreatState.Bullet)o);
+		else if (o instanceof EnemyState.Bullet) {
+			touchBullets().add((EnemyState.Bullet)o);
 		}
 		else if (o instanceof EnemyState.Saucer) {
 			touchSaucers().add((EnemyState.Saucer)o);
@@ -119,9 +119,9 @@ public class AsteroidsState implements MutableOOState {
 
 		index = OOStateUtilities.objectIndexWithName(bullets, objectName);
 		if (index != -1) {
-			ThreatState.Bullet obj = bullets.get(index);
+			EnemyState.Bullet obj = bullets.get(index);
 			touchBullets().remove(index);
-			bullets.add(index, (ThreatState.Bullet)obj.copyWithName(newName));
+			bullets.add(index, (EnemyState.Bullet)obj.copyWithName(newName));
 			return this;
 		}
 
@@ -339,13 +339,13 @@ public class AsteroidsState implements MutableOOState {
 		return saucer;
 	}
 
-	public List<ThreatState.Bullet> touchBullets() {
-		bullets = new ArrayList<ThreatState.Bullet>(bullets);
+	public List<EnemyState.Bullet> touchBullets() {
+		bullets = new ArrayList<EnemyState.Bullet>(bullets);
 		return bullets;
 	}
 
-	public ThreatState.Bullet touchBullet(int index) {
-		ThreatState.Bullet bullet = bullets.get(index).copy();
+	public EnemyState.Bullet touchBullet(int index) {
+		EnemyState.Bullet bullet = bullets.get(index).copy();
 		touchBullets().remove(index);
 		touchBullets().add(index, bullet);
 		return bullet;

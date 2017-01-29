@@ -29,7 +29,6 @@ import burlap.statehashing.simple.SimpleHashableStateFactory;
 import burlap.visualizer.Visualizer;
 import uk.co.alexoyston.asteroids.simple_rl.state.AgentState;
 import uk.co.alexoyston.asteroids.simple_rl.state.EnemyState;
-import uk.co.alexoyston.asteroids.simple_rl.state.ThreatState;
 import uk.co.alexoyston.asteroids.simulation.PhysicsParams;
 
 public class AsteroidsDomain implements DomainGenerator {
@@ -66,7 +65,7 @@ public class AsteroidsDomain implements DomainGenerator {
 		domain.addStateClass(CLASS_AGENT, AgentState.class);
 		domain.addStateClass(CLASS_ASTEROID, EnemyState.Asteroid.class);
 		domain.addStateClass(CLASS_SAUCER, EnemyState.Saucer.class);
-		domain.addStateClass(CLASS_BULLET, ThreatState.Bullet.class);
+		domain.addStateClass(CLASS_BULLET, EnemyState.Bullet.class);
 
 		domain.addActionTypes(
 				new UniversalActionType(ACTION_FORWARD),

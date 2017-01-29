@@ -11,10 +11,11 @@ import burlap.mdp.core.StateTransitionProb;
 import burlap.mdp.core.action.Action;
 import burlap.mdp.core.state.State;
 import burlap.mdp.singleagent.model.statemodel.FullStateModel;
+
 import uk.co.alexoyston.asteroids.simple_rl.state.AgentState;
 import uk.co.alexoyston.asteroids.simple_rl.state.AsteroidsState;
 import uk.co.alexoyston.asteroids.simple_rl.state.EnemyState;
-import uk.co.alexoyston.asteroids.simple_rl.state.ThreatState;
+
 import uk.co.alexoyston.asteroids.simulation.PhysicsParams;
 
 class AsteroidsModel implements FullStateModel{
@@ -101,20 +102,20 @@ class AsteroidsModel implements FullStateModel{
 				saucer.y = phys.worldHeight + saucer.height;
 		}
 
-		for (ThreatState.Bullet bullet : state.bullets) {
+		for (EnemyState.Bullet bullet : state.bullets) {
 			bullet.x += bullet.vx * phys.updateDelta;
 			bullet.y += bullet.vy * phys.updateDelta;
 
 			// Bounds check
 			if (bullet.x > phys.worldWidth)
-				bullet.x = -2;
-			else if (bullet.x + 2 < 0)
-				bullet.x = phys.worldWidth + 2;
+				bullet.x = -bullet.width;
+			else if (bullet.x + bullet.width < 0)
+				bullet.x = phys.worldWidth + bullet.width;
 
 			if (bullet.y > phys.worldHeight)
-				bullet.y = -2;
-			else if (bullet.y + 2 < 0)
-				bullet.y = phys.worldHeight + 2;
+				bullet.y = -bullet.height;
+			else if (bullet.y + bullet.height < 0)
+				bullet.y = phys.worldHeight + bullet.height;
 		}
 
 		return state;

@@ -15,6 +15,7 @@ import burlap.visualizer.ObjectPainter;
 import burlap.visualizer.RenderLayer;
 import burlap.visualizer.StateRenderLayer;
 import burlap.visualizer.Visualizer;
+
 import joptsimple.ValueConversionException;
 
 import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.*;
@@ -50,7 +51,7 @@ public class AsteroidsVisualizer {
 		ooStatePainter.addObjectClassPainter(CLASS_AGENT, new AgentPainter());
 		ooStatePainter.addObjectClassPainter(CLASS_ASTEROID, new EnemyPainter());
 		ooStatePainter.addObjectClassPainter(CLASS_SAUCER, new EnemyPainter());
-		ooStatePainter.addObjectClassPainter(CLASS_BULLET, new ThreatPainter());
+		ooStatePainter.addObjectClassPainter(CLASS_BULLET, new EnemyPainter());
 
 		return layer;
 	}
@@ -81,8 +82,7 @@ public class AsteroidsVisualizer {
 
 		@Override
 		public void render(Graphics2D g2, float width, float height) {
-			g2.setColor(Color.GREEN);
-			g2.fillRect(0, 0, 5, 5);
+			g2.setColor(Color.RED);
 
 			for (VisualEntity entity : env.getVisualEntities()) {
 
@@ -103,15 +103,12 @@ public class AsteroidsVisualizer {
 
 		@Override
 		public void paintObject(Graphics2D g2, OOState s, ObjectInstance ob, float cWidth, float cHeight) {
-			g2.setColor(Color.RED);
-			g2.fillRect(5, 0, 5, 5);
+			g2.setColor(Color.BLACK);
 
 			float x = (float) ob.get(VAR_X);
 			float y = (float) ob.get(VAR_Y);
 			float width = (float) ob.get(VAR_WIDTH);
 			float height = (float) ob.get(VAR_HEIGHT);
-
-			g2.setColor(Color.RED);
 
 			Path2D.Float poly = new Path2D.Float();
 			poly.moveTo(x, y);
@@ -128,15 +125,12 @@ public class AsteroidsVisualizer {
 
 		@Override
 		public void paintObject(Graphics2D g2, OOState s, ObjectInstance ob, float cWidth, float cHeight) {
-			g2.setColor(Color.CYAN);
-			g2.fillRect(10, 0, 5, 5);
+			g2.setColor(Color.BLACK);
 
 			float x = (float) ob.get(VAR_X);
 			float y = (float) ob.get(VAR_Y);
 			float width = (float) ob.get(VAR_WIDTH);
 			float height = (float) ob.get(VAR_HEIGHT);
-
-			g2.setColor(Color.CYAN);
 
 			Path2D.Float poly = new Path2D.Float();
 			poly.moveTo(x, y);
@@ -146,27 +140,6 @@ public class AsteroidsVisualizer {
 			poly.closePath();
 
 			g2.draw(poly);
-		}
-	}
-
-	public static class ThreatPainter implements ObjectPainter {
-
-		@Override
-		public void paintObject(Graphics2D g2, OOState s, ObjectInstance ob, float cWidth, float cHeight) {
-			g2.setColor(Color.MAGENTA);
-			g2.fillRect(10, 0, 5, 5);
-
-			float x = (float) ob.get(VAR_X);
-			float y = (float) ob.get(VAR_Y);
-
-			Path2D.Float poly = new Path2D.Float();
-			poly.moveTo(x, y);
-			poly.lineTo(x + 2, y);
-			poly.lineTo(x + 2, y + 2);
-			poly.lineTo(x, y + 2);
-			poly.closePath();
-
-			g2.fill(poly);
 		}
 	}
 }

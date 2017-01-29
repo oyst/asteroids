@@ -12,11 +12,12 @@ import burlap.mdp.core.action.Action;
 import burlap.mdp.core.state.State;
 import burlap.mdp.singleagent.environment.Environment;
 import burlap.mdp.singleagent.environment.EnvironmentOutcome;
+
 import uk.co.alexoyston.asteroids.simple_rl.AsteroidsVisualizer.VisualEntity;
 import uk.co.alexoyston.asteroids.simple_rl.state.AgentState;
 import uk.co.alexoyston.asteroids.simple_rl.state.AsteroidsState;
 import uk.co.alexoyston.asteroids.simple_rl.state.EnemyState;
-import uk.co.alexoyston.asteroids.simple_rl.state.ThreatState;
+
 import uk.co.alexoyston.asteroids.simulation.Asteroid;
 import uk.co.alexoyston.asteroids.simulation.PhysicsParams;
 import uk.co.alexoyston.asteroids.simulation.Bullet;
@@ -46,7 +47,7 @@ public class AsteroidsEnvironment implements Environment {
 
 		ArrayList<EnemyState.Asteroid> asteroids = new ArrayList<EnemyState.Asteroid>();
 		ArrayList<EnemyState.Saucer> saucers = new ArrayList<EnemyState.Saucer>();
-		ArrayList<ThreatState.Bullet> bullets = new ArrayList<ThreatState.Bullet>();
+		ArrayList<EnemyState.Bullet> bullets = new ArrayList<EnemyState.Bullet>();
 		Player player = this.sim.players.get(0);
 
 		AgentState agent = new AgentState(
@@ -87,12 +88,15 @@ public class AsteroidsEnvironment implements Environment {
 			}
 
 			if (entity instanceof Bullet) {
-				ThreatState.Bullet bullet = new ThreatState.Bullet(
+				EnemyState.Bullet bullet = new EnemyState.Bullet(
 						"Bullet",
 						entity.location.x,
 						entity.location.y,
 						entity.velocity.x,
-						entity.velocity.y);
+						entity.velocity.y,
+						entity.bounds.width,
+						entity.bounds.height,
+						entity.rotation);
 				bullets.add(bullet);
 			}
 		}

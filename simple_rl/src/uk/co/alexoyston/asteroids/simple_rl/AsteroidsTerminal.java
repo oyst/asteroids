@@ -2,10 +2,11 @@ package uk.co.alexoyston.asteroids.simple_rl;
 
 import burlap.mdp.core.TerminalFunction;
 import burlap.mdp.core.state.State;
+
 import uk.co.alexoyston.asteroids.simple_rl.state.AsteroidsState;
 import uk.co.alexoyston.asteroids.simple_rl.state.AgentState;
 import uk.co.alexoyston.asteroids.simple_rl.state.EnemyState;
-import uk.co.alexoyston.asteroids.simple_rl.state.ThreatState;
+
 import uk.co.alexoyston.asteroids.simulation.PhysicsParams;
 
 class AsteroidsTerminal implements TerminalFunction {
@@ -37,10 +38,10 @@ class AsteroidsTerminal implements TerminalFunction {
 			}
 		}
 
-		for (ThreatState.Bullet bullet : as.bullets) {
+		for (EnemyState.Bullet bullet : as.bullets) {
 			if (collides(
 					agent.x, agent.y, agent.width, agent.height,
-					bullet.x, bullet.y, 2, 2)) {
+					bullet.x, bullet.y, bullet.width, bullet.height)) {
 				return true;
 			}
 		}

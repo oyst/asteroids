@@ -3,10 +3,11 @@ package uk.co.alexoyston.asteroids.simple_rl;
 import burlap.mdp.core.action.Action;
 import burlap.mdp.core.state.State;
 import burlap.mdp.singleagent.model.RewardFunction;
+
 import uk.co.alexoyston.asteroids.simple_rl.state.AgentState;
 import uk.co.alexoyston.asteroids.simple_rl.state.AsteroidsState;
 import uk.co.alexoyston.asteroids.simple_rl.state.EnemyState;
-import uk.co.alexoyston.asteroids.simple_rl.state.ThreatState;
+
 import uk.co.alexoyston.asteroids.simulation.PhysicsParams;
 
 class AsteroidsReward implements RewardFunction {
@@ -39,9 +40,9 @@ class AsteroidsReward implements RewardFunction {
 					asteroid.x, asteroid.y, asteroid.width, asteroid.height)) {
 				return -100;
 			}
-			for (ThreatState.Bullet bullet: asprime.bullets) {
+			for (EnemyState.Bullet bullet: asprime.bullets) {
 				if (collides(
-						bullet.x, bullet.y, 2, 2,
+						bullet.x, bullet.y, bullet.width, bullet.height,
 						asteroid.x, asteroid.y, asteroid.width, asteroid.height)) {
 					return phys.playerAsteroidHitScore;
 				}

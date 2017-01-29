@@ -6,34 +6,48 @@ public class Player extends Entity {
 
 	private float deltaSinceShot = 0;
 	protected float weaponTemp = 0;
-	protected final float shotSpeed = 600f;
-	protected final float shotHeat = 30;
-	protected final float reloadTime = 0.3f;
-	protected final float coolDown = 20;
+	protected final float shotSpeed;
+	protected final float shotHeat;
+	protected final float reloadTime;
+	protected final float coolDown;
+	protected final float maxWeaponTemp;
+
+	protected final int asteroidScore;
+	protected final int saucerScore;
+	protected final int smallSaucerScore;
 
 	protected final Vector2 spawnLocation = new Vector2(0, 0);
-	private final float spawnProtectDuration = 1f;
+	private final float spawnProtectDuration;
 	private float spawnProtectRemaining = 0f;
 	protected int remainingLives = 0;
 
 	private int score = 0;
 
-	public Player() {
+	public Player(PhysicsParams params) {
+		shotSpeed = params.playerShotSpeed;
+		shotHeat = params.playerShotHeat;
+		reloadTime = params.playerReloadTime;
+		coolDown = params.playerWeaponCoolDownRate;
+		spawnProtectDuration = params.playerSpawnProtectDuration;
+		maxWeaponTemp = params.playerMaxWeaponHeat;
+		asteroidScore = params.playerAsteroidHitScore;
+		saucerScore = params.playerSaucerHitScore;
+		smallSaucerScore = params.playerSmallSaucerHitScore;
+		drag = params.playerDrag;
+
 		float width = 20;
 		float height = 20;
 
-		float[] vertices = new float[] { 
+		float[] vertices = new float[] {
 			width / 2, height / 2,
 			0, 0,
 			width / 2, height,
 			width, 0
 		};
-		
+
 		setVertices(vertices);
 
 		center.set(width/2, height/2);
-
-		drag = 0.3f;
 	}
 
 	public void respawn() {
@@ -53,7 +67,7 @@ public class Player extends Entity {
 	}
 
 	public void shoot() {
-		if (weaponTemp > 100 - shotHeat)
+		if (weaponTemp > maxWeaponTemp - shotHeat)
 			return;
 
 		if (deltaSinceShot < reloadTime)
@@ -96,11 +110,11 @@ public class Player extends Entity {
 
 	public void addHitScore(Entity hit) {
 		if (hit instanceof Asteroid)
-			score += 10;
+			score += asteroidScore;
 		if (hit instanceof Saucer)
-			score += 20;
+			score += saucerScore;
 		if (hit instanceof SmallSaucer)
-			score += 30;
+			score += smallSaucerScore;
 	}
 
 	public int getScore() {

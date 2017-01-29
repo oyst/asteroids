@@ -4,16 +4,21 @@ import com.badlogic.gdx.math.Vector2;
 
 public class SmallSaucer extends Entity {
 
-	private float speed = 35;
+	private float speed;
 	private float angle = (float) Math.PI / 6;
-	private float turnFreq = 1; 
+	private float turnFreq;
 	private float deltaSinceTurn = 0;
 
-	private float reloadTime = 0.7f;
+	private float reloadTime;
 	private float deltaSinceShot = 0;
-	private float shotSpeed = 250;
+	private float shotSpeed;
 
-	public SmallSaucer() {
+	public SmallSaucer(PhysicsParams params) {
+		speed = params.smallSaucerSpeed;
+		turnFreq = params.smallSaucerTurnFreq;
+		reloadTime = params.smallSaucerReloadTime;
+		shotSpeed = params.smallSaucerShotSpeed;
+
 		int width = 25;
 		int height = 15;
 

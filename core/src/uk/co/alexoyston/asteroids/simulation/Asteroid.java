@@ -4,10 +4,10 @@ import java.util.ArrayList;
 
 public class Asteroid extends Entity {
 	private int numSplits;
-	private float splitBoost = 7;
+	private float splitBoost;
 
 	private static final ArrayList<float[]> asteroidShapes = new ArrayList<float[]>();
-	
+
 	static {
 		asteroidShapes.add(new float[] {
 			6.0f, 15.0f,
@@ -40,17 +40,22 @@ public class Asteroid extends Entity {
 		});
 	}
 
-	public Asteroid(int numSplits) {
+	public Asteroid(PhysicsParams params) {
+		this(params.asteroidStartSize, params.asteroidSplitBoost);
+	}
+
+	public Asteroid(int numSplits, float splitBoost) {
+		this.splitBoost = splitBoost;
 		this.numSplits = numSplits;
-		
+
 		int index = (int) (Math.random() * asteroidShapes.size());
-	
+
 		float[] vertices = new float[asteroidShapes.get(index).length];
 		System.arraycopy(asteroidShapes.get(index), 0, vertices, 0, asteroidShapes.get(index).length);
-		
-		for (int i = 0; i < vertices.length; i++) 
+
+		for (int i = 0; i < vertices.length; i++)
 			vertices[i] *= (this.numSplits + 1);
-		
+
 		setVertices(vertices);
 
 		center.set(bounds.width/2, bounds.height/2);
@@ -64,7 +69,7 @@ public class Asteroid extends Entity {
 			return;
 
 		for (int i = 0; i < 2; i++) {
-			Asteroid child = new Asteroid(numSplits);
+			Asteroid child = new Asteroid(numSplits, splitBoost);
 
 			// Get an extra boost in a random direction
 			float angle = (float) (Math.random() * 2 * Math.PI);

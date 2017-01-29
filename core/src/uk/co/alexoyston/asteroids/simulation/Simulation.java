@@ -19,27 +19,41 @@ public class Simulation implements Disposable, EntityListener {
 
 	private int level = 0;
 
-	private int asteroidStartNum = 4;
-	private int asteroidStartSize = 2;
-	private float asteroidMinSpeed = 15;
-	private float asteroidMaxSpeed = 25;
+	private int asteroidStartNum;
+	private int asteroidStartSize;
+	private float asteroidMinSpeed;
+	private float asteroidMaxSpeed;
 
 	private int saucersOnField = 0;
-	private int saucersMax = 0;
-	private float saucersProbSmall = 0.3f;
-	private float saucersFreq = 0.5f;
-	private float saucersSpeed = 25;
+	private int saucersMax;
+	private float saucersProbSmall;
+	private float saucersFreq;
+	private float saucersSpeed;
+
+	private float updateLimiter;
 
 	public final Rectangle bounds;
-	
+
 	private PhysicsParams params;
 
 	public Simulation(PhysicsParams params) {
 		this.params = params;
+
 		// TODO: Having the x,y of bounds == 0, 0 causes a problem with the
 		// bounds checks
 		// Find out why and if there is a way to fix it
 		bounds = new Rectangle(1, 1, this.params.worldWidth - 2, this.params.worldHeight - 2);
+
+		asteroidStartNum = this.params.asteroidStartCount;
+		asteroidStartSize = this.params.asteroidStartSize;
+		asteroidMinSpeed = this.params.asteroidMinSpeed;
+		asteroidMaxSpeed = this.params.asteroidMaxSpeed;
+
+		saucersMax = this.params.saucersMax;
+		saucersProbSmall = this.params.saucersProbSmall;
+		saucersFreq = this.params.saucersFreq;
+
+		updateLimiter = this.params.updateDelta;
 
 		level = 0;
 
@@ -49,7 +63,7 @@ public class Simulation implements Disposable, EntityListener {
 	public void nextLevel() {
 		level++;
 		for (int i = 0; i < (asteroidStartNum + level); i++) {
-			Asteroid asteroid = new Asteroid(asteroidStartSize);
+			Asteroid asteroid = new Asteroid(params);
 			float x, y, vx, vy;
 
 			// Start in a random direction
@@ -82,13 +96,12 @@ public class Simulation implements Disposable, EntityListener {
 
 	/**
 	 * Add a new controllable player to the simulation
-	 * 
+	 *
 	 * @return The ID of the player to be used when requesting movement
 	 */
 	public int addPlayer(float x, float y) {
 		int id = players.size();
-		//Gdx.app.log(TAG, "Player " + id + " added");
-		Player player = new Player();
+		Player player = new Player(params);
 		player.location.set(x - player.bounds.width / 2, y - player.bounds.height / 2);
 		player.spawnLocation.set(player.location);
 		players.add(player);
@@ -99,9 +112,18 @@ public class Simulation implements Disposable, EntityListener {
 	public void update(float delta) {
 		//TODO: Refactor the whole update loop
 		// Maybe separate lists for each entity type??
-		
+
 		if (paused)
 			return;
+
+		if (delta < updateLimiter) {
+			try {
+			    Thread.sleep((int) (1000 * updateLimiter - delta));
+			} catch(InterruptedException e) {
+			    Thread.currentThread().interrupt();
+			}
+			delta = updateLimiter;
+		}
 
 		entities.addAll(waitingEntities);
 		waitingEntities.clear();
@@ -113,9 +135,9 @@ public class Simulation implements Disposable, EntityListener {
 		if (Math.random() < saucersFreq * delta && saucersOnField < saucersMax) {
 			Entity saucer;
 			if (Math.random() < saucersProbSmall)
-				saucer = new SmallSaucer();
+				saucer = new SmallSaucer(params);
 			else
-				saucer = new Saucer();
+				saucer = new Saucer(params);
 			saucer.location.y = bounds.y + (float)Math.random() * bounds.height;
 			saucer.location.x = (Math.random() < 0.5) ? bounds.x - saucer.bounds.width : bounds.width;
 			saucer.velocity.x = saucersSpeed;
@@ -236,12 +258,10 @@ public class Simulation implements Disposable, EntityListener {
 	}
 
 	public void pause() {
-		//Gdx.app.log(TAG, "Paused");
 		paused = true;
 	}
 
 	public void resume() {
-		//Gdx.app.log(TAG, "Resumed");
 		paused = false;
 	}
 
@@ -251,18 +271,18 @@ public class Simulation implements Disposable, EntityListener {
 
 	public void playerFwd(int playerId) {
 		Player player = players.get(playerId);
-		player.acceleration.x = (float) Math.sin(player.rotation) * 120f;
-		player.acceleration.y = (float) Math.cos(player.rotation) * 120f;
+		player.acceleration.x = (float) Math.sin(player.rotation) * params.playerThrustPower;
+		player.acceleration.y = (float) Math.cos(player.rotation) * params.playerThrustPower;
 	}
 
 	public void playerRotLeft(int playerId) {
 		Player player = players.get(playerId);
-		player.rotationSpeed = -3f;
+		player.rotationSpeed = -params.playerRotationPower;
 	}
 
 	public void playerRotRight(int playerId) {
 		Player player = players.get(playerId);
-		player.rotationSpeed = 3f;
+		player.rotationSpeed = params.playerRotationPower;
 	}
 
 	public void playerShoot(int playerId) {

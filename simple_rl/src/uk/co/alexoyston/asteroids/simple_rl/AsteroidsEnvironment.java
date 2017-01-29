@@ -29,8 +29,7 @@ import uk.co.alexoyston.asteroids.simulation.SmallSaucer;
 public class AsteroidsEnvironment implements Environment {
 
 	private Simulation sim;
-	private int reward = 0;
-	private boolean terminal = false;
+	private int lastReward = 0;
 	private PhysicsParams phys;
 
 	public AsteroidsEnvironment(PhysicsParams phys) {
@@ -42,24 +41,23 @@ public class AsteroidsEnvironment implements Environment {
 	public State currentObservation() {
 		if (this.sim.players.size() == 0) {
 			AgentState agent = new AgentState();
-			terminal = true;
 			return new AsteroidsState(agent);
 		}
-
-		Player player = this.sim.players.get(0);
-
-		float x = player.location.x;
-		float y = player.location.y;
-		float width = player.bounds.width;
-		float height = player.bounds.height;
-		float rot = player.rotation;
-		float vx = player.velocity.x;
-		float vy = player.velocity.y;
-		AgentState agent = new AgentState(x, y, width, height, rot, vx, vy);
 
 		ArrayList<EnemyState.Asteroid> asteroids = new ArrayList<EnemyState.Asteroid>();
 		ArrayList<EnemyState.Saucer> saucers = new ArrayList<EnemyState.Saucer>();
 		ArrayList<ThreatState.Bullet> bullets = new ArrayList<ThreatState.Bullet>();
+		Player player = this.sim.players.get(0);
+
+		AgentState agent = new AgentState(
+			player.location.x,
+			player.location.y,
+			player.bounds.width,
+			player.bounds.height,
+			player.rotation,
+			player.velocity.x,
+			player.velocity.y
+		);
 
 		for (Entity entity : this.sim.entities) {
 			if (entity instanceof Asteroid) {
@@ -123,62 +121,52 @@ public class AsteroidsEnvironment implements Environment {
 
 	@Override
 	public EnvironmentOutcome executeAction(Action a) {
-		State oldState = currentObservation();
+		Player player;
+		State oldState, newState;
+		int oldScore, newScore;
 
-		if (this.sim.players.size() == 0) {
-			terminal = true;
-			reward = -100;
-			return new EnvironmentOutcome(oldState, a, oldState, reward, terminal);
-		}
+		player = this.sim.players.get(0);
 
-		Player player = this.sim.players.get(0);
-		int oldScore = player.getScore();
+		oldState = currentObservation();
+		oldScore = player.getScore();
 
-		if (a.actionName().equals(ACTION_FORWARD)) {
+		if (a.actionName().equals(ACTION_FORWARD))
 			this.sim.playerFwd(0);
-		}
-		else if (a.actionName().equals(ACTION_ROTATE_RIGHT)) {
+		else if (a.actionName().equals(ACTION_ROTATE_RIGHT))
 			this.sim.playerRotRight(0);
-		}
-		else if (a.actionName().equals(ACTION_ROTATE_LEFT)) {
+		else if (a.actionName().equals(ACTION_ROTATE_LEFT))
 			this.sim.playerRotLeft(0);
-		}
-		else if (a.actionName().equals(ACTION_SHOOT)) {
+		else if (a.actionName().equals(ACTION_SHOOT))
 			this.sim.playerShoot(0);
-		}
 
 		this.sim.update(phys.updateDelta);
 
-		State newState = currentObservation();
-		int newScore = player.getScore();
+		newState = currentObservation();
+		newScore = player.getScore();
 
-		if (this.sim.players.size() == 0) {
-			terminal = true;
-			reward = -100;
-			return new EnvironmentOutcome(oldState, a, newState, reward, terminal);
-		}
+		if (this.sim.players.size() == 0)
+			lastReward = -100;
+		else
+			lastReward = oldScore - newScore;
 
-		reward = oldScore - newScore;
-
-		return new EnvironmentOutcome(oldState, a, newState, reward, isInTerminalState());
+		return new EnvironmentOutcome(oldState, a, newState, lastReward, isInTerminalState());
 	}
 
 	@Override
 	public double lastReward() {
-		return reward;
+		return lastReward;
 	}
 
 	@Override
 	public boolean isInTerminalState() {
-		return terminal;
+		return this.sim.players.size() == 0;
 	}
 
 	@Override
 	public void resetEnvironment() {
 		this.sim = new Simulation(this.phys);
 		this.sim.addPlayer(this.phys.worldWidth / 2, this.phys.worldHeight / 2);
-		terminal = false;
-		reward = 0;
+		lastReward = 0;
 	}
 
 }

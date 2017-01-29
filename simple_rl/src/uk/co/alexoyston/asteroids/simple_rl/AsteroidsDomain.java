@@ -19,6 +19,8 @@ import burlap.behavior.singleagent.planning.stochastic.sparsesampling.SparseSamp
 import burlap.mdp.auxiliary.DomainGenerator;
 import burlap.mdp.core.TerminalFunction;
 import burlap.mdp.core.action.UniversalActionType;
+import burlap.mdp.core.oo.OODomain;
+import burlap.mdp.core.oo.propositional.PropositionalFunction;
 import burlap.mdp.singleagent.SADomain;
 import burlap.mdp.singleagent.environment.Environment;
 import burlap.mdp.singleagent.model.FactoredModel;
@@ -27,6 +29,8 @@ import burlap.mdp.singleagent.oo.OOSADomain;
 import burlap.shell.visual.VisualExplorer;
 import burlap.statehashing.simple.SimpleHashableStateFactory;
 import burlap.visualizer.Visualizer;
+import uk.co.alexoyston.asteroids.simple_rl.props.AgentKilled;
+import uk.co.alexoyston.asteroids.simple_rl.props.AgentShotObject;
 import uk.co.alexoyston.asteroids.simple_rl.state.AgentState;
 import uk.co.alexoyston.asteroids.simple_rl.state.EnemyState;
 import uk.co.alexoyston.asteroids.simulation.PhysicsParams;
@@ -34,8 +38,8 @@ import uk.co.alexoyston.asteroids.simulation.PhysicsParams;
 public class AsteroidsDomain implements DomainGenerator {
 
 	public static final String ACTION_FORWARD = "forward";
-	public static final String ACTION_ROTATE_RIGHT = "rotate_right";
-	public static final String ACTION_ROTATE_LEFT = "rotate_left";
+	public static final String ACTION_ROTATE_RIGHT = "rotateRight";
+	public static final String ACTION_ROTATE_LEFT = "rotateLeft";
 	public static final String ACTION_SHOOT = "shoot";
 	public static final String ACTION_NONE = "none";
 
@@ -48,9 +52,15 @@ public class AsteroidsDomain implements DomainGenerator {
 	public static final String VAR_Y = "y";
 	public static final String VAR_WIDTH = "width";
 	public static final String VAR_HEIGHT = "height";
-	public static final String VAR_VELOCITY_X = "velocity_x";
-	public static final String VAR_VELOCITY_Y = "velocity_y";
+	public static final String VAR_VELOCITY_X = "velocityX";
+	public static final String VAR_VELOCITY_Y = "velocityY";
 	public static final String VAR_ROTATION = "rotation";
+
+	public static final String PF_AGENT_KILLED = "agentKilled";
+	public static final String PF_SHOT_ASTEROID = "shotAsteroid";
+	public static final String PF_SHOT_BULLET = "shotBullet";
+	public static final String PF_SHOT_SAUCER = "shotSaucer";
+	public static final String PF_SHOT_AGENT = "shotAgent";
 
 	private PhysicsParams phys;
 	private AsteroidsModel model;
@@ -74,14 +84,26 @@ public class AsteroidsDomain implements DomainGenerator {
 				new UniversalActionType(ACTION_SHOOT),
 				new UniversalActionType(ACTION_NONE));
 
+		OODomain.Helper.addPfsToDomain(domain, this.generatePfs());
+
 		phys = new PhysicsParams();
 		model = new AsteroidsModel(phys);
-		reward = new AsteroidsReward(phys);
-		terminal = new AsteroidsTerminal(phys);
+		reward = new AsteroidsReward(domain, phys);
+		terminal = new AsteroidsTerminal(domain, phys);
 
 		domain.setModel(new FactoredModel(model, reward, terminal));
 
 		return domain;
+	}
+
+
+	public List<PropositionalFunction> generatePfs(){
+		return Arrays.asList(
+				new AgentShotObject.Bullet(PF_SHOT_BULLET),
+				new AgentShotObject.Agent(PF_SHOT_AGENT),
+				new AgentShotObject.Asteroid(PF_SHOT_ASTEROID),
+				new AgentShotObject.Saucer(PF_SHOT_SAUCER),
+				new AgentKilled(PF_AGENT_KILLED));
 	}
 
 	public static void main(String [] args){

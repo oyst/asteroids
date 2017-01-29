@@ -48,6 +48,7 @@ public abstract class EnemyState implements ObjectInstance {
 		this.width = width;
 		this.height = height;
 		this.rot = rot;
+		this.name = name;
 	}
 
 	@Override

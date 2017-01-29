@@ -2,7 +2,7 @@ package uk.co.alexoyston.asteroids.simulation;
 
 public class PhysicsParams {
 
-	public static float updateDelta = 0.001f;
+	public static float updateDelta = 0.01f;
 
 	public static int worldWidth = 1000;
 	public static int worldHeight = 1000;

@@ -33,7 +33,7 @@ public class AsteroidsVisualizer {
 
 	public static Visualizer getVisualizer(Environment env){
 		Visualizer visualizer = getVisualizer();
-//		visualizer.addRenderLayer(getEnvRenderLayer(env));
+		visualizer.addRenderLayer(getEnvRenderLayer(env));
 		return visualizer;
 	}
 

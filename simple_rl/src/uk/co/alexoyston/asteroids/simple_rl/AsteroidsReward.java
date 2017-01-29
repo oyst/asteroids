@@ -12,7 +12,7 @@ import uk.co.alexoyston.asteroids.simulation.PhysicsParams;
 class AsteroidsReward implements RewardFunction {
 
 	private PhysicsParams phys;
-	
+
 	public AsteroidsReward(PhysicsParams phys) {
 		this.phys = phys;
 	}
@@ -21,8 +21,8 @@ class AsteroidsReward implements RewardFunction {
 	public double reward(State s, Action a, State sprime) {
 		AsteroidsState as = (AsteroidsState)s;
 		AsteroidsState asprime = (AsteroidsState)sprime;
-		
-		
+
+
 		AgentState agent = as.agent;
 		for (EnemyState.Asteroid asteroid : as.asteroids) {
 			if (collides(
@@ -31,7 +31,7 @@ class AsteroidsReward implements RewardFunction {
 				return 0;
 			}
 		}
-		
+
 		agent = asprime.agent;
 		for (EnemyState.Asteroid asteroid : asprime.asteroids) {
 			if (collides(
@@ -43,16 +43,16 @@ class AsteroidsReward implements RewardFunction {
 				if (collides(
 						bullet.x, bullet.y, 2, 2,
 						asteroid.x, asteroid.y, asteroid.width, asteroid.height)) {
-					return 1000;
+					return phys.playerAsteroidHitScore;
 				}
 			}
 		}
-		
+
 		return 0;
 	}
 
 	public boolean collides(
-			float r1_x, float r1_y, float r1_width, float r1_height, 
+			float r1_x, float r1_y, float r1_width, float r1_height,
 			float r2_x, float r2_y, float r2_width, float r2_height) {
 
 		return (r1_x < r2_x + r2_width &&
@@ -60,6 +60,6 @@ class AsteroidsReward implements RewardFunction {
 				r1_y < r2_y + r2_height &&
 				r1_height + r1_y > r2_y);
 	}
-	
-	
+
+
 }

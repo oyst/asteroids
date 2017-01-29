@@ -147,7 +147,7 @@ public class AsteroidsEnvironment implements Environment {
 			this.sim.playerShoot(0);
 		}
 
-		this.sim.update(0.01f);
+		this.sim.update(phys.updateDelta);
 
 		State newState = currentObservation();
 		int newScore = player.getScore();
@@ -158,7 +158,7 @@ public class AsteroidsEnvironment implements Environment {
 			return new EnvironmentOutcome(oldState, a, newState, reward, terminal);
 		}
 
-		reward = oldScore - newScore + 1;
+		reward = oldScore - newScore;
 
 		return new EnvironmentOutcome(oldState, a, newState, reward, isInTerminalState());
 	}

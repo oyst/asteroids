@@ -92,8 +92,8 @@ public class AsteroidsDomain implements DomainGenerator {
 
 		Visualizer v = AsteroidsVisualizer.getVisualizer((AsteroidsEnvironment) env);
 
-//		explorer(domain, env, v);
-		SARSA(domain, env, v);
+		explorer(domain, env, v);
+		// SARSA(domain, env, v);
 //		SS(domain, env, v);
 	}
 
@@ -103,7 +103,7 @@ public class AsteroidsDomain implements DomainGenerator {
 		exp.addKeyAction("w", ACTION_FORWARD, "");
 		exp.addKeyAction("a", ACTION_ROTATE_RIGHT, "");
 		exp.addKeyAction("d", ACTION_ROTATE_LEFT, "");
-		exp.addKeyAction("space", ACTION_SHOOT, "");
+		exp.addKeyAction("e", ACTION_SHOOT, "");
 		exp.addKeyAction("s", ACTION_NONE, "");
 
 		exp.initGUI();

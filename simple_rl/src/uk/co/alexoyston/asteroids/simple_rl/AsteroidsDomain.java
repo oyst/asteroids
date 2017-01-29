@@ -38,6 +38,7 @@ public class AsteroidsDomain implements DomainGenerator {
 	public static final String ACTION_ROTATE_RIGHT = "rotate_right";
 	public static final String ACTION_ROTATE_LEFT = "rotate_left";
 	public static final String ACTION_SHOOT = "shoot";
+	public static final String ACTION_NONE = "none";
 
 	public static final String CLASS_AGENT = "agent";
 	public static final String CLASS_ASTEROID = "asteroid";
@@ -71,7 +72,8 @@ public class AsteroidsDomain implements DomainGenerator {
 				new UniversalActionType(ACTION_FORWARD),
 				new UniversalActionType(ACTION_ROTATE_RIGHT),
 				new UniversalActionType(ACTION_ROTATE_LEFT),
-				new UniversalActionType(ACTION_SHOOT));
+				new UniversalActionType(ACTION_SHOOT),
+				new UniversalActionType(ACTION_NONE));
 
 		phys = new PhysicsParams();
 		model = new AsteroidsModel(phys);
@@ -99,9 +101,10 @@ public class AsteroidsDomain implements DomainGenerator {
 		VisualExplorer exp = new VisualExplorer(domain, env, v);
 
 		exp.addKeyAction("w", ACTION_FORWARD, "");
-		exp.addKeyAction("s", ACTION_ROTATE_RIGHT, "");
+		exp.addKeyAction("a", ACTION_ROTATE_RIGHT, "");
 		exp.addKeyAction("d", ACTION_ROTATE_LEFT, "");
-		exp.addKeyAction("a", ACTION_SHOOT, "");
+		exp.addKeyAction("space", ACTION_SHOOT, "");
+		exp.addKeyAction("s", ACTION_NONE, "");
 
 		exp.initGUI();
 	}

@@ -214,12 +214,6 @@ public class AsteroidsState implements MutableOOState {
 			else if (key.obVarKey.equals(VAR_VELOCITY_Y)) {
 				touchAgent().vy = num.floatValue();
 			}
-			else if (key.obVarKey.equals(VAR_ALIVE)) {
-				touchAgent().alive = num.intValue();
-			}
-			else if (key.obVarKey.equals(VAR_SCORE)) {
-				touchAgent().score = num.intValue();
-			}
 			else {
 				throw new UnknownKeyException(key.obVarKey);
 			}

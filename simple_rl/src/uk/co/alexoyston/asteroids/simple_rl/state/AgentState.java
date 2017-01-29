@@ -20,27 +20,16 @@ public class AgentState implements ObjectInstance {
 	public float width = 0f;
 	public float height = 0f;
 
-	public int alive = 0;
-	public int score = 0;
-
-	private static final List<Object> keys = Arrays.<Object>asList(VAR_X, VAR_Y, VAR_WIDTH, VAR_HEIGHT, VAR_VELOCITY_X, VAR_VELOCITY_Y, VAR_ROTATION, VAR_SCORE, VAR_ALIVE);
+	private static final List<Object> keys = Arrays.<Object>asList(VAR_X, VAR_Y, VAR_WIDTH, VAR_HEIGHT, VAR_VELOCITY_X, VAR_VELOCITY_Y, VAR_ROTATION);
 
 	public AgentState() {
 	}
 
 	public AgentState(float x, float y, float width, float height, float rot) {
-		this(x, y, width, height, rot, 0f, 0f, 3, 0);
+		this(x, y, width, height, rot, 0f, 0f);
 	}
 
 	public AgentState(float x, float y, float width, float height, float rot, float vx, float vy) {
-		this(x, y, width, height, rot, vx, vy, 3, 0);
-	}
-
-	public AgentState(float x, float y, float width, float height, float rot, float vx, float vy, int lives) {
-		this(x, y, width, height, rot, vx, vy, lives, 0);
-	}
-
-	public AgentState(float x, float y, float width, float height, float rot, float vx, float vy, int alive, int score) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -48,8 +37,6 @@ public class AgentState implements ObjectInstance {
 		this.rot = rot;
 		this.vx = vx;
 		this.vy = vy;
-		this.alive = alive;
-		this.score = 0;
 	}
 
 	@Override
@@ -73,17 +60,13 @@ public class AgentState implements ObjectInstance {
 			return vy;
 		} else if (variableKey.equals(VAR_ROTATION)) {
 			return rot;
-		} else if (variableKey.equals(VAR_ALIVE)) {
-			return alive;
-		} else if (variableKey.equals(VAR_SCORE)) {
-			return score;
 		}
 		throw new UnknownKeyException(variableKey);
 	}
 
 	@Override
 	public AgentState copy() {
-		return new AgentState(x, y, width, height, rot, vx, vy, alive, score);
+		return new AgentState(x, y, width, height, rot, vx, vy);
 	}
 
 	@Override

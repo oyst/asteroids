@@ -51,8 +51,6 @@ public class AsteroidsDomain implements DomainGenerator {
 	public static final String VAR_VELOCITY_X = "velocity_x";
 	public static final String VAR_VELOCITY_Y = "velocity_y";
 	public static final String VAR_ROTATION = "rotation";
-	public static final String VAR_SCORE = "score";
-	public static final String VAR_ALIVE = "alive";
 
 	private PhysicsParams phys;
 	private AsteroidsModel model;
@@ -127,8 +125,8 @@ public class AsteroidsDomain implements DomainGenerator {
 
 		TileCodingFeatures tilecoding = new TileCodingFeatures(inputFeatures);
 		tilecoding.addTilingsForDimensionsAndWidths(
-				new boolean[] {true, true, false, false, true, true, true, false, false},
-				new double[] {10, 10, 0, 0, 2, 2, 1.2, 0, 0}, 9, TilingArrangement.RANDOM_JITTER);
+				new boolean[] {true, true, false, false, true, true, true},
+				new double[] {10, 10, 0, 0, 2, 2, 1.2}, 7, TilingArrangement.RANDOM_JITTER);
 
 		double defaultQ = 0.5;
 		DifferentiableStateActionValue vfa = tilecoding.generateVFA(defaultQ/nTilings);

@@ -42,7 +42,7 @@ public class AsteroidsEnvironment implements Environment {
 	public State currentObservation() {
 		if (this.sim.players.size() == 0) {
 			AgentState agent = new AgentState();
-			agent.alive = 0;
+			terminal = true;
 			return new AsteroidsState(agent);
 		}
 
@@ -55,9 +55,7 @@ public class AsteroidsEnvironment implements Environment {
 		float rot = player.rotation;
 		float vx = player.velocity.x;
 		float vy = player.velocity.y;
-		int score = player.getScore();
-		AgentState agent = new AgentState(x, y, width, height, rot, vx, vy, 1);
-		agent.score = score;
+		AgentState agent = new AgentState(x, y, width, height, rot, vx, vy);
 
 		ArrayList<EnemyState.Asteroid> asteroids = new ArrayList<EnemyState.Asteroid>();
 		ArrayList<EnemyState.Saucer> saucers = new ArrayList<EnemyState.Saucer>();
@@ -153,7 +151,6 @@ public class AsteroidsEnvironment implements Environment {
 
 		State newState = currentObservation();
 		int newScore = player.getScore();
-		((AsteroidsState)newState).agent.score = newScore;
 
 		if (this.sim.players.size() == 0) {
 			terminal = true;
@@ -162,9 +159,8 @@ public class AsteroidsEnvironment implements Environment {
 		}
 
 		reward = oldScore - newScore + 1;
-		terminal = ((AsteroidsState)newState).agent.alive <= 0;
 
-		return new EnvironmentOutcome(oldState, a, newState, reward, terminal);
+		return new EnvironmentOutcome(oldState, a, newState, reward, isInTerminalState());
 	}
 
 	@Override

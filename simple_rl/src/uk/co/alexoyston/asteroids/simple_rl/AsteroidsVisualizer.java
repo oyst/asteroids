@@ -21,26 +21,26 @@ import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.*;
 
 
 public class AsteroidsVisualizer {
-    
+
     private AsteroidsVisualizer() {
     }
-	
+
     public static Visualizer getVisualizer() {
 		Visualizer visualizer = new Visualizer();
 		visualizer.setSetRenderLayer(getStateRenderLayer());
 		return visualizer;
     }
-    
+
 	public static Visualizer getVisualizer(Environment env){
 		Visualizer visualizer = getVisualizer();
 //		visualizer.addRenderLayer(getEnvRenderLayer(env));
 		return visualizer;
 	}
-		
+
 	public static RenderLayer getEnvRenderLayer(Environment env) {
 		return new AsteroidsEnvRenderLayer(env);
 	}
-	
+
 	public static StateRenderLayer getStateRenderLayer() {
 		StateRenderLayer layer = new StateRenderLayer();
 
@@ -51,56 +51,56 @@ public class AsteroidsVisualizer {
 		ooStatePainter.addObjectClassPainter(CLASS_ASTEROID, new EnemyPainter());
 		ooStatePainter.addObjectClassPainter(CLASS_SAUCER, new EnemyPainter());
 		ooStatePainter.addObjectClassPainter(CLASS_BULLET, new ThreatPainter());
-		
+
 		return layer;
 	}
-	
+
 	public static class VisualEntity {
 		public float[] vertices;
 		public Color color;
-		
+
 		public VisualEntity(float[] vertices, Color color) {
 			this.vertices = vertices;
 			this.color = color;
 		}
 	}
-	
+
 	public static class AsteroidsEnvRenderLayer implements RenderLayer {
-		
+
 		private AsteroidsEnvironment env;
-		
+
 		public AsteroidsEnvRenderLayer(Environment env) {
 			if (env instanceof AsteroidsEnvironment) {
 				this.env = (AsteroidsEnvironment)env;
-			} 
+			}
 			else {
 				throw new ValueConversionException("Passed environment must extend AsteroidsEnvironment");
 			}
 		}
-		
-		
+
+
 		@Override
 		public void render(Graphics2D g2, float width, float height) {
 			g2.setColor(Color.GREEN);
 			g2.fillRect(0, 0, 5, 5);
-			
+
 			for (VisualEntity entity : env.getVisualEntities()) {
-				
+
 				Path2D.Float poly = new Path2D.Float();
 				poly.moveTo(entity.vertices[0], entity.vertices[1]);
 				for (int i = 2; i < entity.vertices.length; i += 2) {
 					poly.lineTo(entity.vertices[i], entity.vertices[i+1]);
 				}
 				poly.closePath();
-				
+
 				g2.draw(poly);
 			}
-			
+
 		}
 	}
-	
+
 	public static class AgentPainter implements ObjectPainter {
-		
+
 		@Override
 		public void paintObject(Graphics2D g2, OOState s, ObjectInstance ob, float cWidth, float cHeight) {
 			g2.setColor(Color.RED);
@@ -110,7 +110,7 @@ public class AsteroidsVisualizer {
 			float y = (float) ob.get(VAR_Y);
 			float width = (float) ob.get(VAR_WIDTH);
 			float height = (float) ob.get(VAR_HEIGHT);
-						
+
 			g2.setColor(Color.RED);
 
 			Path2D.Float poly = new Path2D.Float();
@@ -119,13 +119,13 @@ public class AsteroidsVisualizer {
 			poly.lineTo(x + width, y + height);
 			poly.lineTo(x, y + height);
 			poly.closePath();
-			
+
 			g2.draw(poly);
 		}
 	}
-	
+
 	public static class EnemyPainter implements ObjectPainter {
-		
+
 		@Override
 		public void paintObject(Graphics2D g2, OOState s, ObjectInstance ob, float cWidth, float cHeight) {
 			g2.setColor(Color.CYAN);
@@ -135,7 +135,7 @@ public class AsteroidsVisualizer {
 			float y = (float) ob.get(VAR_Y);
 			float width = (float) ob.get(VAR_WIDTH);
 			float height = (float) ob.get(VAR_HEIGHT);
-						
+
 			g2.setColor(Color.CYAN);
 
 			Path2D.Float poly = new Path2D.Float();
@@ -144,13 +144,13 @@ public class AsteroidsVisualizer {
 			poly.lineTo(x + width, y + height);
 			poly.lineTo(x, y + height);
 			poly.closePath();
-			
+
 			g2.draw(poly);
 		}
 	}
-	
+
 	public static class ThreatPainter implements ObjectPainter {
-		
+
 		@Override
 		public void paintObject(Graphics2D g2, OOState s, ObjectInstance ob, float cWidth, float cHeight) {
 			g2.setColor(Color.MAGENTA);
@@ -165,7 +165,7 @@ public class AsteroidsVisualizer {
 			poly.lineTo(x + 2, y + 2);
 			poly.lineTo(x, y + 2);
 			poly.closePath();
-			
+
 			g2.fill(poly);
 		}
 	}

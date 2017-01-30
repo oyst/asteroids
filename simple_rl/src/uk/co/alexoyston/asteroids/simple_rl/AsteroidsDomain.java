@@ -29,8 +29,7 @@ import burlap.mdp.singleagent.oo.OOSADomain;
 import burlap.shell.visual.VisualExplorer;
 import burlap.statehashing.simple.SimpleHashableStateFactory;
 import burlap.visualizer.Visualizer;
-import uk.co.alexoyston.asteroids.simple_rl.props.AgentKilled;
-import uk.co.alexoyston.asteroids.simple_rl.props.AgentShotObject;
+import uk.co.alexoyston.asteroids.simple_rl.props.ObjectCollision;
 import uk.co.alexoyston.asteroids.simple_rl.state.AgentState;
 import uk.co.alexoyston.asteroids.simple_rl.state.EnemyState;
 import uk.co.alexoyston.asteroids.simulation.PhysicsParams;
@@ -58,7 +57,6 @@ public class AsteroidsDomain implements DomainGenerator {
 
 	public static final String PF_AGENT_KILLED = "agentKilled";
 	public static final String PF_SHOT_ASTEROID = "shotAsteroid";
-	public static final String PF_SHOT_BULLET = "shotBullet";
 	public static final String PF_SHOT_SAUCER = "shotSaucer";
 	public static final String PF_SHOT_AGENT = "shotAgent";
 
@@ -99,11 +97,10 @@ public class AsteroidsDomain implements DomainGenerator {
 
 	public List<PropositionalFunction> generatePfs(){
 		return Arrays.asList(
-				new AgentShotObject.Bullet(PF_SHOT_BULLET),
-				new AgentShotObject.Agent(PF_SHOT_AGENT),
-				new AgentShotObject.Asteroid(PF_SHOT_ASTEROID),
-				new AgentShotObject.Saucer(PF_SHOT_SAUCER),
-				new AgentKilled(PF_AGENT_KILLED));
+				new ObjectCollision.AgentShot(PF_SHOT_AGENT),
+				new ObjectCollision.AsteroidShot(PF_SHOT_ASTEROID),
+				new ObjectCollision.SaucerShot(PF_SHOT_SAUCER),
+				new ObjectCollision.AgentKilled(PF_AGENT_KILLED));
 	}
 
 	public static void main(String [] args){
@@ -113,8 +110,8 @@ public class AsteroidsDomain implements DomainGenerator {
 
 		Visualizer v = AsteroidsVisualizer.getVisualizer((AsteroidsEnvironment) env);
 
-		explorer(domain, env, v);
-		// SARSA(domain, env, v);
+		// explorer(domain, env, v);
+		SARSA(domain, env, v);
 //		SS(domain, env, v);
 	}
 

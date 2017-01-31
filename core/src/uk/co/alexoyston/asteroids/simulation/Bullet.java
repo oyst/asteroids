@@ -2,13 +2,13 @@ package uk.co.alexoyston.asteroids.simulation;
 
 public class Bullet extends Entity {
 
-	private Entity owner;
+	private BulletShooter owner;
 
-	public Bullet(Entity owner) {
+	public Bullet(BulletShooter owner) {
 		int width = 2;
 		int height = 2;
 
-		float[] vertices = new float[] { 
+		float[] vertices = new float[] {
 			0, 0,
 			width, 0,
 			width, height,
@@ -37,5 +37,12 @@ public class Bullet extends Entity {
 		if (owner instanceof Player) {
 			((Player)owner).addHitScore(other);
 		}
+		owner.onBulletHit(this, other);
+	}
+
+	@Override
+	public void decay() {
+		super.decay();
+		owner.onBulletDecay(this);
 	}
 }

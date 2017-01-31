@@ -4,8 +4,8 @@ public class PhysicsParams {
 
 	public static float updateDelta = 0.01f;
 
-	public static int worldWidth = 1000;
-	public static int worldHeight = 1000;
+	public static int worldWidth = 500;
+	public static int worldHeight = 500;
 
 	public static int asteroidStartCount = 4;
 
@@ -21,6 +21,7 @@ public class PhysicsParams {
 	public static float playerDrag = 0.3f;
 	public static float playerRotationPower = 3f;
 	public static float playerThrustPower = 120f;
+	public static int playerMaxActiveShots = 3;
 	public static float playerShotSpeed = 600f;
 	public static float playerShotHeat = 30f;
 	public static float playerReloadTime = 0.3f;

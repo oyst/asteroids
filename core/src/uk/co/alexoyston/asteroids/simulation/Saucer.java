@@ -2,7 +2,7 @@ package uk.co.alexoyston.asteroids.simulation;
 
 import com.badlogic.gdx.math.Vector2;
 
-public class Saucer extends Entity {
+public class Saucer extends Entity implements BulletShooter {
 
 	private float speed;
 	private float angle = (float) Math.PI / 6;
@@ -93,5 +93,13 @@ public class Saucer extends Entity {
 	@Override
 	public boolean collides(Entity other) {
 		return super.collides(other);
+	}
+
+	@Override
+	public void onBulletHit(Bullet bullet, Entity hitEntity) {
+	}
+
+	@Override
+	public void onBulletDecay(Bullet bullet) {
 	}
 }

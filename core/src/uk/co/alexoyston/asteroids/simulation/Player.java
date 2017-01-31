@@ -2,15 +2,17 @@ package uk.co.alexoyston.asteroids.simulation;
 
 import com.badlogic.gdx.math.Vector2;
 
-public class Player extends Entity {
+public class Player extends Entity implements BulletShooter {
 
-	private float deltaSinceShot = 0;
-	protected float weaponTemp = 0;
+	// public float deltaSinceShot = 0;
+	// public float weaponTemp = 0;
 	protected final float shotSpeed;
-	protected final float shotHeat;
-	protected final float reloadTime;
-	protected final float coolDown;
-	protected final float maxWeaponTemp;
+	// protected final float shotHeat;
+	// protected final float reloadTime;
+	// protected final float coolDown;
+	// protected final float maxWeaponTemp;
+	protected int activeShots = 0;
+	protected final int maxActiveShots;
 
 	protected final int asteroidScore;
 	protected final int saucerScore;
@@ -25,15 +27,16 @@ public class Player extends Entity {
 
 	public Player(PhysicsParams params) {
 		shotSpeed = params.playerShotSpeed;
-		shotHeat = params.playerShotHeat;
-		reloadTime = params.playerReloadTime;
-		coolDown = params.playerWeaponCoolDownRate;
+		// shotHeat = params.playerShotHeat;
+		// reloadTime = params.playerReloadTime;
+		// coolDown = params.playerWeaponCoolDownRate;
 		spawnProtectDuration = params.playerSpawnProtectDuration;
-		maxWeaponTemp = params.playerMaxWeaponHeat;
+		// maxWeaponTemp = params.playerMaxWeaponHeat;
 		asteroidScore = params.playerAsteroidHitScore;
 		saucerScore = params.playerSaucerHitScore;
 		smallSaucerScore = params.playerSmallSaucerHitScore;
 		drag = params.playerDrag;
+		maxActiveShots = params.playerMaxActiveShots;
 
 		float width = 20;
 		float height = 20;
@@ -57,8 +60,8 @@ public class Player extends Entity {
 		}
 		remainingLives--;
 		location.set(spawnLocation);
-		weaponTemp = 0;
-		deltaSinceShot = 0;
+		// weaponTemp = 0;
+		// deltaSinceShot = 0;
 		velocity.setZero();
 		acceleration.setZero();
 		rotation = 0;
@@ -67,14 +70,19 @@ public class Player extends Entity {
 	}
 
 	public void shoot() {
-		if (weaponTemp > maxWeaponTemp - shotHeat)
-			return;
+		// if (weaponTemp > maxWeaponTemp - shotHeat)
+		// 	return;
+		//
+		// if (deltaSinceShot < reloadTime)
+		// 	return;
+		// deltaSinceShot = 0;
+		//
+		// weaponTemp += shotHeat;
 
-		if (deltaSinceShot < reloadTime)
+		if (activeShots >= maxActiveShots)
 			return;
-		deltaSinceShot = 0;
-
-		weaponTemp += shotHeat;
+			
+		activeShots++;
 
 		Bullet bullet = new Bullet(this);
 
@@ -88,9 +96,19 @@ public class Player extends Entity {
 	}
 
 	@Override
+	public void onBulletHit(Bullet bullet, Entity target) {
+		activeShots--;
+	}
+
+	@Override
+	public void onBulletDecay(Bullet bullet) {
+		activeShots--;
+	}
+
+	@Override
 	public void update(float delta) {
-		weaponTemp -= coolDown * delta;
-		deltaSinceShot += delta;
+		// weaponTemp -= coolDown * delta;
+		// deltaSinceShot += delta;
 		spawnProtectRemaining = Math.max(spawnProtectRemaining - delta, 0);
 	}
 

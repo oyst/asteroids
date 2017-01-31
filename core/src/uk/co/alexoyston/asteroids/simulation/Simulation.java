@@ -166,7 +166,7 @@ public class Simulation implements Disposable, EntityListener {
 			// Update age
 			entity.age += delta;
 			if (entity.age > entity.maxAge)
-				entity.alive = false;
+				entity.decay();
 
 			if (!entity.alive) {
 				i.remove();

@@ -24,13 +24,13 @@ public abstract class Entity {
 	public float rotation = 0; // Current rotation in rad
 	public final Vector2 velocity = new Vector2(); // Current velocity in px/s
 	public final Vector2 acceleration = new Vector2();
-	
+
 	public final Rectangle bounds = new Rectangle();
 
 	public float rotationSpeed = 0; // Clockwise rotation in rad/s
 	public float age = 0; // Age in s
 
-	public Color color = Color.WHITE;	
+	public Color color = Color.WHITE;
 	public boolean alive = true;
 
 	protected final Polygon polygon = new Polygon();
@@ -46,7 +46,7 @@ public abstract class Entity {
 	public float[] getVertices() {
 		return polygon.getTransformedVertices();
 	}
-	
+
 	public float[][] getSepVertices() {
 		float[] vertices = polygon.getVertices();
 		float[][] points = new float[vertices.length / 2][2];
@@ -60,7 +60,7 @@ public abstract class Entity {
 	public void setVertices(float[] vertices) {
 		polygon.setVertices(vertices);
 		updateVertices();
-		
+
 		pointIndexes = triangulator.computeTriangles(vertices);
 		triangles = new float[pointIndexes.size * 2][6];
 		// Multiply by 2 to skip over Y coords
@@ -100,7 +100,7 @@ public abstract class Entity {
 
 	/**
 	 * A personal update for any non-standard updates covered by the Simulation
-	 * 
+	 *
 	 * @param delta
 	 * 			Seconds since last update
 	 */
@@ -143,7 +143,7 @@ public abstract class Entity {
 	/**
 	 * Return an array of float[6]'s, each containing the coordinates to make up a single polygon triangle
 	 * The float[6] is ordered as [x1, y1, x2, y2, x3, y3]
-	 * 
+	 *
 	 * @return array of coordinates
 	 */
 	public float[][] getTriangles() {
@@ -167,5 +167,9 @@ public abstract class Entity {
 
 	public final void registerListener(EntityListener listener) {
 		entityListener = listener;
+	}
+
+	public void decay() {
+		alive = false;
 	}
 }

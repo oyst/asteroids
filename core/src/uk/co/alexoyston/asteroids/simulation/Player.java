@@ -4,14 +4,8 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Player extends Entity implements BulletShooter {
 
-	// public float deltaSinceShot = 0;
-	// public float weaponTemp = 0;
+	public int activeShots = 0;
 	protected final float shotSpeed;
-	// protected final float shotHeat;
-	// protected final float reloadTime;
-	// protected final float coolDown;
-	// protected final float maxWeaponTemp;
-	protected int activeShots = 0;
 	protected final int maxActiveShots;
 
 	protected final int asteroidScore;
@@ -27,11 +21,7 @@ public class Player extends Entity implements BulletShooter {
 
 	public Player(PhysicsParams params) {
 		shotSpeed = params.playerShotSpeed;
-		// shotHeat = params.playerShotHeat;
-		// reloadTime = params.playerReloadTime;
-		// coolDown = params.playerWeaponCoolDownRate;
 		spawnProtectDuration = params.playerSpawnProtectDuration;
-		// maxWeaponTemp = params.playerMaxWeaponHeat;
 		asteroidScore = params.playerAsteroidHitScore;
 		saucerScore = params.playerSaucerHitScore;
 		smallSaucerScore = params.playerSmallSaucerHitScore;
@@ -60,28 +50,18 @@ public class Player extends Entity implements BulletShooter {
 		}
 		remainingLives--;
 		location.set(spawnLocation);
-		// weaponTemp = 0;
-		// deltaSinceShot = 0;
 		velocity.setZero();
 		acceleration.setZero();
+		activeShots = 0;
 		rotation = 0;
 		rotationSpeed = 0;
 		spawnProtectRemaining = spawnProtectDuration;
 	}
 
 	public void shoot() {
-		// if (weaponTemp > maxWeaponTemp - shotHeat)
-		// 	return;
-		//
-		// if (deltaSinceShot < reloadTime)
-		// 	return;
-		// deltaSinceShot = 0;
-		//
-		// weaponTemp += shotHeat;
-
 		if (activeShots >= maxActiveShots)
 			return;
-			
+
 		activeShots++;
 
 		Bullet bullet = new Bullet(this);
@@ -107,8 +87,6 @@ public class Player extends Entity implements BulletShooter {
 
 	@Override
 	public void update(float delta) {
-		// weaponTemp -= coolDown * delta;
-		// deltaSinceShot += delta;
 		spawnProtectRemaining = Math.max(spawnProtectRemaining - delta, 0);
 	}
 

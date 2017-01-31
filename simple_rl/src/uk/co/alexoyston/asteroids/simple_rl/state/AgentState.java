@@ -7,6 +7,9 @@ import burlap.mdp.core.oo.state.OOStateUtilities;
 import burlap.mdp.core.oo.state.ObjectInstance;
 import burlap.mdp.core.state.UnknownKeyException;
 import burlap.mdp.core.state.annotations.DeepCopyState;
+
+import uk.co.alexoyston.asteroids.simulation.PhysicsParams;
+
 import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.*;
 
 @DeepCopyState
@@ -19,17 +22,31 @@ public class AgentState implements ObjectInstance {
 	public float vy = 0f;
 	public float width = 0f;
 	public float height = 0f;
+	public int activeShots = 0;
 
-	private static final List<Object> keys = Arrays.<Object>asList(VAR_X, VAR_Y, VAR_WIDTH, VAR_HEIGHT, VAR_VELOCITY_X, VAR_VELOCITY_Y, VAR_ROTATION);
+	private static final List<Object> keys = Arrays.<Object>asList(
+		VAR_X,
+		VAR_Y,
+		VAR_WIDTH,
+		VAR_HEIGHT,
+		VAR_VELOCITY_X,
+		VAR_VELOCITY_Y,
+		VAR_ROTATION,
+		VAR_ACTIVE_SHOTS
+	);
 
 	public AgentState() {
 	}
 
 	public AgentState(float x, float y, float width, float height, float rot) {
-		this(x, y, width, height, rot, 0f, 0f);
+		this(x, y, width, height, rot, 0f, 0f, 0);
 	}
 
 	public AgentState(float x, float y, float width, float height, float rot, float vx, float vy) {
+		this(x, y, width, height, rot, vx, vy, 0);
+	}
+
+	public AgentState(float x, float y, float width, float height, float rot, float vx, float vy, int activeShots) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -37,6 +54,7 @@ public class AgentState implements ObjectInstance {
 		this.rot = rot;
 		this.vx = vx;
 		this.vy = vy;
+		this.activeShots = activeShots;
 	}
 
 	@Override
@@ -60,13 +78,15 @@ public class AgentState implements ObjectInstance {
 			return vy;
 		} else if (variableKey.equals(VAR_ROTATION)) {
 			return rot;
+		} else if (variableKey.equals(VAR_ACTIVE_SHOTS)) {
+			return activeShots;
 		}
 		throw new UnknownKeyException(variableKey);
 	}
 
 	@Override
 	public AgentState copy() {
-		return new AgentState(x, y, width, height, rot, vx, vy);
+		return new AgentState(x, y, width, height, rot, vx, vy, activeShots);
 	}
 
 	@Override

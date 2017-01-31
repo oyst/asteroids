@@ -29,9 +29,12 @@ import burlap.mdp.singleagent.oo.OOSADomain;
 import burlap.shell.visual.VisualExplorer;
 import burlap.statehashing.simple.SimpleHashableStateFactory;
 import burlap.visualizer.Visualizer;
+
 import uk.co.alexoyston.asteroids.simple_rl.props.ObjectCollision;
 import uk.co.alexoyston.asteroids.simple_rl.state.AgentState;
 import uk.co.alexoyston.asteroids.simple_rl.state.EnemyState;
+import uk.co.alexoyston.asteroids.simple_rl.actions.ShootActionType;
+
 import uk.co.alexoyston.asteroids.simulation.PhysicsParams;
 
 public class AsteroidsDomain implements DomainGenerator {
@@ -41,6 +44,8 @@ public class AsteroidsDomain implements DomainGenerator {
 	public static final String ACTION_ROTATE_LEFT = "rotateLeft";
 	public static final String ACTION_SHOOT = "shoot";
 	public static final String ACTION_NONE = "none";
+
+	public static final String ACTIONTYPE_SHOOT = "typeShoot";
 
 	public static final String CLASS_AGENT = "agent";
 	public static final String CLASS_ASTEROID = "asteroid";
@@ -54,6 +59,7 @@ public class AsteroidsDomain implements DomainGenerator {
 	public static final String VAR_VELOCITY_X = "velocityX";
 	public static final String VAR_VELOCITY_Y = "velocityY";
 	public static final String VAR_ROTATION = "rotation";
+	public static final String VAR_ACTIVE_SHOTS = "activeShots";
 
 	public static final String PF_AGENT_KILLED = "agentKilled";
 	public static final String PF_SHOT_ASTEROID = "shotAsteroid";
@@ -79,7 +85,7 @@ public class AsteroidsDomain implements DomainGenerator {
 				new UniversalActionType(ACTION_FORWARD),
 				new UniversalActionType(ACTION_ROTATE_RIGHT),
 				new UniversalActionType(ACTION_ROTATE_LEFT),
-				new UniversalActionType(ACTION_SHOOT),
+				new ShootActionType(ACTIONTYPE_SHOOT, ACTION_SHOOT, phys),
 				new UniversalActionType(ACTION_NONE));
 
 		OODomain.Helper.addPfsToDomain(domain, this.generatePfs());
@@ -93,7 +99,6 @@ public class AsteroidsDomain implements DomainGenerator {
 
 		return domain;
 	}
-
 
 	public List<PropositionalFunction> generatePfs(){
 		return Arrays.asList(
@@ -146,8 +151,8 @@ public class AsteroidsDomain implements DomainGenerator {
 
 		TileCodingFeatures tilecoding = new TileCodingFeatures(inputFeatures);
 		tilecoding.addTilingsForDimensionsAndWidths(
-				new boolean[] {true, true, false, false, true, true, true},
-				new double[] {10, 10, 0, 0, 2, 2, 1.2}, 7, TilingArrangement.RANDOM_JITTER);
+				new boolean[] {true, true, false, false, true, true, true, true},
+				new double[] {10, 10, 0, 0, 2, 2, 1.2, 1}, 8, TilingArrangement.RANDOM_JITTER);
 
 		double defaultQ = 0.5;
 		DifferentiableStateActionValue vfa = tilecoding.generateVFA(defaultQ/nTilings);

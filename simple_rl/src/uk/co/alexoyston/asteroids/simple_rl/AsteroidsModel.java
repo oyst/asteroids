@@ -55,7 +55,7 @@ class AsteroidsModel implements FullStateModel{
 			agent.rot %= (Math.PI) * 2;
 
 		} else if (a.actionName().equals(ACTION_SHOOT)) {
-
+			agent.activeShots++;
 		}
 
 		// Bounds check

@@ -1,9 +1,6 @@
 package uk.co.alexoyston.asteroids.simple_rl;
 
-import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.ACTION_FORWARD;
-import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.ACTION_ROTATE_LEFT;
-import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.ACTION_ROTATE_RIGHT;
-import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.ACTION_SHOOT;
+import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.*;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -57,7 +54,8 @@ public class AsteroidsEnvironment implements Environment {
 			player.bounds.height,
 			player.rotation,
 			player.velocity.x,
-			player.velocity.y
+			player.velocity.y,
+			player.activeShots
 		);
 
 		for (Entity entity : this.sim.entities) {
@@ -139,7 +137,7 @@ public class AsteroidsEnvironment implements Environment {
 		else if (a.actionName().equals(ACTION_ROTATE_RIGHT))
 			this.sim.playerRotRight(0);
 		else if (a.actionName().equals(ACTION_ROTATE_LEFT))
-			this.sim.playerRotLeft(0);
+		this.sim.playerRotLeft(0);
 		else if (a.actionName().equals(ACTION_SHOOT))
 			this.sim.playerShoot(0);
 

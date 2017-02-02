@@ -21,6 +21,7 @@ class AsteroidsReward implements RewardFunction {
 
 	private int collisionReward = -100;
 	private int defaultReward = 0;
+	private int shootReward = -1;
 
 	protected PropositionalFunction killed;
 	protected PropositionalFunction shotAsteroid;
@@ -46,6 +47,9 @@ class AsteroidsReward implements RewardFunction {
 		if (killed.someGroundingIsTrue((OOState)sprime)) {
 			return collisionReward;
 		}
+
+		if (a.actionName().equals(ACTION_SHOOT))
+			return shootReward;
 
 		return defaultReward;
 	}

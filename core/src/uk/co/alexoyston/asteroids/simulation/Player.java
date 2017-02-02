@@ -77,7 +77,7 @@ public class Player extends Entity implements BulletShooter {
 
 	@Override
 	public void onBulletHit(Bullet bullet, Entity target) {
-		activeShots--;
+		// activeShots--;
 	}
 
 	@Override

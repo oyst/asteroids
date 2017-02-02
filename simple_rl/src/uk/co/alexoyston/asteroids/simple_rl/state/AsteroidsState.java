@@ -3,6 +3,7 @@ package uk.co.alexoyston.asteroids.simple_rl.state;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.HashSet;
 
 import burlap.mdp.core.oo.state.MutableOOState;
 import burlap.mdp.core.oo.state.OOStateUtilities;
@@ -17,6 +18,7 @@ import burlap.mdp.core.state.annotations.ShallowCopyState;
 
 import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.*;
 
+// Copy-on-write
 @ShallowCopyState
 public class AsteroidsState implements MutableOOState {
 
@@ -24,6 +26,8 @@ public class AsteroidsState implements MutableOOState {
 	public List<EnemyState.Asteroid> asteroids;
 	public List<EnemyState.Bullet> bullets;
 	public List<EnemyState.Saucer> saucers;
+
+	private HashSet<Object> touchSet;
 
 	public AsteroidsState() {
 	}
@@ -307,47 +311,77 @@ public class AsteroidsState implements MutableOOState {
 
 	@Override
 	public AsteroidsState copy() {
-		return new AsteroidsState(agent, asteroids, bullets, saucers);
+		AsteroidsState state = new AsteroidsState(agent, asteroids, bullets, saucers);
+		state.resetTouchSet();
+		return state;
+	}
+
+	public void resetTouchSet() {
+		touchSet = new HashSet<Object>();
 	}
 
 	public AgentState touchAgent() {
+		if (touchSet.contains(agent))
+			return agent;
 		agent = agent.copy();
+		touchSet.add(agent);
 		return agent;
 	}
 
 	public List<EnemyState.Asteroid> touchAsteroids() {
+		if (touchSet.contains(asteroids))
+			return asteroids;
 		asteroids = new ArrayList<EnemyState.Asteroid>(asteroids);
+		touchSet.add(asteroids);
 		return asteroids;
 	}
 
 	public EnemyState.Asteroid touchAsteroid(int index) {
-		EnemyState.Asteroid asteroid = asteroids.get(index).copy();
-		touchAsteroids().remove(index);
-		touchAsteroids().add(index, asteroid);
+		EnemyState.Asteroid asteroid = asteroids.get(index);
+		if (touchSet.contains(asteroid))
+			return asteroid;
+		touchAsteroids();
+		asteroid = asteroid.copy();
+		asteroids.set(index, asteroid);
+		touchSet.add(asteroid);
 		return asteroid;
 	}
 
 	public List<EnemyState.Saucer> touchSaucers() {
+		if (touchSet.contains(saucers))
+			return saucers;
 		saucers = new ArrayList<EnemyState.Saucer>(saucers);
+		touchSet.add(saucers);
 		return saucers;
 	}
 
 	public EnemyState.Saucer touchSaucer(int index) {
-		EnemyState.Saucer saucer = saucers.get(index).copy();
-		touchSaucers().remove(index);
-		touchSaucers().add(index, saucer);
+		EnemyState.Saucer saucer = saucers.get(index);
+		if (touchSet.contains(saucer))
+			return saucer;
+		touchSaucers();
+		saucer = saucer.copy();
+		saucers.set(index, saucer);
+		touchSet.add(saucer);
 		return saucer;
 	}
 
 	public List<EnemyState.Bullet> touchBullets() {
+		if (touchSet.contains(bullets))
+			return bullets;
 		bullets = new ArrayList<EnemyState.Bullet>(bullets);
+		touchSet.add(bullets);
 		return bullets;
 	}
 
 	public EnemyState.Bullet touchBullet(int index) {
-		EnemyState.Bullet bullet = bullets.get(index).copy();
-		touchBullets().remove(index);
-		touchBullets().add(index, bullet);
+		EnemyState.Bullet bullet = bullets.get(index);
+		if (touchSet.contains(bullet))
+			return bullet;
+		touchBullets();
+		bullet = bullet.copy();
+		bullets.set(index, bullet);
+		touchSet.add(bullet);
 		return bullet;
 	}
 

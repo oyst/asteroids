@@ -66,7 +66,7 @@ public class AsteroidsDomain implements DomainGenerator {
 	public static final String PF_SHOT_SAUCER = "shotSaucer";
 	public static final String PF_SHOT_AGENT = "shotAgent";
 
-	private PhysicsParams phys;
+	private static PhysicsParams phys = new PhysicsParams();
 	private AsteroidsModel model;
 	private RewardFunction reward;
 	private TerminalFunction terminal;
@@ -90,7 +90,6 @@ public class AsteroidsDomain implements DomainGenerator {
 
 		OODomain.Helper.addPfsToDomain(domain, this.generatePfs());
 
-		phys = new PhysicsParams();
 		model = new AsteroidsModel(phys);
 		reward = new AsteroidsReward(domain, phys);
 		terminal = new AsteroidsTerminal(domain, phys);
@@ -147,19 +146,34 @@ public class AsteroidsDomain implements DomainGenerator {
 		ConcatenatedObjectFeatures inputFeatures = new ConcatenatedObjectFeatures()
 				.addObjectVectorizion(CLASS_AGENT, new NumericVariableFeatures());
 
-		int nTilings = 5;
+		double playerMaxVelocity = 2*(phys.playerThrustPower / phys.playerDrag) - (phys.playerThrustPower * phys.updateDelta);
+		double maxVelocity = playerMaxVelocity;
+		maxVelocity = Math.max(maxVelocity, phys.saucerSpeed*2);
+		maxVelocity = Math.max(maxVelocity, phys.smallSaucerSpeed*2);
+		maxVelocity = Math.max(maxVelocity, phys.asteroidMaxSpeed*2);
+
+		int nTilings = 10;
+		int resolution = 20;
+
+		double yWidth = phys.worldHeight / resolution;
+		double xWidth = phys.worldWidth / resolution;
+		double velocityWidth = maxVelocity / resolution;
+		double rotationWidth = (Math.PI*2) / resolution;
+		double activeShotsWidth = phys.playerMaxActiveShots / resolution;
 
 		TileCodingFeatures tilecoding = new TileCodingFeatures(inputFeatures);
 		tilecoding.addTilingsForDimensionsAndWidths(
 				new boolean[] {true, true, false, false, true, true, true, true},
-				new double[] {10, 10, 0, 0, 2, 2, 1.2, 1}, 8, TilingArrangement.RANDOM_JITTER);
+				new double[] {xWidth, yWidth, 0, 0, velocityWidth, velocityWidth, rotationWidth, activeShotsWidth},
+				8,
+				TilingArrangement.RANDOM_JITTER);
 
 		double defaultQ = 0.5;
 		DifferentiableStateActionValue vfa = tilecoding.generateVFA(defaultQ/nTilings);
 		GradientDescentSarsaLam agent = new GradientDescentSarsaLam(domain, 0.99, vfa, 0.02, 0.5);
 
 		List<Episode> episodes = new ArrayList<Episode>();
-		for(int i = 0; i < 1; i++){
+		for(int i = 0; i < 300; i++){
 			Episode ea = agent.runLearningEpisode(env);
 			episodes.add(ea);
 			System.out.println(i + ": " + ea.maxTimeStep());

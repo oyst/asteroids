@@ -149,7 +149,7 @@ public class AsteroidsEnvironment implements Environment {
 		if (this.sim.players.size() == 0)
 			lastReward = -100;
 		else
-			lastReward = oldScore - newScore;
+			lastReward = newScore - oldScore;
 
 		return new EnvironmentOutcome(oldState, a, newState, lastReward, isInTerminalState());
 	}

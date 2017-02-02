@@ -20,24 +20,14 @@ import joptsimple.ValueConversionException;
 import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.*;
 
 public class AsteroidsVisualizer {
-    private AsteroidsVisualizer() {
-    }
+		private AsteroidsVisualizer() {
+		}
 
-    public static Visualizer getVisualizer() {
-  		Visualizer visualizer = new Visualizer();
-  		visualizer.setSetRenderLayer(getStateRenderLayer());
-  		return visualizer;
-    }
-
-	public static Visualizer getVisualizer(Environment env){
-		Visualizer visualizer = getVisualizer();
-		visualizer.addRenderLayer(getEnvRenderLayer(env));
-		return visualizer;
-	}
-
-	public static RenderLayer getEnvRenderLayer(Environment env) {
-		return new AsteroidsEnvRenderLayer(env);
-	}
+		public static Visualizer getVisualizer() {
+			Visualizer visualizer = new Visualizer();
+			visualizer.setSetRenderLayer(getStateRenderLayer());
+			return visualizer;
+		}
 
 	public static StateRenderLayer getStateRenderLayer() {
 		StateRenderLayer layer = new StateRenderLayer();
@@ -59,7 +49,7 @@ public class AsteroidsVisualizer {
 		public void paintObject(Graphics2D g2, OOState s, ObjectInstance ob, float cWidth, float cHeight) {
 			g2.setColor(Color.BLACK);
 
-      EntityState entity = (EntityState)ob;
+			EntityState entity = (EntityState)ob;
 			float x = entity.x;
 			float y = entity.y;
 			float width = entity.width;

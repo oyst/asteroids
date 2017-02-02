@@ -111,7 +111,7 @@ public class AsteroidsDomain implements DomainGenerator {
 		OOSADomain domain = asteroids.generateDomain();
 		Environment env = new AsteroidsEnvironment(asteroids.phys);
 
-		Visualizer v = AsteroidsVisualizer.getVisualizer((AsteroidsEnvironment) env);
+		Visualizer v = AsteroidsVisualizer.getVisualizer();
 
 		// explorer(domain, env, v);
 		SARSA(domain, env, v);

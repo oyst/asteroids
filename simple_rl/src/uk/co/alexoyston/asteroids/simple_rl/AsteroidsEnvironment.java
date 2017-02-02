@@ -8,7 +8,6 @@ import burlap.mdp.core.state.State;
 import burlap.mdp.singleagent.environment.Environment;
 import burlap.mdp.singleagent.environment.EnvironmentOutcome;
 
-import uk.co.alexoyston.asteroids.simple_rl.AsteroidsVisualizer.VisualEntity;
 import uk.co.alexoyston.asteroids.simple_rl.state.AgentState;
 import uk.co.alexoyston.asteroids.simple_rl.state.AsteroidsState;
 import uk.co.alexoyston.asteroids.simple_rl.state.PolarState;

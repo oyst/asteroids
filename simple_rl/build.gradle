@@ -5,11 +5,11 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 project.ext.mainClassName = "uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain"
 
 task run(dependsOn: classes, type: JavaExec) {
-    main = project.mainClassName
-    classpath = sourceSets.main.runtimeClasspath
-    standardInput = System.in
+		main = project.mainClassName
+		classpath = sourceSets.main.runtimeClasspath
+		standardInput = System.in
 }
 
 eclipse.project {
-    name = "simple_rl"
+		name = "simple_rl"
 }

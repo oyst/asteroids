@@ -17,39 +17,39 @@ import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.*;
 
 public class ShootActionType implements ActionType {
 
-  private PhysicsParams phys;
-  private String name;
-  private String actionName;
+	private PhysicsParams phys;
+	private String name;
+	private String actionName;
 
-  public ShootActionType(String actionTypeName, String actionName, PhysicsParams phys) {
-    this.phys = phys;
-    this.name = actionTypeName;
-    this.actionName = actionName;
-  }
+	public ShootActionType(String actionTypeName, String actionName, PhysicsParams phys) {
+		this.phys = phys;
+		this.name = actionTypeName;
+		this.actionName = actionName;
+	}
 
-  @Override
-  public List<Action>	allApplicableActions(State s) {
-    ArrayList<Action> actions = new ArrayList<Action>();
+	@Override
+	public List<Action>	allApplicableActions(State s) {
+		ArrayList<Action> actions = new ArrayList<Action>();
 
-    AsteroidsState state = (AsteroidsState)s;
-    AgentState agent = (AgentState)state.object(CLASS_AGENT);
-    int activeShots = (int)agent.get(VAR_ACTIVE_SHOTS);
+		AsteroidsState state = (AsteroidsState)s;
+		AgentState agent = (AgentState)state.object(CLASS_AGENT);
+		int activeShots = (int)agent.get(VAR_ACTIVE_SHOTS);
 
-    if (activeShots < phys.playerMaxActiveShots)
-      actions.add(new SimpleAction(actionName));
+		if (activeShots < phys.playerMaxActiveShots)
+			actions.add(new SimpleAction(actionName));
 
-    return actions;
-  }
+		return actions;
+	}
 
-  @Override
-  public Action	associatedAction(String strRep) {
-    if (strRep.equals(actionName))
-      return new SimpleAction(actionName);
-    throw new IllegalArgumentException("Unknown action name: " + strRep);
-  }
+	@Override
+	public Action	associatedAction(String strRep) {
+		if (strRep.equals(actionName))
+			return new SimpleAction(actionName);
+		throw new IllegalArgumentException("Unknown action name: " + strRep);
+	}
 
-  @Override
-  public String	typeName() {
-    return name;
-  }
+	@Override
+	public String	typeName() {
+		return name;
+	}
 }

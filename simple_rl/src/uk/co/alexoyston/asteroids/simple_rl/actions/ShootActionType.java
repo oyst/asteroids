@@ -37,7 +37,7 @@ public class ShootActionType implements ActionType {
 
     if (activeShots < phys.playerMaxActiveShots)
       actions.add(new SimpleAction(actionName));
-      
+
     return actions;
   }
 
@@ -45,7 +45,7 @@ public class ShootActionType implements ActionType {
   public Action	associatedAction(String strRep) {
     if (strRep.equals(actionName))
       return new SimpleAction(actionName);
-    throw new IllegalArgumentException("Unknown action name");
+    throw new IllegalArgumentException("Unknown action name: " + strRep);
   }
 
   @Override

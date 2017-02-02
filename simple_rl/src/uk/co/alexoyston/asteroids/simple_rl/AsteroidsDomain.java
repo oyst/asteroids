@@ -30,10 +30,10 @@ import burlap.shell.visual.VisualExplorer;
 import burlap.statehashing.simple.SimpleHashableStateFactory;
 import burlap.visualizer.Visualizer;
 
+import uk.co.alexoyston.asteroids.simple_rl.actions.ShootActionType;
 import uk.co.alexoyston.asteroids.simple_rl.props.ObjectCollision;
 import uk.co.alexoyston.asteroids.simple_rl.state.AgentState;
-import uk.co.alexoyston.asteroids.simple_rl.state.EnemyState;
-import uk.co.alexoyston.asteroids.simple_rl.actions.ShootActionType;
+import uk.co.alexoyston.asteroids.simple_rl.state.PolarState;
 
 import uk.co.alexoyston.asteroids.simulation.PhysicsParams;
 
@@ -52,14 +52,13 @@ public class AsteroidsDomain implements DomainGenerator {
 	public static final String CLASS_SAUCER = "saucer";
 	public static final String CLASS_BULLET = "bullet";
 
-	public static final String VAR_X = "x";
-	public static final String VAR_Y = "y";
-	public static final String VAR_WIDTH = "width";
-	public static final String VAR_HEIGHT = "height";
-	public static final String VAR_VELOCITY_X = "velocityX";
+	public static final String CLASS_CLOSEST_OBJ = "closest";
+
+	public static final String VAR_DIST = "dist"; // Absolute distance from Agent to Object
+	public static final String VAR_ANGLE = "angle"; // Angle between Agent and Object
+	public static final String VAR_VELOCITY_X = "velocityX"; // Velocity of Object relative to Agent
 	public static final String VAR_VELOCITY_Y = "velocityY";
-	public static final String VAR_ROTATION = "rotation";
-	public static final String VAR_ACTIVE_SHOTS = "activeShots";
+	public static final String VAR_ACTIVE_SHOTS = "activeShots"; // Current shots made by Agent
 
 	public static final String PF_AGENT_KILLED = "agentKilled";
 	public static final String PF_SHOT_ASTEROID = "shotAsteroid";
@@ -77,9 +76,9 @@ public class AsteroidsDomain implements DomainGenerator {
 		OOSADomain domain = new OOSADomain();
 
 		domain.addStateClass(CLASS_AGENT, AgentState.class);
-		domain.addStateClass(CLASS_ASTEROID, EnemyState.Asteroid.class);
-		domain.addStateClass(CLASS_SAUCER, EnemyState.Saucer.class);
-		domain.addStateClass(CLASS_BULLET, EnemyState.Bullet.class);
+		domain.addStateClass(CLASS_ASTEROID, PolarState.Asteroid.class);
+		domain.addStateClass(CLASS_SAUCER, PolarState.Saucer.class);
+		domain.addStateClass(CLASS_BULLET, PolarState.Bullet.class);
 
 		domain.addActionTypes(
 				new UniversalActionType(ACTION_FORWARD),
@@ -116,7 +115,7 @@ public class AsteroidsDomain implements DomainGenerator {
 
 		// explorer(domain, env, v);
 		SARSA(domain, env, v);
-//		SS(domain, env, v);
+		// SS(domain, env, v);
 	}
 
 	public static void explorer(OOSADomain domain, Environment env, Visualizer v){
@@ -125,7 +124,7 @@ public class AsteroidsDomain implements DomainGenerator {
 		exp.addKeyAction("w", ACTION_FORWARD, "");
 		exp.addKeyAction("a", ACTION_ROTATE_RIGHT, "");
 		exp.addKeyAction("d", ACTION_ROTATE_LEFT, "");
-		exp.addKeyAction("e", ACTION_SHOOT, "");
+		exp.addKeyAction("e", ACTIONTYPE_SHOOT, ACTION_SHOOT);
 		exp.addKeyAction("s", ACTION_NONE, "");
 
 		exp.initGUI();
@@ -137,14 +136,33 @@ public class AsteroidsDomain implements DomainGenerator {
 		ss.toggleDebugPrinting(true);
 		Policy p = new GreedyQPolicy(ss);
 
-		Episode e = PolicyUtils.rollout(p, env.currentObservation(), domain.getModel(), 1);
+		Episode e = PolicyUtils.rollout(p, env.currentObservation(), domain.getModel(), 10);
 		System.out.println("Num steps: " + e.maxTimeStep());
 		new EpisodeSequenceVisualizer(v, domain, Arrays.asList(e));
 	}
 
 	public static void SARSA(SADomain domain, Environment env, Visualizer v){
-		ConcatenatedObjectFeatures inputFeatures = new ConcatenatedObjectFeatures()
-				.addObjectVectorizion(CLASS_AGENT, new NumericVariableFeatures());
+		ConcatenatedObjectFeatures inputFeatures = new ConcatenatedObjectFeatures();
+		inputFeatures.addObjectVectorizion(
+			CLASS_AGENT,
+			new NumericVariableFeatures(
+				VAR_ACTIVE_SHOTS
+			)
+		);
+		inputFeatures.addObjectVectorizion(
+			CLASS_ASTEROID,
+			new NumericVariableFeatures(
+				VAR_DIST, VAR_ANGLE,
+				VAR_VELOCITY_X, VAR_VELOCITY_Y
+			)
+		);
+		inputFeatures.addObjectVectorizion(
+			CLASS_BULLET,
+			new NumericVariableFeatures(
+				VAR_DIST, VAR_ANGLE,
+				VAR_VELOCITY_X, VAR_VELOCITY_Y
+			)
+		);
 
 		double playerMaxVelocity = 2*(phys.playerThrustPower / phys.playerDrag) - (phys.playerThrustPower * phys.updateDelta);
 		double maxVelocity = playerMaxVelocity;
@@ -155,17 +173,22 @@ public class AsteroidsDomain implements DomainGenerator {
 		int nTilings = 10;
 		int resolution = 20;
 
-		double yWidth = phys.worldHeight / resolution;
-		double xWidth = phys.worldWidth / resolution;
+		double distWidth = Math.max(phys.worldWidth, phys.worldHeight) / resolution;
+		double angleWidth = (Math.PI*2) / resolution;
 		double velocityWidth = maxVelocity / resolution;
-		double rotationWidth = (Math.PI*2) / resolution;
 		double activeShotsWidth = phys.playerMaxActiveShots / resolution;
 
 		TileCodingFeatures tilecoding = new TileCodingFeatures(inputFeatures);
-		tilecoding.addTilingsForDimensionsAndWidths(
-				new boolean[] {true, true, false, false, true, true, true, true},
-				new double[] {xWidth, yWidth, 0, 0, velocityWidth, velocityWidth, rotationWidth, activeShotsWidth},
-				8,
+		tilecoding.addTilingsForAllDimensionsWithWidths(
+				new double[] {
+					activeShotsWidth,
+					distWidth, angleWidth, velocityWidth, velocityWidth,
+					distWidth, angleWidth, velocityWidth, velocityWidth,
+					distWidth, angleWidth, velocityWidth, velocityWidth,
+					distWidth, angleWidth, velocityWidth, velocityWidth,
+					distWidth, angleWidth, velocityWidth, velocityWidth,
+					distWidth, angleWidth, velocityWidth, velocityWidth},
+				1 + 12 + 12,
 				TilingArrangement.RANDOM_JITTER);
 
 		double defaultQ = 0.5;
@@ -173,7 +196,7 @@ public class AsteroidsDomain implements DomainGenerator {
 		GradientDescentSarsaLam agent = new GradientDescentSarsaLam(domain, 0.99, vfa, 0.02, 0.5);
 
 		List<Episode> episodes = new ArrayList<Episode>();
-		for(int i = 0; i < 300; i++){
+		for(int i = 0; i < 2; i++){
 			Episode ea = agent.runLearningEpisode(env);
 			episodes.add(ea);
 			System.out.println(i + ": " + ea.maxTimeStep());

@@ -1,7 +1,5 @@
 package uk.co.alexoyston.asteroids.simple_rl;
 
-import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.*;
-
 import java.awt.Color;
 import java.util.ArrayList;
 
@@ -13,7 +11,7 @@ import burlap.mdp.singleagent.environment.EnvironmentOutcome;
 import uk.co.alexoyston.asteroids.simple_rl.AsteroidsVisualizer.VisualEntity;
 import uk.co.alexoyston.asteroids.simple_rl.state.AgentState;
 import uk.co.alexoyston.asteroids.simple_rl.state.AsteroidsState;
-import uk.co.alexoyston.asteroids.simple_rl.state.EnemyState;
+import uk.co.alexoyston.asteroids.simple_rl.state.PolarState;
 
 import uk.co.alexoyston.asteroids.simulation.Asteroid;
 import uk.co.alexoyston.asteroids.simulation.PhysicsParams;
@@ -23,6 +21,8 @@ import uk.co.alexoyston.asteroids.simulation.Player;
 import uk.co.alexoyston.asteroids.simulation.Saucer;
 import uk.co.alexoyston.asteroids.simulation.Simulation;
 import uk.co.alexoyston.asteroids.simulation.SmallSaucer;
+
+import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.*;
 
 public class AsteroidsEnvironment implements Environment {
 
@@ -36,89 +36,48 @@ public class AsteroidsEnvironment implements Environment {
 	}
 
 	@Override
+	public void resetEnvironment() {
+		sim = new Simulation(phys);
+		sim.addPlayer(phys.worldWidth / 2, phys.worldHeight / 2);
+		lastReward = 0;
+	}
+
+	@Override
 	public State currentObservation() {
-		if (this.sim.players.size() == 0) {
-			AgentState agent = new AgentState();
-			return new AsteroidsState(agent);
-		}
+		if (sim.players.size() == 0)
+			return new AsteroidsState(new AgentState());
 
-		ArrayList<EnemyState.Asteroid> asteroids = new ArrayList<EnemyState.Asteroid>();
-		ArrayList<EnemyState.Saucer> saucers = new ArrayList<EnemyState.Saucer>();
-		ArrayList<EnemyState.Bullet> bullets = new ArrayList<EnemyState.Bullet>();
-		Player player = this.sim.players.get(0);
+		ArrayList<PolarState.Asteroid> asteroids = new ArrayList<PolarState.Asteroid>();
+		ArrayList<PolarState.Saucer> saucers = new ArrayList<PolarState.Saucer>();
+		ArrayList<PolarState.Bullet> bullets = new ArrayList<PolarState.Bullet>();
+		Player player = sim.players.get(0);
 
-		AgentState agent = new AgentState(
-			player.location.x,
-			player.location.y,
-			player.bounds.width,
-			player.bounds.height,
-			player.rotation,
-			player.velocity.x,
-			player.velocity.y,
-			player.activeShots
-		);
+		AgentState agent = new AgentState(player, player.activeShots);
 
 		for (Entity entity : this.sim.entities) {
+			float dist = (float)Math.sqrt(Math.pow(player.location.x - entity.location.x, 2) + Math.pow(player.location.y - entity.location.y, 2));
+			float angle = (float)Math.tan((player.location.y + entity.location.y) / (player.location.x + entity.location.x));
+			float vx = entity.velocity.x - player.velocity.x;
+			float vy = entity.velocity.y - player.velocity.y;
+
 			if (entity instanceof Asteroid) {
-				EnemyState.Asteroid asteroid = new EnemyState.Asteroid(
-						"Asteroid",
-						entity.location.x,
-						entity.location.y,
-						entity.velocity.x,
-						entity.velocity.y,
-						entity.bounds.width,
-						entity.bounds.height,
-						entity.rotation);
+				PolarState.Asteroid asteroid = new PolarState.Asteroid("asteroid_" + entity.hashCode(), entity, dist, angle, vx, vy);
 				asteroids.add(asteroid);
 			}
 
 			if (entity instanceof Saucer || entity instanceof SmallSaucer) {
-				EnemyState.Saucer saucer = new EnemyState.Saucer(
-						"Saucer",
-						entity.location.x,
-						entity.location.y,
-						entity.velocity.x,
-						entity.velocity.y,
-						entity.bounds.width,
-						entity.bounds.height,
-						entity.rotation);
+				PolarState.Saucer saucer = new PolarState.Saucer("saucer_" + entity.hashCode(), entity, dist, angle, vx, vy);
 				saucers.add(saucer);
 			}
 
 			if (entity instanceof Bullet) {
-				EnemyState.Bullet bullet = new EnemyState.Bullet(
-						"Bullet",
-						entity.location.x,
-						entity.location.y,
-						entity.velocity.x,
-						entity.velocity.y,
-						entity.bounds.width,
-						entity.bounds.height,
-						entity.rotation);
+				PolarState.Bullet bullet = new PolarState.Bullet("bullet_" + entity.hashCode(), entity, dist, angle, vx, vy);
 				bullets.add(bullet);
 			}
 		}
 
 		State state = new AsteroidsState(agent, asteroids, bullets, saucers);
 		return state;
-	}
-
-	public VisualEntity[] getVisualEntities() {
-
-		int numEntities = sim.entities.size() + sim.players.size();
-		VisualEntity[] entities = new VisualEntity[numEntities];
-		int currEntity = 0;
-
-		for (Entity entity : sim.entities) {
-			entities[currEntity] = new VisualEntity(entity.getVertices(), Color.BLACK);
-			currEntity++;
-		}
-		for (Entity player : sim.players) {
-			entities[currEntity] = new VisualEntity(player.getVertices(), Color.BLACK);
-			currEntity++;
-		}
-
-		return entities;
 	}
 
 	@Override
@@ -162,13 +121,6 @@ public class AsteroidsEnvironment implements Environment {
 	@Override
 	public boolean isInTerminalState() {
 		return this.sim.players.size() == 0;
-	}
-
-	@Override
-	public void resetEnvironment() {
-		this.sim = new Simulation(this.phys);
-		this.sim.addPlayer(this.phys.worldWidth / 2, this.phys.worldHeight / 2);
-		lastReward = 0;
 	}
 
 }

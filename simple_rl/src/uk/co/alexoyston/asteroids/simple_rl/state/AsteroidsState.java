@@ -5,303 +5,140 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.HashSet;
 
-import burlap.mdp.core.oo.state.MutableOOState;
+import burlap.mdp.core.oo.state.OOState;
 import burlap.mdp.core.oo.state.OOStateUtilities;
 import burlap.mdp.core.oo.state.OOVariableKey;
 import burlap.mdp.core.oo.state.ObjectInstance;
 import burlap.mdp.core.oo.state.exceptions.UnknownClassException;
 import burlap.mdp.core.oo.state.exceptions.UnknownObjectException;
-import burlap.mdp.core.state.MutableState;
 import burlap.mdp.core.state.StateUtilities;
 import burlap.mdp.core.state.UnknownKeyException;
 import burlap.mdp.core.state.annotations.ShallowCopyState;
 
 import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.*;
 
-// Copy-on-write
 @ShallowCopyState
-public class AsteroidsState implements MutableOOState {
+public class AsteroidsState implements OOState {
 
-	public AgentState agent;
-	public List<EnemyState.Asteroid> asteroids;
-	public List<EnemyState.Bullet> bullets;
-	public List<EnemyState.Saucer> saucers;
+	private static final float nullDistance = 10000f;
+	private static final int closestAsteroidsCount = 3;
+	private static final int closestSaucersCount = 0;
+	private static final int closestBulletsCount = 3;
+
+	private static final PolarState.Asteroid nullAsteroid = new PolarState.Asteroid("asteroidNull", nullDistance, 0f, 0f, 0f);
+	private static final PolarState.Saucer nullSaucer = new PolarState.Saucer("saucerNull", nullDistance, 0f, 0f, 0f);
+	private static final PolarState.Bullet nullBullet = new PolarState.Bullet("bulletNull", nullDistance, 0f, 0f, 0f);
 
 	private HashSet<Object> touchSet;
+
+	public AgentState agent;
+	public PolarState.Asteroid[] asteroids = new PolarState.Asteroid[closestAsteroidsCount];
+	public PolarState.Saucer[] saucers = new PolarState.Saucer[closestSaucersCount];
+	public PolarState.Bullet[] bullets = new PolarState.Bullet[closestBulletsCount];
 
 	public AsteroidsState() {
 	}
 
 	public AsteroidsState(AgentState agent) {
 		this.agent = agent;
-		this.asteroids = new ArrayList<EnemyState.Asteroid>();
-		this.bullets = new ArrayList<EnemyState.Bullet>();
-		this.saucers = new ArrayList<EnemyState.Saucer>();
+		for (int i = 0; i < asteroids.length; i++) asteroids[i] = nullAsteroid;
+		for (int i = 0; i < saucers.length; i++) saucers[i] = nullSaucer;
+		for (int i = 0; i < bullets.length; i++) bullets[i] = nullBullet;
 	}
 
-	public AsteroidsState(AgentState agent, List<EnemyState.Asteroid> asteroids, List<EnemyState.Bullet> bullets, List<EnemyState.Saucer> saucers) {
+	public AsteroidsState(AgentState agent, PolarState.Asteroid[] asteroids, PolarState.Bullet[] bullets, PolarState.Saucer[] saucers) {
 		this.agent = agent;
 		this.asteroids = asteroids;
-		this.bullets = bullets;
 		this.saucers = saucers;
+		this.bullets = bullets;
+		touchSet = new HashSet<Object>();
 	}
 
-	@Override
-	public MutableOOState addObject(ObjectInstance o) {
-		if (o instanceof AgentState) {
-			agent = (AgentState)o;
-		}
-		else if (o instanceof EnemyState.Asteroid) {
-			touchAsteroids().add((EnemyState.Asteroid)o);
-		}
-		else if (o instanceof EnemyState.Bullet) {
-			touchBullets().add((EnemyState.Bullet)o);
-		}
-		else if (o instanceof EnemyState.Saucer) {
-			touchSaucers().add((EnemyState.Saucer)o);
-		}
-		else {
-			throw new UnknownClassException(o.className());
-		}
-		return this;
+	public AsteroidsState(AgentState agent, List<PolarState.Asteroid> asteroids, List<PolarState.Bullet> bullets, List<PolarState.Saucer> saucers) {
+		this.agent = agent;
+		selectSort(asteroids, this.asteroids, nullAsteroid);
+		System.out.println(asteroids.size() != 0 ? asteroids.get(0).dist : "n");
+		selectSort(saucers, this.saucers, nullSaucer);
+		selectSort(bullets, this.bullets, nullBullet);
+		touchSet = new HashSet<Object>();
 	}
 
-	@Override
-	public MutableOOState removeObject(String oname) {
-		int index = -1;
-
-		if (agent.name().equals(oname)) {
-			// Cannot remove agent
-			agent = new AgentState();
-			return this;
+	private static <T extends PolarState> void selectSort(List<T> src, T[] dst, T fillerState) {
+		T min;
+		T dst_max = null;
+		for (int i = 0; i < dst.length; i++) {
+			min = fillerState;
+			for (T elem : src) {
+				if ((elem.compareTo(min) < 0) && (dst_max == null || elem.compareTo(dst_max) > 0))
+					min = elem;
+			}
+			dst_max = min;
+			dst[i] = dst_max;
 		}
-
-		index = OOStateUtilities.objectIndexWithName(asteroids, oname);
-		if (index != -1) {
-			touchAsteroids().remove(index);
-			return this;
-		}
-
-		index = OOStateUtilities.objectIndexWithName(bullets, oname);
-		if (index != -1) {
-			touchBullets().remove(index);
-			return this;
-		}
-
-		index = OOStateUtilities.objectIndexWithName(saucers, oname);
-		if (index != -1) {
-			touchSaucers().remove(index);
-			return this;
-		}
-
-		throw new UnknownObjectException(oname);
-	}
-
-	@Override
-	public MutableOOState renameObject(String objectName, String newName) {
-		int index = -1;
-
-		if (agent.name().equals(objectName)) {
-			throw new RuntimeException("Agent name must be " + objectName);
-		}
-
-		index = OOStateUtilities.objectIndexWithName(asteroids, objectName);
-		if (index != -1) {
-			EnemyState.Asteroid obj = asteroids.get(index);
-			touchAsteroids().remove(index);
-			asteroids.add(index, (EnemyState.Asteroid)obj.copyWithName(newName));
-			return this;
-		}
-
-		index = OOStateUtilities.objectIndexWithName(saucers, objectName);
-		if (index != -1) {
-			EnemyState.Saucer obj = saucers.get(index);
-			touchSaucers().remove(index);
-			saucers.add(index, (EnemyState.Saucer)obj.copyWithName(newName));
-			return this;
-		}
-
-		index = OOStateUtilities.objectIndexWithName(bullets, objectName);
-		if (index != -1) {
-			EnemyState.Bullet obj = bullets.get(index);
-			touchBullets().remove(index);
-			bullets.add(index, (EnemyState.Bullet)obj.copyWithName(newName));
-			return this;
-		}
-
-		throw new UnknownObjectException(objectName);
-
 	}
 
 	@Override
 	public int numObjects() {
-		// One agent and some asteroids
-		return 1 + asteroids.size() + bullets.size() + saucers.size();
+		return 1 + asteroids.length + bullets.length + saucers.length;
 	}
 
 	@Override
 	public ObjectInstance object(String oname) {
-		int index = -1;
+		int index;
 
-		if (agent.name().equals(oname)) {
+		if (agent.name().equals(oname))
 			return agent;
-		}
 
-		index = OOStateUtilities.objectIndexWithName(asteroids, oname);
-		if (index != -1) {
-			return asteroids.get(index);
-		}
+		index = objectIndexWithName(asteroids, oname);
+		if (index != -1)
+			return asteroids[index];
 
-		index = OOStateUtilities.objectIndexWithName(saucers, oname);
-		if (index != -1) {
-			return saucers.get(index);
-		}
+		index = objectIndexWithName(saucers, oname);
+		if (index != -1)
+			return saucers[index];
 
-		index = OOStateUtilities.objectIndexWithName(bullets, oname);
-		if (index != -1) {
-			return bullets.get(index);
-		}
+		index = objectIndexWithName(bullets, oname);
+		if (index != -1)
+			return bullets[index];
 
 		throw new UnknownObjectException(oname);
 	}
 
 	@Override
 	public List<ObjectInstance> objects() {
-		List<ObjectInstance> obs = new ArrayList<ObjectInstance>(numObjects());
-		obs.add(agent);
-		obs.addAll(asteroids);
-		obs.addAll(saucers);
-		obs.addAll(bullets);
-		return obs;
+		List<ObjectInstance> objs = new ArrayList<ObjectInstance>(numObjects());
+		objs.add(agent);
+		objs.addAll(Arrays.asList(asteroids));
+		objs.addAll(Arrays.asList(saucers));
+		objs.addAll(Arrays.asList(bullets));
+		return objs;
 	}
 
 	@Override
 	public List<ObjectInstance> objectsOfClass(String oclass) {
+		List<ObjectInstance> objs = new ArrayList<ObjectInstance>();
+
 		if(oclass.equals(CLASS_AGENT)){
 			return Arrays.<ObjectInstance>asList(agent);
 		}
 		else if(oclass.equals(CLASS_ASTEROID)){
-			return new ArrayList<ObjectInstance>(asteroids);
+			objs.addAll(Arrays.asList(asteroids));
+			return objs;
 		}
 		else if(oclass.equals(CLASS_SAUCER)){
-			return new ArrayList<ObjectInstance>(saucers);
+			objs.addAll(Arrays.asList(saucers));
+			return objs;
 		}
 		else if(oclass.equals(CLASS_BULLET)){
-			return new ArrayList<ObjectInstance>(bullets);
+			objs.addAll(Arrays.asList(bullets));
+			return objs;
 		}
 		throw new UnknownClassException(oclass);
 	}
 
 	@Override
-	public MutableState set(Object variableKey, Object value) {
-		//TODO: Research
-		OOVariableKey key = OOStateUtilities.generateKey(variableKey);
-		Number num = StateUtilities.stringOrNumber(value);
-		int index = -1;
-
-		if (agent.name().equals(key.obName)) {
-			if (key.obVarKey.equals(VAR_X)) {
-				touchAgent().x = num.floatValue();
-			}
-			else if (key.obVarKey.equals(VAR_Y)) {
-				touchAgent().y = num.floatValue();
-			}
-			else if (key.obVarKey.equals(VAR_WIDTH)) {
-				touchAgent().width = num.floatValue();
-			}
-			else if (key.obVarKey.equals(VAR_HEIGHT)) {
-				touchAgent().height = num.floatValue();
-			}
-			else if (key.obVarKey.equals(VAR_VELOCITY_X)) {
-				touchAgent().vx = num.floatValue();
-			}
-			else if (key.obVarKey.equals(VAR_VELOCITY_Y)) {
-				touchAgent().vy = num.floatValue();
-			}
-			else {
-				throw new UnknownKeyException(key.obVarKey);
-			}
-			return this;
-		}
-
-		index = OOStateUtilities.objectIndexWithName(asteroids, key.obName);
-		if (index != -1) {
-			if (key.obVarKey.equals(VAR_X)) {
-				touchAsteroid(index).x = num.floatValue();
-			}
-			else if (key.obVarKey.equals(VAR_Y)) {
-				touchAsteroid(index).y = num.floatValue();
-			}
-			else if (key.obVarKey.equals(VAR_WIDTH)) {
-				touchAsteroid(index).width = num.floatValue();
-			}
-			else if (key.obVarKey.equals(VAR_HEIGHT)) {
-				touchAsteroid(index).height = num.floatValue();
-			}
-			else if (key.obVarKey.equals(VAR_VELOCITY_X)) {
-				touchAsteroid(index).vx = num.floatValue();
-			}
-			else if (key.obVarKey.equals(VAR_VELOCITY_Y)) {
-				touchAsteroid(index).vy = num.floatValue();
-			}
-			else {
-				throw new UnknownKeyException(key.obVarKey);
-			}
-			return this;
-		}
-
-		index = OOStateUtilities.objectIndexWithName(saucers, key.obName);
-		if (index != -1) {
-			if (key.obVarKey.equals(VAR_X)) {
-				touchSaucer(index).x = num.floatValue();
-			}
-			else if (key.obVarKey.equals(VAR_Y)) {
-				touchSaucer(index).y = num.floatValue();
-			}
-			else if (key.obVarKey.equals(VAR_WIDTH)) {
-				touchSaucer(index).width = num.floatValue();
-			}
-			else if (key.obVarKey.equals(VAR_HEIGHT)) {
-				touchSaucer(index).height = num.floatValue();
-			}
-			else if (key.obVarKey.equals(VAR_VELOCITY_X)) {
-				touchSaucer(index).vx = num.floatValue();
-			}
-			else if (key.obVarKey.equals(VAR_VELOCITY_Y)) {
-				touchSaucer(index).vy = num.floatValue();
-			}
-			else {
-				throw new UnknownKeyException(key.obVarKey);
-			}
-			return this;
-		}
-
-		index = OOStateUtilities.objectIndexWithName(bullets, key.obName);
-		if (index != -1) {
-			if (key.obVarKey.equals(VAR_X)) {
-				touchBullet(index).x = num.floatValue();
-			}
-			else if (key.obVarKey.equals(VAR_Y)) {
-				touchBullet(index).y = num.floatValue();
-			}
-			else if (key.obVarKey.equals(VAR_VELOCITY_X)) {
-				touchBullet(index).vx = num.floatValue();
-			}
-			else if (key.obVarKey.equals(VAR_VELOCITY_Y)) {
-				touchBullet(index).vy = num.floatValue();
-			}
-			else {
-				throw new UnknownKeyException(key.obVarKey);
-			}
-			return this;
-		}
-
-		throw new UnknownKeyException(key.obName);
-	}
-
-	@Override
 	public Object get(Object variableKey) {
-		return OOStateUtilities.get(this,  variableKey);
+		return OOStateUtilities.get(this, variableKey);
 	}
 
 	@Override
@@ -320,73 +157,14 @@ public class AsteroidsState implements MutableOOState {
 		touchSet = new HashSet<Object>();
 	}
 
-	public AgentState touchAgent() {
-		if (touchSet.contains(agent))
-			return agent;
-		agent = agent.copy();
-		touchSet.add(agent);
-		return agent;
-	}
-
-	public List<EnemyState.Asteroid> touchAsteroids() {
-		if (touchSet.contains(asteroids))
-			return asteroids;
-		asteroids = new ArrayList<EnemyState.Asteroid>(asteroids);
-		touchSet.add(asteroids);
-		return asteroids;
-	}
-
-	public EnemyState.Asteroid touchAsteroid(int index) {
-		EnemyState.Asteroid asteroid = asteroids.get(index);
-		if (touchSet.contains(asteroid))
-			return asteroid;
-		touchAsteroids();
-		asteroid = asteroid.copy();
-		asteroids.set(index, asteroid);
-		touchSet.add(asteroid);
-		return asteroid;
-	}
-
-	public List<EnemyState.Saucer> touchSaucers() {
-		if (touchSet.contains(saucers))
-			return saucers;
-		saucers = new ArrayList<EnemyState.Saucer>(saucers);
-		touchSet.add(saucers);
-		return saucers;
-	}
-
-	public EnemyState.Saucer touchSaucer(int index) {
-		EnemyState.Saucer saucer = saucers.get(index);
-		if (touchSet.contains(saucer))
-			return saucer;
-		touchSaucers();
-		saucer = saucer.copy();
-		saucers.set(index, saucer);
-		touchSet.add(saucer);
-		return saucer;
-	}
-
-	public List<EnemyState.Bullet> touchBullets() {
-		if (touchSet.contains(bullets))
-			return bullets;
-		bullets = new ArrayList<EnemyState.Bullet>(bullets);
-		touchSet.add(bullets);
-		return bullets;
-	}
-
-	public EnemyState.Bullet touchBullet(int index) {
-		EnemyState.Bullet bullet = bullets.get(index);
-		if (touchSet.contains(bullet))
-			return bullet;
-		touchBullets();
-		bullet = bullet.copy();
-		bullets.set(index, bullet);
-		touchSet.add(bullet);
-		return bullet;
-	}
-
 	@Override
 	public String toString() {
 		return OOStateUtilities.ooStateToString(this);
+	}
+
+	public <T extends ObjectInstance> int objectIndexWithName(T[] objects, String name) {
+		for (int i = 0; i < objects.length; i++)
+			if (objects[i].name().equals(name)) return i;
+		return -1;
 	}
 }

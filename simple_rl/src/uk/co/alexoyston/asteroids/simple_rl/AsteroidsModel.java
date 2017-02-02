@@ -1,10 +1,5 @@
 package uk.co.alexoyston.asteroids.simple_rl;
 
-import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.ACTION_FORWARD;
-import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.ACTION_ROTATE_LEFT;
-import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.ACTION_ROTATE_RIGHT;
-import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.ACTION_SHOOT;
-
 import java.util.List;
 
 import burlap.mdp.core.StateTransitionProb;
@@ -12,11 +7,14 @@ import burlap.mdp.core.action.Action;
 import burlap.mdp.core.state.State;
 import burlap.mdp.singleagent.model.statemodel.FullStateModel;
 
+import uk.co.alexoyston.asteroids.simulation.PhysicsParams;
+
 import uk.co.alexoyston.asteroids.simple_rl.state.AgentState;
 import uk.co.alexoyston.asteroids.simple_rl.state.AsteroidsState;
-import uk.co.alexoyston.asteroids.simple_rl.state.EnemyState;
+import uk.co.alexoyston.asteroids.simple_rl.state.PolarState;
+import uk.co.alexoyston.asteroids.simple_rl.state.EntityState;
 
-import uk.co.alexoyston.asteroids.simulation.PhysicsParams;
+import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.*;
 
 class AsteroidsModel implements FullStateModel{
 
@@ -34,29 +32,30 @@ class AsteroidsModel implements FullStateModel{
 		AgentState agent = state.agent;
 
 		if (a.actionName().equals(ACTION_FORWARD)) {
-			double ax = Math.sin(agent.rot) * phys.playerThrustPower;
-			double ay = Math.cos(agent.rot) * phys.playerThrustPower;
-
-			agent.x += agent.vx * phys.updateDelta + ax * phys.updateDelta * phys.updateDelta * 0.5f;
-			agent.y += agent.vy * phys.updateDelta + ay * phys.updateDelta * phys.updateDelta * 0.5f;
+			double ax = Math.sin(agent.rotation) * phys.playerThrustPower;
+			double ay = Math.cos(agent.rotation) * phys.playerThrustPower;
 
 			agent.vx += ax * phys.updateDelta;
 			agent.vy += ay * phys.updateDelta;
-
-			agent.vx -= agent.vx * phys.playerDrag * phys.updateDelta;
-			agent.vy -= agent.vy * phys.playerDrag * phys.updateDelta;
+			agent.x += ax * phys.updateDelta * phys.updateDelta * 0.5f;
+			agent.y += ay * phys.updateDelta * phys.updateDelta * 0.5f;
 
 		} else if (a.actionName().equals(ACTION_ROTATE_RIGHT)) {
-			agent.rot += phys.playerRotationPower * phys.updateDelta;
-			agent.rot %= (Math.PI) * 2;
+			agent.rotation += phys.playerRotationPower * phys.updateDelta;
+			agent.rotation %= (Math.PI) * 2;
 
 		} else if (a.actionName().equals(ACTION_ROTATE_LEFT)) {
-			agent.rot += -phys.playerRotationPower * phys.updateDelta;
-			agent.rot %= (Math.PI) * 2;
+			agent.rotation += -phys.playerRotationPower * phys.updateDelta;
+			agent.rotation %= (Math.PI) * 2;
 
 		} else if (a.actionName().equals(ACTION_SHOOT)) {
 			agent.activeShots++;
 		}
+
+		agent.vx -= agent.vx * phys.playerDrag * phys.updateDelta;
+		agent.vy -= agent.vy * phys.playerDrag * phys.updateDelta;
+		agent.x += agent.vx * phys.updateDelta;
+		agent.y += agent.vy * phys.updateDelta;
 
 		// Bounds check
 		if (agent.x > phys.worldWidth)
@@ -70,7 +69,7 @@ class AsteroidsModel implements FullStateModel{
 			agent.y = phys.worldHeight + agent.height;
 
 
-		for (EnemyState.Asteroid asteroid : state.asteroids) {
+		for (PolarState.Asteroid asteroid : state.asteroids) {
 			asteroid.x += asteroid.vx * phys.updateDelta;
 			asteroid.y += asteroid.vy * phys.updateDelta;
 
@@ -84,9 +83,15 @@ class AsteroidsModel implements FullStateModel{
 				asteroid.y = -asteroid.height;
 			else if (asteroid.y + asteroid.height < 0)
 				asteroid.y = phys.worldHeight + asteroid.height;
+
+			asteroid.dist = (float) Math.sqrt(Math.pow(asteroid.x - agent.x, 2) + Math.pow(asteroid.y - agent.y, 2));
+			asteroid.angle = (float) Math.tan((agent.y + asteroid.y) / (agent.x + asteroid.x));
+			asteroid.angle -= agent.rotation;
+			asteroid.vx -= agent.vx;
+			asteroid.vy -= agent.vy;
 		}
 
-		for (EnemyState.Saucer saucer : state.saucers) {
+		for (PolarState.Saucer saucer : state.saucers) {
 			saucer.x += saucer.vx * phys.updateDelta;
 			saucer.y += saucer.vy * phys.updateDelta;
 
@@ -100,9 +105,15 @@ class AsteroidsModel implements FullStateModel{
 				saucer.y = -saucer.height;
 			else if (saucer.y + saucer.height < 0)
 				saucer.y = phys.worldHeight + saucer.height;
+
+			saucer.dist = (float) Math.sqrt(Math.pow(saucer.x - agent.x, 2) + Math.pow(saucer.y - agent.y, 2));
+			saucer.angle = (float) Math.tan((agent.y + saucer.y) / (agent.x + saucer.x));
+			saucer.angle -= agent.rotation;
+			saucer.vx -= agent.vx;
+			saucer.vy -= agent.vy;
 		}
 
-		for (EnemyState.Bullet bullet : state.bullets) {
+		for (PolarState.Bullet bullet : state.bullets) {
 			bullet.x += bullet.vx * phys.updateDelta;
 			bullet.y += bullet.vy * phys.updateDelta;
 
@@ -116,6 +127,12 @@ class AsteroidsModel implements FullStateModel{
 				bullet.y = -bullet.height;
 			else if (bullet.y + bullet.height < 0)
 				bullet.y = phys.worldHeight + bullet.height;
+
+			bullet.dist = (float) Math.sqrt(Math.pow(bullet.x - agent.x, 2) + Math.pow(bullet.y - agent.y, 2));
+			bullet.angle = (float) Math.tan((agent.y + bullet.y) / (agent.x + bullet.x));
+			bullet.angle -= agent.rotation;
+			bullet.vx -= agent.vx;
+			bullet.vy -= agent.vy;
 		}
 
 		return state;
@@ -125,4 +142,33 @@ class AsteroidsModel implements FullStateModel{
 	public List<StateTransitionProb> stateTransitions(State s, Action a) {
 		return FullStateModel.Helper.deterministicTransition(this, s, a);
 	}
+
+	private EntityState updateEntity(EntityState state) {
+		// Update absolute location
+		state.x += state.vx * phys.updateDelta;
+		state.y += state.vy * phys.updateDelta;
+
+		// Bounds check
+		if (state.x > phys.worldWidth)
+			state.x = -state.width;
+		else if (state.x + state.width < 0)
+			state.x = phys.worldWidth + state.width;
+
+		if (state.y > phys.worldHeight)
+			state.y = -state.height;
+		else if (state.y + state.height < 0)
+			state.y = phys.worldHeight + state.height;
+
+		return state;
+	}
+
+	private PolarState updatePolar(PolarState state, AgentState origin) {
+		state.dist = (float) Math.sqrt(Math.pow(state.x - origin.x, 2) + Math.pow(state.y - origin.y, 2));
+		state.angle = (float) Math.tan((origin.y + state.y) / (origin.x + state.x));
+		state.angle -= origin.rotation;
+		state.vx -= origin.vx;
+		state.vy -= origin.vy;
+		return state;
+	}
+
 }

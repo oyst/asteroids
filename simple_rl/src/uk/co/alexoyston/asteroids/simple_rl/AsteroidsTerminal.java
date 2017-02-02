@@ -6,10 +6,6 @@ import burlap.mdp.core.oo.OODomain;
 import burlap.mdp.core.oo.propositional.PropositionalFunction;
 import burlap.mdp.core.oo.state.OOState;
 
-import uk.co.alexoyston.asteroids.simple_rl.state.AsteroidsState;
-import uk.co.alexoyston.asteroids.simple_rl.state.AgentState;
-import uk.co.alexoyston.asteroids.simple_rl.state.EnemyState;
-
 import uk.co.alexoyston.asteroids.simulation.PhysicsParams;
 
 import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.*;
@@ -27,7 +23,6 @@ class AsteroidsTerminal implements TerminalFunction {
 
 	@Override
 	public boolean isTerminal(State s) {
-		System.out.println("Terminal");
 		return killed.someGroundingIsTrue((OOState)s);
 	}
 }

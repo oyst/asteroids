@@ -1,8 +1,5 @@
 package uk.co.alexoyston.asteroids.simple_rl;
 
-import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.CLASS_AGENT;
-import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.CLASS_ASTEROID;
-
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Path2D;
@@ -16,20 +13,20 @@ import burlap.visualizer.RenderLayer;
 import burlap.visualizer.StateRenderLayer;
 import burlap.visualizer.Visualizer;
 
+import uk.co.alexoyston.asteroids.simple_rl.state.EntityState;
+
 import joptsimple.ValueConversionException;
 
 import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.*;
 
-
 public class AsteroidsVisualizer {
-
     private AsteroidsVisualizer() {
     }
 
     public static Visualizer getVisualizer() {
-		Visualizer visualizer = new Visualizer();
-		visualizer.setSetRenderLayer(getStateRenderLayer());
-		return visualizer;
+  		Visualizer visualizer = new Visualizer();
+  		visualizer.setSetRenderLayer(getStateRenderLayer());
+  		return visualizer;
     }
 
 	public static Visualizer getVisualizer(Environment env){
@@ -48,67 +45,25 @@ public class AsteroidsVisualizer {
 		OOStatePainter ooStatePainter = new OOStatePainter();
 		layer.addStatePainter(ooStatePainter);
 
-		ooStatePainter.addObjectClassPainter(CLASS_AGENT, new AgentPainter());
-		ooStatePainter.addObjectClassPainter(CLASS_ASTEROID, new EnemyPainter());
-		ooStatePainter.addObjectClassPainter(CLASS_SAUCER, new EnemyPainter());
-		ooStatePainter.addObjectClassPainter(CLASS_BULLET, new EnemyPainter());
+		ooStatePainter.addObjectClassPainter(CLASS_AGENT, new EntityPainter());
+		ooStatePainter.addObjectClassPainter(CLASS_ASTEROID, new EntityPainter());
+		ooStatePainter.addObjectClassPainter(CLASS_SAUCER, new EntityPainter());
+		ooStatePainter.addObjectClassPainter(CLASS_BULLET, new EntityPainter());
 
 		return layer;
 	}
 
-	public static class VisualEntity {
-		public float[] vertices;
-		public Color color;
-
-		public VisualEntity(float[] vertices, Color color) {
-			this.vertices = vertices;
-			this.color = color;
-		}
-	}
-
-	public static class AsteroidsEnvRenderLayer implements RenderLayer {
-
-		private AsteroidsEnvironment env;
-
-		public AsteroidsEnvRenderLayer(Environment env) {
-			if (env instanceof AsteroidsEnvironment) {
-				this.env = (AsteroidsEnvironment)env;
-			}
-			else {
-				throw new ValueConversionException("Passed environment must extend AsteroidsEnvironment");
-			}
-		}
-
-
-		@Override
-		public void render(Graphics2D g2, float width, float height) {
-			g2.setColor(Color.RED);
-
-			for (VisualEntity entity : env.getVisualEntities()) {
-
-				Path2D.Float poly = new Path2D.Float();
-				poly.moveTo(entity.vertices[0], entity.vertices[1]);
-				for (int i = 2; i < entity.vertices.length; i += 2) {
-					poly.lineTo(entity.vertices[i], entity.vertices[i+1]);
-				}
-				poly.closePath();
-
-				g2.draw(poly);
-			}
-
-		}
-	}
-
-	public static class AgentPainter implements ObjectPainter {
+	public static class EntityPainter implements ObjectPainter {
 
 		@Override
 		public void paintObject(Graphics2D g2, OOState s, ObjectInstance ob, float cWidth, float cHeight) {
 			g2.setColor(Color.BLACK);
 
-			float x = (float) ob.get(VAR_X);
-			float y = (float) ob.get(VAR_Y);
-			float width = (float) ob.get(VAR_WIDTH);
-			float height = (float) ob.get(VAR_HEIGHT);
+      EntityState entity = (EntityState)ob;
+			float x = entity.x;
+			float y = entity.y;
+			float width = entity.width;
+			float height = entity.height;
 
 			Path2D.Float poly = new Path2D.Float();
 			poly.moveTo(x, y);
@@ -121,25 +76,4 @@ public class AsteroidsVisualizer {
 		}
 	}
 
-	public static class EnemyPainter implements ObjectPainter {
-
-		@Override
-		public void paintObject(Graphics2D g2, OOState s, ObjectInstance ob, float cWidth, float cHeight) {
-			g2.setColor(Color.BLACK);
-
-			float x = (float) ob.get(VAR_X);
-			float y = (float) ob.get(VAR_Y);
-			float width = (float) ob.get(VAR_WIDTH);
-			float height = (float) ob.get(VAR_HEIGHT);
-
-			Path2D.Float poly = new Path2D.Float();
-			poly.moveTo(x, y);
-			poly.lineTo(x + width, y);
-			poly.lineTo(x + width, y + height);
-			poly.lineTo(x, y + height);
-			poly.closePath();
-
-			g2.draw(poly);
-		}
-	}
 }

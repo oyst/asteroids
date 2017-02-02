@@ -1,21 +1,13 @@
 package uk.co.alexoyston.asteroids.simple_rl.props;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import burlap.mdp.core.oo.OODomain;
 import burlap.mdp.core.oo.propositional.PropositionalFunction;
 import burlap.mdp.core.oo.state.OOState;
-import burlap.mdp.core.oo.state.ObjectInstance;
-import burlap.mdp.core.state.StateUtilities;
 
-import uk.co.alexoyston.asteroids.simple_rl.state.AgentState;
-import uk.co.alexoyston.asteroids.simple_rl.state.EnemyState;
+import uk.co.alexoyston.asteroids.simple_rl.state.EntityState;
 
 import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.*;
 
-public abstract class ObjectCollision extends PropositionalFunction{
+public abstract class ObjectCollision extends PropositionalFunction {
 
   public ObjectCollision(String name, String objectClass1, String objectClass2) {
     super(name, new String[]{objectClass1, objectClass2});
@@ -23,8 +15,8 @@ public abstract class ObjectCollision extends PropositionalFunction{
 
   @Override
   public boolean isTrue(OOState state, String... params) {
-    ObjectInstance obj1 = (ObjectInstance)state.object(params[0]);
-    ObjectInstance obj2 = (ObjectInstance)state.object(params[1]);
+    EntityState obj1 = (EntityState)state.object(params[0]);
+    EntityState obj2 = (EntityState)state.object(params[1]);
 
     return collides(obj1, obj2);
   }
@@ -60,38 +52,25 @@ public abstract class ObjectCollision extends PropositionalFunction{
 
     @Override
     public boolean isTrue(OOState state, String... params) {
-      ObjectInstance agent = (ObjectInstance)state.object(params[0]);
-      if (!params[0].equals(CLASS_AGENT)) System.out.println(params[0]);
+      EntityState agent = (EntityState)state.object(params[0]);
+
       for (String param : params) {
         if (param.equals(CLASS_AGENT)) continue;
-        ObjectInstance obj = (ObjectInstance)state.object(param);
+
+        EntityState obj = (EntityState)state.object(param);
         if (collides(agent, obj)) return true;
       }
       return false;
     }
   }
 
-  private static boolean collides(ObjectInstance obj1, ObjectInstance obj2) {
-
-    float obj1_x = StateUtilities.stringOrNumber(obj1.get(VAR_X)).floatValue();
-    float obj1_y = StateUtilities.stringOrNumber(obj1.get(VAR_Y)).floatValue();
-    float obj1_width = StateUtilities.stringOrNumber(obj1.get(VAR_WIDTH)).floatValue();
-    float obj1_height = StateUtilities.stringOrNumber(obj1.get(VAR_HEIGHT)).floatValue();
-
-    float obj2_x = StateUtilities.stringOrNumber(obj2.get(VAR_X)).floatValue();
-    float obj2_y = StateUtilities.stringOrNumber(obj2.get(VAR_Y)).floatValue();
-    float obj2_width = StateUtilities.stringOrNumber(obj2.get(VAR_WIDTH)).floatValue();
-    float obj2_height = StateUtilities.stringOrNumber(obj2.get(VAR_HEIGHT)).floatValue();
-
-    if (
-    obj1_x > obj2_x + obj2_width ||
-    obj1_y > obj2_y + obj2_height ||
-    obj1_x + obj1_width < obj2_x ||
-    obj1_y + obj1_height < obj2_y) {
+  private static boolean collides(EntityState obj1, EntityState obj2) {
+    if (obj1.x > obj2.x + obj2.width  ||
+        obj1.y > obj2.y + obj2.height ||
+        obj1.x + obj1.width < obj2.x  ||
+        obj1.y + obj1.height < obj2.y)
       return false;
-    }
     return true;
-
   }
 
 }

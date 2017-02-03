@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.HashSet;
+import java.util.Collections;
 
 import burlap.mdp.core.oo.state.OOState;
 import burlap.mdp.core.oo.state.OOStateUtilities;
@@ -21,18 +22,18 @@ import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.*;
 public class AsteroidsState implements OOState {
 
 	private static final float nullDistance = 10000f;
-	private static final int closestAsteroidsCount = 3;
-	private static final int closestSaucersCount = 1;
-	private static final int closestBulletsCount = 5;
+	public static final int closestAsteroidsCount = 3;
+	public static final int closestSaucersCount = 3;
+	public static final int closestBulletsCount = 3;
 
 	private static final PolarState.Asteroid nullAsteroid = new PolarState.Asteroid("asteroidNull", nullDistance, 0f, 0f, 0f);
 	private static final PolarState.Saucer nullSaucer = new PolarState.Saucer("saucerNull", nullDistance, 0f, 0f, 0f);
 	private static final PolarState.Bullet nullBullet = new PolarState.Bullet("bulletNull", nullDistance, 0f, 0f, 0f);
 
 	public AgentState agent;
-	public List<ObjectInstance> asteroids = null;// = new PolarState.Asteroid[closestAsteroidsCount];
-	public List<ObjectInstance> saucers = null;// = new PolarState.Saucer[closestSaucersCount];
-	public List<ObjectInstance> bullets = null;// = new PolarState.Bullet[closestBulletsCount];
+	public List<ObjectInstance> asteroids = new ArrayList<ObjectInstance>();
+	public List<ObjectInstance> saucers = new ArrayList<ObjectInstance>();
+	public List<ObjectInstance> bullets = new ArrayList<ObjectInstance>();
 
 	public List<ObjectInstance> objects = null;
 
@@ -40,14 +41,11 @@ public class AsteroidsState implements OOState {
 	}
 
 	public AsteroidsState(AgentState agent) {
-		this.agent = agent;
+		this(agent, null, null, null);
 	}
 
 	public AsteroidsState(AgentState agent, List<PolarState.Asteroid> asteroids, List<PolarState.Bullet> bullets, List<PolarState.Saucer> saucers) {
 		this.agent = agent;
-		this.asteroids = asteroids;
-		this.saucers = saucers;
-		this.bullets = bullets;
 
 		this.asteroids = getClosest(asteroids, closestAsteroidsCount, nullAsteroid);
 		this.saucers = getClosest(saucers, closestSaucersCount, nullSaucer);
@@ -60,23 +58,19 @@ public class AsteroidsState implements OOState {
 		if (desiredSize == 0)
 			return out;
 
-		if (desiredSize < array.size()) {
+		if (array == null)
+			array = new ArrayList<T>(0);
+
+		if (desiredSize > array.size()) {
 			out.addAll(array);
 			for (int i = array.size(); i < desiredSize; i++)
 				out.add(fillerObj);
 			return out;
 		}
 
-		T min = array.get(start);
-		T max = null;
-		for (int start = 0; start < desiredSize; start++) {
-			T curr;
-			for (T elem : array) {
-				if (elem.compareTo(min) < 0 && (max == null || elem.compareTo(max) > 0))
-		// 			min = curr;
-		// 	}
-		// 	out.add(min);
-		// }
+		Collections.sort(array);
+		for (int i = 0; i < desiredSize; i++)
+			out.add(array.get(i));
 
 		return out;
 	}
@@ -110,13 +104,12 @@ public class AsteroidsState implements OOState {
 
 	@Override
 	public List<ObjectInstance> objects() {
-		if (objects == null) {
-			objects = new ArrayList<ObjectInstance>(numObjects());
-			objects.add(agent);
-			objects.addAll(asteroids);
-			objects.addAll(saucers);
-			objects.addAll(bullets);
-		}
+		// if (objects == null) {
+		objects = new ArrayList<ObjectInstance>(numObjects());
+		objects.add(agent);
+		objects.addAll(asteroids);
+		objects.addAll(saucers);
+		objects.addAll(bullets);
 		return objects;
 	}
 
@@ -148,7 +141,11 @@ public class AsteroidsState implements OOState {
 
 	@Override
 	public AsteroidsState copy() {
-		return new AsteroidsState(agent, asteroids, bullets, saucers);
+		AsteroidsState copy = new AsteroidsState(agent);
+		copy.asteroids = asteroids;
+		copy.saucers = saucers;
+		copy.bullets = bullets;
+		return copy;
 	}
 
 	@Override

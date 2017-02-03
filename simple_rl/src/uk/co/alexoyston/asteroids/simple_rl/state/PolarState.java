@@ -85,7 +85,7 @@ public abstract class PolarState extends EntityState implements Comparable<Polar
 	public abstract PolarState copy();
 
 	@DeepCopyState
-	public static class Asteroid extends PolarState{
+	public static class Asteroid extends PolarState {
 		public Asteroid(String name, float dist, float angle, float vx, float vy) {
 			super(name, dist, angle, vx, vy);
 		}

@@ -33,6 +33,7 @@ public class Bullet extends Entity {
 
 	@Override
 	public void collision(Entity other) {
+		if (!alive) return;
 		alive = false;
 		if (owner instanceof Player) {
 			((Player)owner).addHitScore(other);
@@ -42,7 +43,8 @@ public class Bullet extends Entity {
 
 	@Override
 	public void decay() {
+		if (alive)
+			owner.onBulletDecay(this);
 		super.decay();
-		owner.onBulletDecay(this);
 	}
 }

@@ -14,6 +14,7 @@ import burlap.visualizer.StateRenderLayer;
 import burlap.visualizer.Visualizer;
 
 import uk.co.alexoyston.asteroids.simple_rl.state.EntityState;
+import uk.co.alexoyston.asteroids.simple_rl.state.PolarState;
 
 import joptsimple.ValueConversionException;
 
@@ -40,6 +41,9 @@ public class AsteroidsVisualizer {
 		ooStatePainter.addObjectClassPainter(CLASS_SAUCER, new EntityPainter());
 		ooStatePainter.addObjectClassPainter(CLASS_BULLET, new EntityPainter());
 
+		ooStatePainter.addObjectClassPainter(CLASS_ASTEROID, new PolarPainter());
+		ooStatePainter.addObjectClassPainter(CLASS_BULLET, new PolarPainter());
+
 		return layer;
 	}
 
@@ -63,6 +67,32 @@ public class AsteroidsVisualizer {
 			poly.closePath();
 
 			g2.draw(poly);
+
+		}
+	}
+
+
+	public static class PolarPainter implements ObjectPainter {
+
+		@Override
+		public void paintObject(Graphics2D g2, OOState s, ObjectInstance ob, float cWidth, float cHeight) {
+			g2.setColor(Color.RED);
+
+			PolarState entity = (PolarState)ob;
+			float x = entity.x;
+			float y = entity.y;
+			float dist = entity.dist;
+			float angle = entity.angle;
+			float vx = entity.rel_vx;
+			float vy = entity.rel_vy;
+
+			// Path2D.Float poly = new Path2D.Float();
+			// poly.moveTo(x, y);
+			// poly.lineTo(x + Math.asin(angle), y + Math.acos(angle));
+			// poly.closePath();
+			g2.drawLine((int)x, (int)y, (int)x - (int)(dist*Math.sin(angle)), (int)y - (int)(dist*Math.cos(angle)));
+
+			// g2.draw(poly);
 		}
 	}
 

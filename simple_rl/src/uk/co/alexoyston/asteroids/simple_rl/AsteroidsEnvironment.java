@@ -54,23 +54,31 @@ public class AsteroidsEnvironment implements Environment {
 		AgentState agent = new AgentState(player, player.activeShots);
 
 		for (Entity entity : this.sim.entities) {
-			float dist = (float)Math.sqrt(Math.pow(player.location.x - entity.location.x, 2) + Math.pow(player.location.y - entity.location.y, 2));
-			float angle = (float)Math.tan((player.location.y + entity.location.y) / (player.location.x + entity.location.x));
+			float dx = entity.location.x - player.location.x;
+			float dy = entity.location.y - player.location.y;
+			if (Math.abs(dx) > phys.worldWidth / 2)
+				dx = (phys.worldWidth - Math.abs(dx)) * Math.signum(dx);
+			if (Math.abs(dy) > phys.worldHeight / 2)
+				dy = (phys.worldHeight - Math.abs(dy)) * Math.signum(dy);
+			float dist = (float)Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+			float angle = (float)Math.atan((dx) / (dy)) - player.rotation;
+			angle %= Math.PI * 2;
+
 			float vx = entity.velocity.x - player.velocity.x;
 			float vy = entity.velocity.y - player.velocity.y;
 
 			if (entity instanceof Asteroid) {
-				PolarState.Asteroid asteroid = new PolarState.Asteroid("asteroid_" + entity.hashCode(), entity, dist, angle, vx, vy);
+				PolarState.Asteroid asteroid = new PolarState.Asteroid("asteroid", entity, dist, angle, vx, vy);
 				asteroids.add(asteroid);
 			}
 
 			if (entity instanceof Saucer || entity instanceof SmallSaucer) {
-				PolarState.Saucer saucer = new PolarState.Saucer("saucer_" + entity.hashCode(), entity, dist, angle, vx, vy);
+				PolarState.Saucer saucer = new PolarState.Saucer("saucer", entity, dist, angle, vx, vy);
 				saucers.add(saucer);
 			}
 
 			if (entity instanceof Bullet) {
-				PolarState.Bullet bullet = new PolarState.Bullet("bullet_" + entity.hashCode(), entity, dist, angle, vx, vy);
+				PolarState.Bullet bullet = new PolarState.Bullet("bullet", entity, dist, angle, vx, vy);
 				bullets.add(bullet);
 			}
 		}
@@ -105,9 +113,10 @@ public class AsteroidsEnvironment implements Environment {
 		newScore = player.getScore();
 
 		if (this.sim.players.size() == 0)
-			lastReward = -100;
+			lastReward = -1000;
 		else
 			lastReward = newScore - oldScore;
+		lastReward--;
 
 		return new EnvironmentOutcome(oldState, a, newState, lastReward, isInTerminalState());
 	}

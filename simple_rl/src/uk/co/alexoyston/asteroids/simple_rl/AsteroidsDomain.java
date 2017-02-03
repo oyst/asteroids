@@ -29,6 +29,15 @@ import burlap.mdp.singleagent.oo.OOSADomain;
 import burlap.shell.visual.VisualExplorer;
 import burlap.statehashing.simple.SimpleHashableStateFactory;
 import burlap.visualizer.Visualizer;
+import burlap.behavior.singleagent.auxiliary.performance.PerformanceMetric;
+import burlap.behavior.singleagent.auxiliary.performance.TrialMode;
+import burlap.behavior.singleagent.auxiliary.performance.LearningAlgorithmExperimenter;
+import burlap.behavior.singleagent.learning.LearningAgentFactory;
+import burlap.behavior.singleagent.learning.LearningAgent;
+import burlap.behavior.singleagent.learning.tdmethods.SarsaLam;
+
+import uk.co.alexoyston.asteroids.simple_rl.algorithms.Sarsa;
+import uk.co.alexoyston.asteroids.simple_rl.algorithms.TileCodingFactory;
 
 import uk.co.alexoyston.asteroids.simple_rl.actions.ShootActionType;
 import uk.co.alexoyston.asteroids.simple_rl.props.ObjectCollision;
@@ -113,9 +122,9 @@ public class AsteroidsDomain implements DomainGenerator {
 
 		Visualizer v = AsteroidsVisualizer.getVisualizer();
 
-		// explorer(domain, env, v);
-		SARSA(domain, env, v);
-		// SS(domain, env, v);
+		//  explorer(domain, env, v);
+//		SARSA(domain, env, v);
+		expAndPlot(domain, env, 10, 200);
 	}
 
 	public static void explorer(OOSADomain domain, Environment env, Visualizer v){
@@ -130,80 +139,51 @@ public class AsteroidsDomain implements DomainGenerator {
 		exp.initGUI();
 	}
 
-	public static void SS(SADomain domain, Environment env, Visualizer v) {
-		SparseSampling ss = new SparseSampling(domain, 1, new SimpleHashableStateFactory(), 10, 1);
-		ss.setForgetPreviousPlanResults(true);
-		ss.toggleDebugPrinting(true);
-		Policy p = new GreedyQPolicy(ss);
-
-		Episode e = PolicyUtils.rollout(p, env.currentObservation(), domain.getModel(), 10);
-		System.out.println("Num steps: " + e.maxTimeStep());
-		new EpisodeSequenceVisualizer(v, domain, Arrays.asList(e));
-	}
-
-	public static void SARSA(SADomain domain, Environment env, Visualizer v){
-		ConcatenatedObjectFeatures inputFeatures = new ConcatenatedObjectFeatures();
-		inputFeatures.addObjectVectorizion(
-			CLASS_AGENT,
-			new NumericVariableFeatures(
-				VAR_ACTIVE_SHOTS
-			)
-		);
-		inputFeatures.addObjectVectorizion(
-			CLASS_ASTEROID,
-			new NumericVariableFeatures(
-				VAR_DIST, VAR_ANGLE,
-				VAR_VELOCITY_X, VAR_VELOCITY_Y
-			)
-		);
-		inputFeatures.addObjectVectorizion(
-			CLASS_BULLET,
-			new NumericVariableFeatures(
-				VAR_DIST, VAR_ANGLE,
-				VAR_VELOCITY_X, VAR_VELOCITY_Y
-			)
-		);
-
-		double playerMaxVelocity = 2*(phys.playerThrustPower / phys.playerDrag) - (phys.playerThrustPower * phys.updateDelta);
-		double maxVelocity = playerMaxVelocity;
-		maxVelocity = Math.max(maxVelocity, phys.saucerSpeed*2);
-		maxVelocity = Math.max(maxVelocity, phys.smallSaucerSpeed*2);
-		maxVelocity = Math.max(maxVelocity, phys.asteroidMaxSpeed*2);
-
-		int nTilings = 10;
-		int resolution = 20;
-
-		double distWidth = Math.max(phys.worldWidth, phys.worldHeight) / resolution;
-		double angleWidth = (Math.PI*2) / resolution;
-		double velocityWidth = maxVelocity / resolution;
-		double activeShotsWidth = phys.playerMaxActiveShots / resolution;
-
-		TileCodingFeatures tilecoding = new TileCodingFeatures(inputFeatures);
-		tilecoding.addTilingsForAllDimensionsWithWidths(
-				new double[] {
-					activeShotsWidth,
-					distWidth, angleWidth, velocityWidth, velocityWidth,
-					distWidth, angleWidth, velocityWidth, velocityWidth,
-					distWidth, angleWidth, velocityWidth, velocityWidth,
-					distWidth, angleWidth, velocityWidth, velocityWidth,
-					distWidth, angleWidth, velocityWidth, velocityWidth,
-					distWidth, angleWidth, velocityWidth, velocityWidth},
-				1 + 12 + 12,
-				TilingArrangement.RANDOM_JITTER);
-
+	public static void SARSA(OOSADomain domain, Environment env, Visualizer v) {
 		double defaultQ = 0.5;
-		DifferentiableStateActionValue vfa = tilecoding.generateVFA(defaultQ/nTilings);
-		GradientDescentSarsaLam agent = new GradientDescentSarsaLam(domain, 0.99, vfa, 0.02, 0.5);
+		int numTilings = 5;
+		int resolution = 10;
+
+		TileCodingFeatures tilecoding = new TileCodingFactory(phys).getPolarFeatures(resolution, 3, 1, 5);
+		DifferentiableStateActionValue vfa = tilecoding.generateVFA(defaultQ/numTilings);
+		Sarsa.GDSarsaLamFactoryBuilder builder = new Sarsa.GDSarsaLamFactoryBuilder(domain, vfa);
+		Sarsa.GDSarsaLamFactory gdSarsaLam = builder.build();
+
+		LearningAgent agent = gdSarsaLam.generateAgent();
 
 		List<Episode> episodes = new ArrayList<Episode>();
-		for(int i = 0; i < 2; i++){
+		for(int i = 0; i < 50; i++){
 			Episode ea = agent.runLearningEpisode(env);
 			episodes.add(ea);
 			System.out.println(i + ": " + ea.maxTimeStep());
 			env.resetEnvironment();
 		}
+
 		new EpisodeSequenceVisualizer(v, domain, episodes);
 
+	}
+
+	public static void expAndPlot(OOSADomain domain, Environment env, int numTrials, int trialLength){
+		double defaultQ = 0.5;
+		int numTilings = 20;
+		int resolution = 10;
+
+		TileCodingFeatures tilecoding = new TileCodingFactory(phys).getPolarFeatures(resolution, 3, 1, 5);
+		DifferentiableStateActionValue vfa = tilecoding.generateVFA(defaultQ/numTilings);
+		Sarsa.GDSarsaLamFactoryBuilder builder = new Sarsa.GDSarsaLamFactoryBuilder(domain, vfa);
+		Sarsa.GDSarsaLamFactory gdSarsaLam = builder.build();
+
+		LearningAlgorithmExperimenter exp = new LearningAlgorithmExperimenter(
+			env, numTrials, trialLength,
+			gdSarsaLam
+		);
+
+		exp.setUpPlottingConfiguration(500, 250, 2, 1000,
+				TrialMode.MOST_RECENT_AND_AVERAGE,
+				PerformanceMetric.CUMULATIVE_STEPS_PER_EPISODE,
+				PerformanceMetric.AVERAGE_EPISODE_REWARD);
+
+		exp.startExperiment();
 	}
 
 }

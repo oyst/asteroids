@@ -9,7 +9,7 @@ public class PhysicsParams {
 
 	public static int asteroidStartCount = 4;
 
-	public static int saucersMax = 0;
+	public static int saucersMax = 1;
 	public static float saucersProbSmall = 0.3f;
 	public static float saucersFreq = 0.5f;
 
@@ -24,9 +24,9 @@ public class PhysicsParams {
 	public static int playerMaxActiveShots = 3;
 	public static float playerShotSpeed = 600f;
 	public static float playerSpawnProtectDuration = 1f;
-	public static int playerAsteroidHitScore = 10;
-	public static int playerSaucerHitScore = 20;
-	public static int playerSmallSaucerHitScore = 30;
+	public static int playerAsteroidHitScore = 100;
+	public static int playerSaucerHitScore = 300;
+	public static int playerSmallSaucerHitScore = 500;
 
 	public static float saucerSpeed = 35f;
 	public static float saucerTurnFreq = 1f;

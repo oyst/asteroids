@@ -116,6 +116,8 @@ public abstract class Entity {
 	 * @return true if the two collide, false otherwise
 	 */
 	public boolean collides(Entity other) {
+		if (!alive)
+			return false;
 
 		// Bounding box collision detection
 		if (!Intersector.overlaps(bounds, other.bounds))

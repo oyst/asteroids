@@ -15,9 +15,9 @@ class AsteroidsReward implements RewardFunction {
 
 	private PhysicsParams phys;
 
-	private int collisionReward = -100;
-	private int defaultReward = 0;
-	private int shootReward = -1;
+	private int collisionReward = -1000;
+	private int defaultReward = -1;
+	private int shootReward = 0;
 
 	protected PropositionalFunction killed;
 	protected PropositionalFunction shotAsteroid;

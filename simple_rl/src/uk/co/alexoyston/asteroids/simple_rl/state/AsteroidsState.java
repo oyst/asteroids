@@ -22,63 +22,68 @@ public class AsteroidsState implements OOState {
 
 	private static final float nullDistance = 10000f;
 	private static final int closestAsteroidsCount = 3;
-	private static final int closestSaucersCount = 0;
-	private static final int closestBulletsCount = 3;
+	private static final int closestSaucersCount = 1;
+	private static final int closestBulletsCount = 5;
 
 	private static final PolarState.Asteroid nullAsteroid = new PolarState.Asteroid("asteroidNull", nullDistance, 0f, 0f, 0f);
 	private static final PolarState.Saucer nullSaucer = new PolarState.Saucer("saucerNull", nullDistance, 0f, 0f, 0f);
 	private static final PolarState.Bullet nullBullet = new PolarState.Bullet("bulletNull", nullDistance, 0f, 0f, 0f);
 
-	private HashSet<Object> touchSet;
-
 	public AgentState agent;
-	public PolarState.Asteroid[] asteroids = new PolarState.Asteroid[closestAsteroidsCount];
-	public PolarState.Saucer[] saucers = new PolarState.Saucer[closestSaucersCount];
-	public PolarState.Bullet[] bullets = new PolarState.Bullet[closestBulletsCount];
+	public List<ObjectInstance> asteroids = null;// = new PolarState.Asteroid[closestAsteroidsCount];
+	public List<ObjectInstance> saucers = null;// = new PolarState.Saucer[closestSaucersCount];
+	public List<ObjectInstance> bullets = null;// = new PolarState.Bullet[closestBulletsCount];
+
+	public List<ObjectInstance> objects = null;
 
 	public AsteroidsState() {
 	}
 
 	public AsteroidsState(AgentState agent) {
 		this.agent = agent;
-		for (int i = 0; i < asteroids.length; i++) asteroids[i] = nullAsteroid;
-		for (int i = 0; i < saucers.length; i++) saucers[i] = nullSaucer;
-		for (int i = 0; i < bullets.length; i++) bullets[i] = nullBullet;
-	}
-
-	public AsteroidsState(AgentState agent, PolarState.Asteroid[] asteroids, PolarState.Bullet[] bullets, PolarState.Saucer[] saucers) {
-		this.agent = agent;
-		this.asteroids = asteroids;
-		this.saucers = saucers;
-		this.bullets = bullets;
-		touchSet = new HashSet<Object>();
 	}
 
 	public AsteroidsState(AgentState agent, List<PolarState.Asteroid> asteroids, List<PolarState.Bullet> bullets, List<PolarState.Saucer> saucers) {
 		this.agent = agent;
-		selectSort(asteroids, this.asteroids, nullAsteroid);
-		selectSort(saucers, this.saucers, nullSaucer);
-		selectSort(bullets, this.bullets, nullBullet);
-		touchSet = new HashSet<Object>();
+		this.asteroids = asteroids;
+		this.saucers = saucers;
+		this.bullets = bullets;
+
+		this.asteroids = getClosest(asteroids, closestAsteroidsCount, nullAsteroid);
+		this.saucers = getClosest(saucers, closestSaucersCount, nullSaucer);
+		this.bullets = getClosest(bullets, closestBulletsCount, nullBullet);
 	}
 
-	private static <T extends PolarState> void selectSort(List<T> src, T[] dst, T fillerState) {
-		T min;
-		T dst_max = null;
-		for (int i = 0; i < dst.length; i++) {
-			min = fillerState;
-			for (T elem : src) {
-				if ((elem.compareTo(min) < 0) && (dst_max == null || elem.compareTo(dst_max) > 0))
-					min = elem;
-			}
-			dst_max = min;
-			dst[i] = dst_max;
+	private <T extends PolarState> List<ObjectInstance> getClosest(List<T> array, int desiredSize, T fillerObj) {
+		List<ObjectInstance> out = new ArrayList<ObjectInstance>(desiredSize);
+
+		if (desiredSize == 0)
+			return out;
+
+		if (desiredSize < array.size()) {
+			out.addAll(array);
+			for (int i = array.size(); i < desiredSize; i++)
+				out.add(fillerObj);
+			return out;
 		}
+
+		T min = array.get(start);
+		T max = null;
+		for (int start = 0; start < desiredSize; start++) {
+			T curr;
+			for (T elem : array) {
+				if (elem.compareTo(min) < 0 && (max == null || elem.compareTo(max) > 0))
+		// 			min = curr;
+		// 	}
+		// 	out.add(min);
+		// }
+
+		return out;
 	}
 
 	@Override
 	public int numObjects() {
-		return 1 + asteroids.length + bullets.length + saucers.length;
+		return 1 + closestAsteroidsCount + closestSaucersCount + closestBulletsCount;
 	}
 
 	@Override
@@ -88,50 +93,46 @@ public class AsteroidsState implements OOState {
 		if (agent.name().equals(oname))
 			return agent;
 
-		index = objectIndexWithName(asteroids, oname);
+		index = OOStateUtilities.objectIndexWithName(asteroids, oname);
 		if (index != -1)
-			return asteroids[index];
+			return asteroids.get(index);
 
-		index = objectIndexWithName(saucers, oname);
+		index = OOStateUtilities.objectIndexWithName(saucers, oname);
 		if (index != -1)
-			return saucers[index];
+			return saucers.get(index);
 
-		index = objectIndexWithName(bullets, oname);
+		index = OOStateUtilities.objectIndexWithName(bullets, oname);
 		if (index != -1)
-			return bullets[index];
+			return bullets.get(index);
 
 		throw new UnknownObjectException(oname);
 	}
 
 	@Override
 	public List<ObjectInstance> objects() {
-		List<ObjectInstance> objs = new ArrayList<ObjectInstance>(numObjects());
-		objs.add(agent);
-		objs.addAll(Arrays.asList(asteroids));
-		objs.addAll(Arrays.asList(saucers));
-		objs.addAll(Arrays.asList(bullets));
-		return objs;
+		if (objects == null) {
+			objects = new ArrayList<ObjectInstance>(numObjects());
+			objects.add(agent);
+			objects.addAll(asteroids);
+			objects.addAll(saucers);
+			objects.addAll(bullets);
+		}
+		return objects;
 	}
 
 	@Override
 	public List<ObjectInstance> objectsOfClass(String oclass) {
 		List<ObjectInstance> objs = new ArrayList<ObjectInstance>();
 
-		if(oclass.equals(CLASS_AGENT)){
+		if(oclass.equals(CLASS_AGENT))
 			return Arrays.<ObjectInstance>asList(agent);
-		}
-		else if(oclass.equals(CLASS_ASTEROID)){
-			objs.addAll(Arrays.asList(asteroids));
-			return objs;
-		}
-		else if(oclass.equals(CLASS_SAUCER)){
-			objs.addAll(Arrays.asList(saucers));
-			return objs;
-		}
-		else if(oclass.equals(CLASS_BULLET)){
-			objs.addAll(Arrays.asList(bullets));
-			return objs;
-		}
+		else if(oclass.equals(CLASS_ASTEROID))
+			return asteroids;
+		else if(oclass.equals(CLASS_SAUCER))
+			return saucers;
+		else if(oclass.equals(CLASS_BULLET))
+			return bullets;
+
 		throw new UnknownClassException(oclass);
 	}
 
@@ -147,23 +148,11 @@ public class AsteroidsState implements OOState {
 
 	@Override
 	public AsteroidsState copy() {
-		AsteroidsState state = new AsteroidsState(agent, asteroids, bullets, saucers);
-		state.resetTouchSet();
-		return state;
-	}
-
-	public void resetTouchSet() {
-		touchSet = new HashSet<Object>();
+		return new AsteroidsState(agent, asteroids, bullets, saucers);
 	}
 
 	@Override
 	public String toString() {
 		return OOStateUtilities.ooStateToString(this);
-	}
-
-	public <T extends ObjectInstance> int objectIndexWithName(T[] objects, String name) {
-		for (int i = 0; i < objects.length; i++)
-			if (objects[i].name().equals(name)) return i;
-		return -1;
 	}
 }

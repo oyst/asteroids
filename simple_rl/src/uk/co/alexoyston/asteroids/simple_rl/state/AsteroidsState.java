@@ -57,7 +57,6 @@ public class AsteroidsState implements OOState {
 	public AsteroidsState(AgentState agent, List<PolarState.Asteroid> asteroids, List<PolarState.Bullet> bullets, List<PolarState.Saucer> saucers) {
 		this.agent = agent;
 		selectSort(asteroids, this.asteroids, nullAsteroid);
-		System.out.println(asteroids.size() != 0 ? asteroids.get(0).dist : "n");
 		selectSort(saucers, this.saucers, nullSaucer);
 		selectSort(bullets, this.bullets, nullBullet);
 		touchSet = new HashSet<Object>();

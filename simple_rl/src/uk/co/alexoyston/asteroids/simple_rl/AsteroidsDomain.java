@@ -9,38 +9,29 @@ import burlap.behavior.functionapproximation.dense.ConcatenatedObjectFeatures;
 import burlap.behavior.functionapproximation.dense.NumericVariableFeatures;
 import burlap.behavior.functionapproximation.sparse.tilecoding.TileCodingFeatures;
 import burlap.behavior.functionapproximation.sparse.tilecoding.TilingArrangement;
-import burlap.behavior.policy.GreedyQPolicy;
-import burlap.behavior.policy.Policy;
-import burlap.behavior.policy.PolicyUtils;
 import burlap.behavior.singleagent.Episode;
 import burlap.behavior.singleagent.auxiliary.EpisodeSequenceVisualizer;
+import burlap.behavior.singleagent.auxiliary.performance.PerformanceMetric;
+import burlap.behavior.singleagent.auxiliary.performance.TrialMode;
+import burlap.behavior.singleagent.auxiliary.performance.LearningAlgorithmExperimenter;
 import burlap.behavior.singleagent.learning.tdmethods.vfa.GradientDescentSarsaLam;
+import burlap.behavior.singleagent.learning.LearningAgentFactory;
+import burlap.behavior.singleagent.learning.LearningAgent;
+import burlap.behavior.singleagent.learning.tdmethods.SarsaLam;
 import burlap.behavior.singleagent.planning.stochastic.sparsesampling.SparseSampling;
 import burlap.mdp.auxiliary.DomainGenerator;
-import burlap.mdp.core.TerminalFunction;
 import burlap.mdp.core.action.UniversalActionType;
 import burlap.mdp.core.oo.OODomain;
-import burlap.mdp.core.oo.propositional.PropositionalFunction;
 import burlap.mdp.singleagent.SADomain;
 import burlap.mdp.singleagent.environment.Environment;
-import burlap.mdp.singleagent.model.FactoredModel;
-import burlap.mdp.singleagent.model.RewardFunction;
 import burlap.mdp.singleagent.oo.OOSADomain;
 import burlap.shell.visual.VisualExplorer;
 import burlap.statehashing.simple.SimpleHashableStateFactory;
 import burlap.visualizer.Visualizer;
-import burlap.behavior.singleagent.auxiliary.performance.PerformanceMetric;
-import burlap.behavior.singleagent.auxiliary.performance.TrialMode;
-import burlap.behavior.singleagent.auxiliary.performance.LearningAlgorithmExperimenter;
-import burlap.behavior.singleagent.learning.LearningAgentFactory;
-import burlap.behavior.singleagent.learning.LearningAgent;
-import burlap.behavior.singleagent.learning.tdmethods.SarsaLam;
-
-import uk.co.alexoyston.asteroids.simple_rl.algorithms.Sarsa;
-import uk.co.alexoyston.asteroids.simple_rl.algorithms.TileCodingFactory;
 
 import uk.co.alexoyston.asteroids.simple_rl.actions.ShootActionType;
-import uk.co.alexoyston.asteroids.simple_rl.props.ObjectCollision;
+import uk.co.alexoyston.asteroids.simple_rl.algorithms.Sarsa;
+import uk.co.alexoyston.asteroids.simple_rl.algorithms.TileCodingFactory;
 import uk.co.alexoyston.asteroids.simple_rl.state.AgentState;
 import uk.co.alexoyston.asteroids.simple_rl.state.PolarState;
 
@@ -61,23 +52,13 @@ public class AsteroidsDomain implements DomainGenerator {
 	public static final String CLASS_SAUCER = "saucer";
 	public static final String CLASS_BULLET = "bullet";
 
-	public static final String CLASS_CLOSEST_OBJ = "closest";
-
 	public static final String VAR_DIST = "dist"; // Absolute distance from Agent to Object
 	public static final String VAR_ANGLE = "angle"; // Angle between Agent and Object
 	public static final String VAR_VELOCITY_X = "velocityX"; // Velocity of Object relative to Agent
 	public static final String VAR_VELOCITY_Y = "velocityY";
 	public static final String VAR_ACTIVE_SHOTS = "activeShots"; // Current shots made by Agent
 
-	public static final String PF_AGENT_KILLED = "agentKilled";
-	public static final String PF_SHOT_ASTEROID = "shotAsteroid";
-	public static final String PF_SHOT_SAUCER = "shotSaucer";
-	public static final String PF_SHOT_AGENT = "shotAgent";
-
 	private static PhysicsParams phys = new PhysicsParams();
-	private AsteroidsModel model;
-	private RewardFunction reward;
-	private TerminalFunction terminal;
 
 	@Override
 	public OOSADomain generateDomain() {
@@ -96,23 +77,9 @@ public class AsteroidsDomain implements DomainGenerator {
 				new ShootActionType(ACTIONTYPE_SHOOT, ACTION_SHOOT, phys),
 				new UniversalActionType(ACTION_NONE));
 
-		OODomain.Helper.addPfsToDomain(domain, this.generatePfs());
-
-		model = new AsteroidsModel(phys);
-		reward = new AsteroidsReward(domain, phys);
-		terminal = new AsteroidsTerminal(domain, phys);
-
-		domain.setModel(new FactoredModel(model, reward, terminal));
+		domain.setModel(null);
 
 		return domain;
-	}
-
-	public List<PropositionalFunction> generatePfs(){
-		return Arrays.asList(
-				new ObjectCollision.AgentShot(PF_SHOT_AGENT),
-				new ObjectCollision.AsteroidShot(PF_SHOT_ASTEROID),
-				new ObjectCollision.SaucerShot(PF_SHOT_SAUCER),
-				new ObjectCollision.AgentKilled(PF_AGENT_KILLED));
 	}
 
 	public static void main(String [] args){
@@ -122,8 +89,8 @@ public class AsteroidsDomain implements DomainGenerator {
 
 		Visualizer v = AsteroidsVisualizer.getVisualizer();
 
-		//  explorer(domain, env, v);
-//		SARSA(domain, env, v);
+		// explorer(domain, env, v);
+		// SARSA(domain, env, v);
 		expAndPlot(domain, env, 10, 200);
 	}
 
@@ -144,7 +111,7 @@ public class AsteroidsDomain implements DomainGenerator {
 		int numTilings = 5;
 		int resolution = 10;
 
-		TileCodingFeatures tilecoding = new TileCodingFactory(phys).getPolarFeatures(resolution, 3, 1, 5);
+		TileCodingFeatures tilecoding = new TileCodingFactory(phys).getPolarFeatures(resolution, 3, 3, 3);
 		DifferentiableStateActionValue vfa = tilecoding.generateVFA(defaultQ/numTilings);
 		Sarsa.GDSarsaLamFactoryBuilder builder = new Sarsa.GDSarsaLamFactoryBuilder(domain, vfa);
 		Sarsa.GDSarsaLamFactory gdSarsaLam = builder.build();

@@ -51,41 +51,51 @@ public class AsteroidsEnvironment implements Environment {
 		ArrayList<PolarState.Bullet> bullets = new ArrayList<PolarState.Bullet>();
 		Player player = sim.players.get(0);
 
-		int x = (int)player.bounds.x;
-		int y = (int)player.bounds.y;
-		int rad = (int)Math.max(player.bounds.width, player.bounds.height) / 2;
-		float rot = player.rotation;
+		final float playerX = (player.location.x + player.center.x);
+		final float playerY = (player.location.y + player.center.y);
+		int diameter = (int)Math.max(player.bounds.width, player.bounds.height);
 
-		AgentState agent = new AgentState(rad, rot, player.activeShots);
+		AgentState agent = new AgentState(diameter, player.activeShots);
 
 		for (Entity entity : this.sim.entities) {
-			float dx = entity.bounds.x - player.bounds.x;
-			float dy = entity.bounds.y - player.bounds.y;
-			// if (Math.abs(dx) > phys.worldWidth / 2)
-			// 	dx = (phys.worldWidth - Math.abs(dx)) * -Math.signum(dx);
-			// if (Math.abs(dy) > phys.worldHeight / 2)
-			// 	dy = (phys.worldHeight - Math.abs(dy)) * -Math.signum(dy);
+			float objX = (entity.location.x + entity.center.x);
+			float objY = (entity.location.y + entity.center.y);
 
-			float dist = (float)Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-			float angle = (float)Math.atan(dy/dx) + (dx > 0 ? (float)Math.PI : 0f);
+			// Calculate the distance between the agent and object
+			float dX = (objX - playerX);
+			float dY = (objY - playerY);
 
-			rad = (int)Math.max(entity.bounds.width, entity.bounds.height) / 2;
+			// Calculate the shortest distance using wrap around if necessary
+			if (Math.abs(dX) > phys.worldWidth / 2)
+				dX -= phys.worldWidth * Math.signum(dX);
+			if (Math.abs(dY) > phys.worldHeight / 2)
+				dY -= phys.worldHeight * Math.signum(dY);
 
-			float vx = entity.velocity.x - player.velocity.x;
-			float vy = entity.velocity.y - player.velocity.y;
+			// Angle and distance between the agent and object
+			// atan returns principal angle, and we need a full 2PI radians, so subtract PI if the object is behind the agent
+			// Take away the agents rotation to get the angle relative to the agent
+			float angle = (float)Math.atan(dX/dY) + (dY < 0 ? (float)Math.PI : 0f) - player.rotation;
+			float dist = (float)Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2));
+
+			// Get the objects max diameter
+			diameter = (int)Math.max(entity.bounds.width, entity.bounds.height);
+
+			// Relative velocity of the object to the agent
+			float vx = (entity.velocity.x - player.velocity.x);
+			float vy = (entity.velocity.y - player.velocity.y);
 
 			if (entity instanceof Asteroid) {
-				PolarState.Asteroid asteroid = new PolarState.Asteroid("asteroid", rad, dist, angle, vx, vy);
+				PolarState.Asteroid asteroid = new PolarState.Asteroid("asteroid", diameter, dist, angle, vx, vy);
 				asteroids.add(asteroid);
 			}
 
 			if (entity instanceof Saucer || entity instanceof SmallSaucer) {
-				PolarState.Saucer saucer = new PolarState.Saucer("saucer", rad, dist, angle, vx, vy);
+				PolarState.Saucer saucer = new PolarState.Saucer("saucer", diameter, dist, angle, vx, vy);
 				saucers.add(saucer);
 			}
 
 			if (entity instanceof Bullet) {
-				PolarState.Bullet bullet = new PolarState.Bullet("bullet", rad, dist, angle, vx, vy);
+				PolarState.Bullet bullet = new PolarState.Bullet("bullet", diameter, dist, angle, vx, vy);
 				bullets.add(bullet);
 			}
 		}

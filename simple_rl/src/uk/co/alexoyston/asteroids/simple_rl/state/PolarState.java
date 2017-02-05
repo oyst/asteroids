@@ -18,7 +18,7 @@ public abstract class PolarState implements ObjectInstance, Comparable<PolarStat
 	public float vx = 0f;
 	public float vy = 0f;
 
-	public int radius;
+	public int diameter;
 
 	protected String name;
 
@@ -32,14 +32,14 @@ public abstract class PolarState implements ObjectInstance, Comparable<PolarStat
 	public PolarState() {
 	}
 
-	public PolarState(String name, int radius, float dist, float angle, float vx, float vy) {
+	public PolarState(String name, int diameter, float dist, float angle, float vx, float vy) {
 		this.name = name;
 		this.dist = dist;
 		this.angle = angle;
 		this.vx = vx;
 		this.vy = vy;
 
-		this.radius = (short)radius;
+		this.diameter = (short)diameter;
 	}
 
 	@Override
@@ -93,8 +93,8 @@ public abstract class PolarState implements ObjectInstance, Comparable<PolarStat
 
 	@DeepCopyState
 	public static class Asteroid extends PolarState {
-		public Asteroid(String name, int radius, float dist, float angle, float vx, float vy) {
-			super(name, radius, dist, angle, vx, vy);
+		public Asteroid(String name, int diameter, float dist, float angle, float vx, float vy) {
+			super(name, diameter, dist, angle, vx, vy);
 		}
 
 		@Override
@@ -104,14 +104,14 @@ public abstract class PolarState implements ObjectInstance, Comparable<PolarStat
 
 		@Override
 		public PolarState.Asteroid copy() {
-			return new Asteroid(name, radius, dist, angle, vx, vy);
+			return new Asteroid(name, diameter, dist, angle, vx, vy);
 		}
 	}
 
 	@DeepCopyState
 	public static class Saucer extends PolarState{
-		public Saucer(String name, int radius, float dist, float angle, float vx, float vy) {
-			super(name, radius, dist, angle, vx, vy);
+		public Saucer(String name, int diameter, float dist, float angle, float vx, float vy) {
+			super(name, diameter, dist, angle, vx, vy);
 		}
 
 		@Override
@@ -121,14 +121,14 @@ public abstract class PolarState implements ObjectInstance, Comparable<PolarStat
 
 		@Override
 		public PolarState.Saucer copy() {
-			return new Saucer(name, radius, dist, angle, vx, vy);
+			return new Saucer(name, diameter, dist, angle, vx, vy);
 		}
 	}
 
 	@DeepCopyState
 	public static class Bullet extends PolarState{
-		public Bullet(String name, int radius, float dist, float angle, float vx, float vy) {
-			super(name, radius, dist, angle, vx, vy);
+		public Bullet(String name, int diameter, float dist, float angle, float vx, float vy) {
+			super(name, diameter, dist, angle, vx, vy);
 		}
 
 		@Override
@@ -138,7 +138,7 @@ public abstract class PolarState implements ObjectInstance, Comparable<PolarStat
 
 		@Override
 		public PolarState.Bullet copy() {
-			return new Bullet(name, radius, dist, angle, vx, vy);
+			return new Bullet(name, diameter, dist, angle, vx, vy);
 		}
 	}
 }

@@ -88,11 +88,11 @@ public class AsteroidsDomain implements DomainGenerator {
 		OOSADomain domain = asteroids.generateDomain();
 		Environment env = new AsteroidsEnvironment(asteroids.phys);
 
-		Visualizer v = AsteroidsVisualizer.getVisualizer();
+		Visualizer v = AsteroidsVisualizer.getVisualizer(50, 50, asteroids.phys.worldWidth, asteroids.phys.worldHeight);
 
-		// explorer(domain, env, v);
+		explorer(domain, env, v);
 		// SARSA(domain, env, v);
-		expAndPlot(domain, env, 10, 100);
+		// expAndPlot(domain, env, 10, 100);
 	}
 
 	public static void explorer(OOSADomain domain, Environment env, Visualizer v){

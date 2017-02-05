@@ -19,8 +19,7 @@ public class AgentState implements ObjectInstance {
 
 	protected final String name = CLASS_AGENT;
 
-	public short radius;
-	public float rotation;
+	public short diameter;
 
 	private static final List<Object> keys = Arrays.<Object>asList(
 		VAR_ACTIVE_SHOTS
@@ -29,11 +28,10 @@ public class AgentState implements ObjectInstance {
 	public AgentState() {
 	}
 
-	public AgentState(int radius, float rotation, int activeShots) {
+	public AgentState(int diameter, int activeShots) {
 		this.activeShots = activeShots;
 
-		this.radius = (short)radius;
-		this.rotation = rotation;
+		this.diameter = (short)diameter;
 	}
 
 	@Override
@@ -51,7 +49,7 @@ public class AgentState implements ObjectInstance {
 
 	@Override
 	public AgentState copy() {
-		return new AgentState(radius, rotation, activeShots);
+		return new AgentState(diameter, activeShots);
 	}
 
 	@Override

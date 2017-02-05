@@ -13,3 +13,12 @@ task run(dependsOn: classes, type: JavaExec) {
 eclipse.project {
 		name = "simple_rl"
 }
+
+jar {
+	manifest {
+		attributes(
+			"Main-Class": project.ext.mainClassName,
+			"Class-Path": configurations.compile.collect { it.getName() }.join(" "))
+  }
+	from configurations.compile.collect { entry -> zipTree(entry) }
+}

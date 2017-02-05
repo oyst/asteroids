@@ -51,6 +51,7 @@ public class AsteroidsDomain implements DomainGenerator {
 	public static final String CLASS_ASTEROID = "asteroid";
 	public static final String CLASS_SAUCER = "saucer";
 	public static final String CLASS_BULLET = "bullet";
+	public static final String CLASS_OBJECT = "object";
 
 	public static final String VAR_DIST = "dist"; // Absolute distance from Agent to Object
 	public static final String VAR_ANGLE = "angle"; // Angle between Agent and Object
@@ -91,7 +92,7 @@ public class AsteroidsDomain implements DomainGenerator {
 
 		// explorer(domain, env, v);
 		// SARSA(domain, env, v);
-		expAndPlot(domain, env, 10, 200);
+		expAndPlot(domain, env, 10, 100);
 	}
 
 	public static void explorer(OOSADomain domain, Environment env, Visualizer v){

@@ -23,12 +23,12 @@ public class AsteroidsState implements OOState {
 
 	private static final float nullDistance = 10000f;
 	public static final int closestAsteroidsCount = 3;
-	public static final int closestSaucersCount = 3;
-	public static final int closestBulletsCount = 3;
+	public static final int closestSaucersCount = 1;
+	public static final int closestBulletsCount = 5;
 
-	private static final PolarState.Asteroid nullAsteroid = new PolarState.Asteroid("asteroidNull", nullDistance, 0f, 0f, 0f);
-	private static final PolarState.Saucer nullSaucer = new PolarState.Saucer("saucerNull", nullDistance, 0f, 0f, 0f);
-	private static final PolarState.Bullet nullBullet = new PolarState.Bullet("bulletNull", nullDistance, 0f, 0f, 0f);
+	private static final PolarState.Asteroid nullAsteroid = new PolarState.Asteroid("asteroidNull", 0, nullDistance, 0f, 0f, 0f);
+	private static final PolarState.Saucer nullSaucer = new PolarState.Saucer("saucerNull", 0, nullDistance, 0f, 0f, 0f);
+	private static final PolarState.Bullet nullBullet = new PolarState.Bullet("bulletNull", 0, nullDistance, 0f, 0f, 0f);
 
 	public AgentState agent;
 	public List<ObjectInstance> asteroids = new ArrayList<ObjectInstance>();
@@ -115,16 +115,26 @@ public class AsteroidsState implements OOState {
 
 	@Override
 	public List<ObjectInstance> objectsOfClass(String oclass) {
-		List<ObjectInstance> objs = new ArrayList<ObjectInstance>();
 
 		if(oclass.equals(CLASS_AGENT))
 			return Arrays.<ObjectInstance>asList(agent);
+
 		else if(oclass.equals(CLASS_ASTEROID))
 			return asteroids;
+
 		else if(oclass.equals(CLASS_SAUCER))
 			return saucers;
+
 		else if(oclass.equals(CLASS_BULLET))
 			return bullets;
+
+		else if(oclass.equals(CLASS_OBJECT)) {
+			List<ObjectInstance> objs = new ArrayList<ObjectInstance>();
+			objs.addAll(asteroids);
+			objs.addAll(saucers);
+			objs.addAll(bullets);
+			return objs;
+		}
 
 		throw new UnknownClassException(oclass);
 	}

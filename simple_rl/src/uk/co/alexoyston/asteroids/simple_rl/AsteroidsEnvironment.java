@@ -51,34 +51,41 @@ public class AsteroidsEnvironment implements Environment {
 		ArrayList<PolarState.Bullet> bullets = new ArrayList<PolarState.Bullet>();
 		Player player = sim.players.get(0);
 
-		AgentState agent = new AgentState(player, player.activeShots);
+		int x = (int)player.bounds.x;
+		int y = (int)player.bounds.y;
+		int rad = (int)Math.max(player.bounds.width, player.bounds.height) / 2;
+		float rot = player.rotation;
+
+		AgentState agent = new AgentState(rad, rot, player.activeShots);
 
 		for (Entity entity : this.sim.entities) {
-			float dx = entity.location.x - player.location.x;
-			float dy = entity.location.y - player.location.y;
-			if (Math.abs(dx) > phys.worldWidth / 2)
-				dx = (phys.worldWidth - Math.abs(dx)) * Math.signum(dx);
-			if (Math.abs(dy) > phys.worldHeight / 2)
-				dy = (phys.worldHeight - Math.abs(dy)) * Math.signum(dy);
+			float dx = entity.bounds.x - player.bounds.x;
+			float dy = entity.bounds.y - player.bounds.y;
+			// if (Math.abs(dx) > phys.worldWidth / 2)
+			// 	dx = (phys.worldWidth - Math.abs(dx)) * -Math.signum(dx);
+			// if (Math.abs(dy) > phys.worldHeight / 2)
+			// 	dy = (phys.worldHeight - Math.abs(dy)) * -Math.signum(dy);
+
 			float dist = (float)Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-			float angle = (float)Math.atan((dx) / (dy)) - player.rotation;
-			angle %= Math.PI * 2;
+			float angle = (float)Math.atan(dy/dx) + (dx > 0 ? (float)Math.PI : 0f);
+
+			rad = (int)Math.max(entity.bounds.width, entity.bounds.height) / 2;
 
 			float vx = entity.velocity.x - player.velocity.x;
 			float vy = entity.velocity.y - player.velocity.y;
 
 			if (entity instanceof Asteroid) {
-				PolarState.Asteroid asteroid = new PolarState.Asteroid("asteroid", entity, dist, angle, vx, vy);
+				PolarState.Asteroid asteroid = new PolarState.Asteroid("asteroid", rad, dist, angle, vx, vy);
 				asteroids.add(asteroid);
 			}
 
 			if (entity instanceof Saucer || entity instanceof SmallSaucer) {
-				PolarState.Saucer saucer = new PolarState.Saucer("saucer", entity, dist, angle, vx, vy);
+				PolarState.Saucer saucer = new PolarState.Saucer("saucer", rad, dist, angle, vx, vy);
 				saucers.add(saucer);
 			}
 
 			if (entity instanceof Bullet) {
-				PolarState.Bullet bullet = new PolarState.Bullet("bullet", entity, dist, angle, vx, vy);
+				PolarState.Bullet bullet = new PolarState.Bullet("bullet", rad, dist, angle, vx, vy);
 				bullets.add(bullet);
 			}
 		}

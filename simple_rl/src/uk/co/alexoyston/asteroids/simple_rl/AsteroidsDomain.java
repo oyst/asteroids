@@ -3,6 +3,8 @@ package uk.co.alexoyston.asteroids.simple_rl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import burlap.behavior.functionapproximation.dense.fourier.FourierBasis;
 import burlap.behavior.functionapproximation.sparse.tilecoding.TileCodingFeatures;
@@ -21,6 +23,7 @@ import burlap.mdp.singleagent.environment.Environment;
 import burlap.mdp.singleagent.oo.OOSADomain;
 import burlap.shell.visual.VisualExplorer;
 import burlap.visualizer.Visualizer;
+import burlap.mdp.core.state.vardomain.VariableDomain;
 
 import uk.co.alexoyston.asteroids.simple_rl.actions.ShootActionType;
 import uk.co.alexoyston.asteroids.simple_rl.algorithms.PolarFeaturesFactory;
@@ -52,7 +55,26 @@ public class AsteroidsDomain implements DomainGenerator {
 	public static final String VAR_VELOCITY_Y = "velocityY";
 	public static final String VAR_ACTIVE_SHOTS = "activeShots"; // Current shots made by Agent
 
-	private static PhysicsParams phys = new PhysicsParams();
+	private static final PhysicsParams phys = new PhysicsParams();
+	protected static final Map<Object, VariableDomain> domains = new HashMap<Object, VariableDomain>();
+
+	static {
+		double maxDist = Math.max(phys.worldWidth, phys.worldHeight) / 2;
+
+		double maxPlayerVelocity = Math.sqrt(2 * phys.playerThrustPower / phys.playerDrag);
+    double maxAsteroidVelocity = (maxPlayerVelocity + phys.asteroidMaxSpeed);
+    double maxSaucerVelocity = (maxPlayerVelocity + phys.saucerSpeed);
+    double maxBulletVelocity = (maxPlayerVelocity + phys.playerShotSpeed);
+    double maxVelocity = Math.max(maxAsteroidVelocity, Math.max(maxSaucerVelocity, maxBulletVelocity));
+
+		int maxActiveShots = phys.playerMaxActiveShots;
+
+		domains.put(VAR_DIST, new VariableDomain(-maxDist, maxDist));
+		domains.put(VAR_ANGLE, new VariableDomain(0, 2*Math.PI));
+		domains.put(VAR_VELOCITY_X, new VariableDomain(-maxVelocity, maxVelocity));
+		domains.put(VAR_VELOCITY_Y, new VariableDomain(-maxVelocity, maxVelocity));
+		domains.put(VAR_ACTIVE_SHOTS, new VariableDomain(0, phys.playerMaxActiveShots));
+	}
 
 	@Override
 	public OOSADomain generateDomain() {
@@ -83,7 +105,7 @@ public class AsteroidsDomain implements DomainGenerator {
 
 		Visualizer v = AsteroidsVisualizer.getVisualizer(50, 50, phys.worldWidth, phys.worldHeight);
 
-		PolarFeaturesFactory featuresFactory = new PolarFeaturesFactory(phys);
+		PolarFeaturesFactory featuresFactory = new PolarFeaturesFactory(domains);
 
 		TileCodingFeatures tileCoding = featuresFactory.getTileCoding(10);
 		VFAGenerator tileCodingVFA = (dq) -> {return tileCoding.generateVFA(dq);};

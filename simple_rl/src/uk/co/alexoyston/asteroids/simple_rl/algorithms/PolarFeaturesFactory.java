@@ -2,6 +2,8 @@ package uk.co.alexoyston.asteroids.simple_rl.algorithms;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 import burlap.behavior.functionapproximation.dense.ConcatenatedObjectFeatures;
 import burlap.behavior.functionapproximation.dense.DenseStateFeatures;
@@ -22,7 +24,7 @@ import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.*;
 
 public class PolarFeaturesFactory {
 
-  protected PhysicsParams phys;
+  protected Map<Object, VariableDomain> domains;
   protected DenseStateFeatures inputFeatures;
 
   protected final static int numAsteroids = AsteroidsState.closestAsteroidsCount;
@@ -32,74 +34,44 @@ public class PolarFeaturesFactory {
   protected final static List<Object> polarAgentFeatures = AgentState.keys;
   protected final static List<Object> polarObjectFeatures = PolarState.keys;
 
-  protected double polarMaxDist;
-  protected double polarMaxAngle;
-  protected double polarMaxAsteroidVelocity;
-  protected double polarMaxSaucerVelocity;
-  protected double polarMaxBulletVelocity;
-  protected double polarMaxVelocity;
+  protected final NormalizedVariableFeatures agentNormFeatures;
+  protected final NormalizedVariableFeatures objNormFeatures;
 
-  protected double maxPlayerVelocity;
-  protected double maxActiveShots;
+  protected final NumericVariableFeatures agentNumFeatures;
+  protected final NumericVariableFeatures objNumFeatures;
 
-  public PolarFeaturesFactory(PhysicsParams phys) {
-    this.phys = phys;
+  public PolarFeaturesFactory(Map<Object, VariableDomain> domains) {
+    this.domains = domains;
 
-    maxPlayerVelocity = 2*(phys.playerThrustPower / phys.playerDrag) - (phys.playerThrustPower * phys.updateDelta);
-    maxActiveShots = phys.playerMaxActiveShots;
+    agentNormFeatures = new NormalizedVariableFeatures();
+    for (Object key : polarAgentFeatures)
+      agentNormFeatures.variableDomain(key, domains.get(key));
 
-    polarMaxDist = Math.max(phys.worldWidth, phys.worldHeight) / 2;
-    polarMaxAngle = (Math.PI*2);
-    polarMaxAsteroidVelocity = (maxPlayerVelocity + phys.asteroidMaxSpeed);
-    polarMaxSaucerVelocity = (maxPlayerVelocity + phys.saucerSpeed);
-    polarMaxBulletVelocity = (maxPlayerVelocity + phys.playerShotSpeed);
-    polarMaxVelocity = Math.max(polarMaxAsteroidVelocity, Math.max(polarMaxSaucerVelocity, polarMaxBulletVelocity));
+    objNormFeatures = new NormalizedVariableFeatures();
+    for (Object key : polarObjectFeatures)
+      objNormFeatures.variableDomain(key, domains.get(key));
 
-    inputFeatures = getNormalizedFeatures(numAsteroids, numSaucers, numBullets);
+    agentNumFeatures = new NumericVariableFeatures(polarAgentFeatures);
+    objNumFeatures = new NumericVariableFeatures(polarObjectFeatures);
+
+    inputFeatures = getNormalizedFeatures();
   }
 
-  protected DenseStateFeatures getFeatures(int numAsteroids, int numSaucers, int numBullets) {
+  protected DenseStateFeatures getFeatures() {
     ConcatenatedObjectFeatures inputFeatures = new ConcatenatedObjectFeatures();
-
-    inputFeatures.addObjectVectorizion(
-      CLASS_AGENT, new NumericVariableFeatures(polarAgentFeatures)
-    );
-    inputFeatures.addObjectVectorizion(
-      CLASS_ASTEROID, new NumericVariableFeatures(polarObjectFeatures)
-    );
-    inputFeatures.addObjectVectorizion(
-      CLASS_SAUCER, new NumericVariableFeatures(polarObjectFeatures)
-    );
-    inputFeatures.addObjectVectorizion(
-      CLASS_BULLET, new NumericVariableFeatures(polarObjectFeatures)
-    );
-
+    inputFeatures.addObjectVectorizion(CLASS_AGENT, agentNumFeatures);
+    inputFeatures.addObjectVectorizion(CLASS_ASTEROID, objNumFeatures);
+    inputFeatures.addObjectVectorizion(CLASS_SAUCER, objNumFeatures);
+    inputFeatures.addObjectVectorizion(CLASS_BULLET, objNumFeatures);
     return inputFeatures;
   }
 
-  protected DenseStateFeatures getNormalizedFeatures(int numAsteroids, int numSaucers, int numBullets) {
+  protected DenseStateFeatures getNormalizedFeatures() {
     ConcatenatedObjectFeatures inputFeatures = new ConcatenatedObjectFeatures();
-
-    inputFeatures.addObjectVectorizion(
-      CLASS_AGENT, new NormalizedVariableFeatures()
-        .variableDomain(VAR_ACTIVE_SHOTS, new VariableDomain(0, maxActiveShots))
-    );
-    inputFeatures.addObjectVectorizion(
-      CLASS_ASTEROID, new NormalizedVariableFeatures()
-        .variableDomain(VAR_DIST, new VariableDomain(-polarMaxDist, polarMaxDist))
-        .variableDomain(VAR_ANGLE, new VariableDomain(0, 2*Math.PI))
-    );
-    inputFeatures.addObjectVectorizion(
-      CLASS_SAUCER, new NormalizedVariableFeatures()
-        .variableDomain(VAR_DIST, new VariableDomain(-polarMaxDist, polarMaxDist))
-        .variableDomain(VAR_ANGLE, new VariableDomain(0, 2*Math.PI))
-    );
-    inputFeatures.addObjectVectorizion(
-      CLASS_BULLET, new NormalizedVariableFeatures()
-        .variableDomain(VAR_DIST, new VariableDomain(-polarMaxDist, polarMaxDist))
-        .variableDomain(VAR_ANGLE, new VariableDomain(0, 2*Math.PI))
-    );
-
+    inputFeatures.addObjectVectorizion(CLASS_AGENT, agentNormFeatures);
+    inputFeatures.addObjectVectorizion(CLASS_ASTEROID, objNormFeatures);
+    inputFeatures.addObjectVectorizion(CLASS_SAUCER, objNormFeatures);
+    inputFeatures.addObjectVectorizion(CLASS_BULLET, objNormFeatures);
     return inputFeatures;
   }
 
@@ -110,21 +82,12 @@ public class PolarFeaturesFactory {
 
     int j = 0;
 
-    weights[j++] = maxActiveShots / resolution;
-    for (int n = 0; n < numObjects; n++) {
-      weights[j++] = polarMaxDist / resolution;
-      weights[j++] = polarMaxAngle / resolution;
-      weights[j++] = polarMaxVelocity / resolution;
-      weights[j++] = polarMaxVelocity / resolution;
+    for (Object key : polarAgentFeatures)
+      weights[j++] = domains.get(key).span() / resolution;
+    for (int i = 0; i < numObjects; i++) {
+      for (Object key : polarObjectFeatures)
+        weights[j++] = domains.get(key).span() / resolution;
     }
-
-    // weights[j++] = 1f/resolution;
-    // for (int n = 0; n < numObjects; n++) {
-    //   weights[j++] = polarMaxDist / resolution;
-    //   weights[j++] = polarMaxAngle / resolution;
-    //   weights[j++] = polarMaxVelocity / resolution;
-    //   weights[j++] = polarMaxVelocity / resolution;
-    // }
 
     TileCodingFeatures tilecoding = new TileCodingFeatures(inputFeatures);
     tilecoding.addTilingsForAllDimensionsWithWidths(

@@ -119,6 +119,9 @@ public abstract class Entity {
 		if (!alive)
 			return false;
 
+		if (other == this)
+			return false;
+
 		// Bounding box collision detection
 		if (!Intersector.overlaps(bounds, other.bounds))
 			return false;

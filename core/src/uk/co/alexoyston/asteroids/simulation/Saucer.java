@@ -43,6 +43,8 @@ public class Saucer extends Entity implements BulletShooter {
 
 		setVertices(vertices);
 
+		velocity.x = speed;
+
 		center.set(width/2, height/2);
 	}
 

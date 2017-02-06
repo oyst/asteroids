@@ -28,7 +28,6 @@ public class Simulation implements Disposable, EntityListener {
 	private int saucersMax;
 	private float saucersProbSmall;
 	private float saucersFreq;
-	private float saucersSpeed;
 
 	private float updateLimiter;
 
@@ -140,7 +139,6 @@ public class Simulation implements Disposable, EntityListener {
 				saucer = new Saucer(params);
 			saucer.location.y = bounds.y + (float)Math.random() * bounds.height;
 			saucer.location.x = (Math.random() < 0.5) ? bounds.x - saucer.bounds.width : bounds.width;
-			saucer.velocity.x = saucersSpeed;
 			requestEntity(saucer);
 			saucersOnField++;
 		}

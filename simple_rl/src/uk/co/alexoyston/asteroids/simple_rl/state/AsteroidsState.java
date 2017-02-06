@@ -24,7 +24,7 @@ public class AsteroidsState implements OOState {
 	private static final float nullDistance = 10000f;
 	public static final int closestAsteroidsCount = 3;
 	public static final int closestSaucersCount = 1;
-	public static final int closestBulletsCount = 5;
+	public static final int closestBulletsCount = 1;
 
 	private static final PolarState.Asteroid nullAsteroid = new PolarState.Asteroid("asteroidNull", 0, nullDistance, 0f, 0f, 0f);
 	private static final PolarState.Saucer nullSaucer = new PolarState.Saucer("saucerNull", 0, nullDistance, 0f, 0f, 0f);

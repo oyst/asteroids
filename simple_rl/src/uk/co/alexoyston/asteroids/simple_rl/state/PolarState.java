@@ -22,7 +22,7 @@ public abstract class PolarState implements ObjectInstance, Comparable<PolarStat
 
 	protected String name;
 
-	protected static final List<Object> keys = Arrays.<Object>asList(
+	public static final List<Object> keys = Arrays.<Object>asList(
 			VAR_DIST,
 			VAR_ANGLE,
 			VAR_VELOCITY_X,

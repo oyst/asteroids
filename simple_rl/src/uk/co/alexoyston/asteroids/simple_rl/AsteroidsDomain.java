@@ -7,6 +7,7 @@ import java.util.List;
 import burlap.behavior.functionapproximation.DifferentiableStateActionValue;
 import burlap.behavior.functionapproximation.dense.ConcatenatedObjectFeatures;
 import burlap.behavior.functionapproximation.dense.NumericVariableFeatures;
+import burlap.behavior.functionapproximation.dense.fourier.FourierBasis;
 import burlap.behavior.functionapproximation.sparse.tilecoding.TileCodingFeatures;
 import burlap.behavior.functionapproximation.sparse.tilecoding.TilingArrangement;
 import burlap.behavior.singleagent.Episode;
@@ -30,8 +31,8 @@ import burlap.statehashing.simple.SimpleHashableStateFactory;
 import burlap.visualizer.Visualizer;
 
 import uk.co.alexoyston.asteroids.simple_rl.actions.ShootActionType;
-import uk.co.alexoyston.asteroids.simple_rl.algorithms.Sarsa;
-import uk.co.alexoyston.asteroids.simple_rl.algorithms.TileCodingFactory;
+import uk.co.alexoyston.asteroids.simple_rl.algorithms.PolarFeaturesFactory;
+import uk.co.alexoyston.asteroids.simple_rl.algorithms.VFAGenerator;
 import uk.co.alexoyston.asteroids.simple_rl.state.AgentState;
 import uk.co.alexoyston.asteroids.simple_rl.state.PolarState;
 
@@ -86,13 +87,37 @@ public class AsteroidsDomain implements DomainGenerator {
 	public static void main(String [] args){
 		AsteroidsDomain asteroids = new AsteroidsDomain();
 		OOSADomain domain = asteroids.generateDomain();
-		Environment env = new AsteroidsEnvironment(asteroids.phys);
+		Environment env = new AsteroidsEnvironment(phys);
 
-		Visualizer v = AsteroidsVisualizer.getVisualizer(50, 50, asteroids.phys.worldWidth, asteroids.phys.worldHeight);
+		Visualizer v = AsteroidsVisualizer.getVisualizer(50, 50, phys.worldWidth, phys.worldHeight);
 
-		explorer(domain, env, v);
-		// SARSA(domain, env, v);
-		// expAndPlot(domain, env, 10, 100);
+		PolarFeaturesFactory featuresFactory = new PolarFeaturesFactory(phys);
+
+		TileCodingFeatures tileCoding = featuresFactory.getTileCoding(10);
+		VFAGenerator tileCodingVFA = (dq) -> {return tileCoding.generateVFA(dq);};
+
+		FourierBasis fourierBasis = featuresFactory.getFourierBasis(2, 2);
+		VFAGenerator fourierBasisVFA = (dq) -> {return fourierBasis.generateVFA(dq);};
+
+		LearningAgentFactory gdSarsa = getSarsaAgentFactory(domain, tileCodingVFA, 0.99, 0.02, 0.5, 0.1);
+
+		// explorer(domain, env, v);
+		// episodicView(domain, env, v, agent, 50);
+		expAndPlot(env, 100, 10, gdSarsa);
+	}
+
+	public static LearningAgentFactory getSarsaAgentFactory(OOSADomain domain, VFAGenerator vfaGen,
+		double gamma, double learningRate, double defaultQ, double lambda) {
+
+		LearningAgentFactory agentFactory = new LearningAgentFactory() {
+			public String getAgentName() {
+				return String.format("GD-SARSA: (%.2f, %.2f, %.2f, %.2f)", gamma, learningRate, defaultQ, lambda);
+			}
+			public LearningAgent generateAgent() {
+				return new GradientDescentSarsaLam(domain, gamma, vfaGen.generateVFA(defaultQ), learningRate, lambda);
+			}
+		};
+		return agentFactory;
 	}
 
 	public static void explorer(OOSADomain domain, Environment env, Visualizer v){
@@ -107,43 +132,23 @@ public class AsteroidsDomain implements DomainGenerator {
 		exp.initGUI();
 	}
 
-	public static void SARSA(OOSADomain domain, Environment env, Visualizer v) {
-		double defaultQ = 0.5;
-		int numTilings = 5;
-		int resolution = 10;
+	public static void episodicView(OOSADomain domain, Environment env, Visualizer v,
+		LearningAgentFactory agentFactory, int numEpisodes) {
 
-		TileCodingFeatures tilecoding = new TileCodingFactory(phys).getPolarFeatures(resolution, 3, 3, 3);
-		DifferentiableStateActionValue vfa = tilecoding.generateVFA(defaultQ/numTilings);
-		Sarsa.GDSarsaLamFactoryBuilder builder = new Sarsa.GDSarsaLamFactoryBuilder(domain, vfa);
-		Sarsa.GDSarsaLamFactory gdSarsaLam = builder.build();
-
-		LearningAgent agent = gdSarsaLam.generateAgent();
-
-		List<Episode> episodes = new ArrayList<Episode>();
-		for(int i = 0; i < 50; i++){
-			Episode ea = agent.runLearningEpisode(env);
-			episodes.add(ea);
-			System.out.println(i + ": " + ea.maxTimeStep());
-			env.resetEnvironment();
-		}
-
-		new EpisodeSequenceVisualizer(v, domain, episodes);
-
+			LearningAgent agent = agentFactory.generateAgent();
+			List<Episode> episodes = new ArrayList<Episode>();
+			for(int i = 0; i < numEpisodes; i++){
+				Episode ep = agent.runLearningEpisode(env);
+				episodes.add(ep);
+				System.out.println(i + ": " + ep.maxTimeStep());
+				env.resetEnvironment();
+			}
+			new EpisodeSequenceVisualizer(v, domain, episodes);
 	}
 
-	public static void expAndPlot(OOSADomain domain, Environment env, int numTrials, int trialLength){
-		double defaultQ = 0.5;
-		int numTilings = 20;
-		int resolution = 10;
-
-		TileCodingFeatures tilecoding = new TileCodingFactory(phys).getPolarFeatures(resolution, 3, 1, 5);
-		DifferentiableStateActionValue vfa = tilecoding.generateVFA(defaultQ/numTilings);
-		Sarsa.GDSarsaLamFactoryBuilder builder = new Sarsa.GDSarsaLamFactoryBuilder(domain, vfa);
-		Sarsa.GDSarsaLamFactory gdSarsaLam = builder.build();
-
+	public static void expAndPlot(Environment env, int numTrials, int trialLength, LearningAgentFactory... agentFactories){
 		LearningAlgorithmExperimenter exp = new LearningAlgorithmExperimenter(
-			env, numTrials, trialLength,
-			gdSarsaLam
+			env, numTrials, trialLength, agentFactories
 		);
 
 		exp.setUpPlottingConfiguration(500, 250, 2, 1000,

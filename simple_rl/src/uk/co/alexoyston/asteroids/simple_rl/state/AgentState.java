@@ -21,7 +21,7 @@ public class AgentState implements ObjectInstance {
 
 	public short diameter;
 
-	private static final List<Object> keys = Arrays.<Object>asList(
+	public static final List<Object> keys = Arrays.<Object>asList(
 		VAR_ACTIVE_SHOTS
 	);
 

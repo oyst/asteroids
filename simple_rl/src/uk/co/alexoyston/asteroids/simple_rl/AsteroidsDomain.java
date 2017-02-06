@@ -44,9 +44,6 @@ public class AsteroidsDomain implements DomainGenerator {
 	public static final String ACTIONTYPE_SHOOT = "typeShoot";
 
 	public static final String CLASS_AGENT = "agent";
-	public static final String CLASS_ASTEROID = "asteroid";
-	public static final String CLASS_SAUCER = "saucer";
-	public static final String CLASS_BULLET = "bullet";
 	public static final String CLASS_OBJECT = "object";
 
 	public static final String VAR_DIST = "dist"; // Absolute distance from Agent to Object
@@ -82,9 +79,7 @@ public class AsteroidsDomain implements DomainGenerator {
 		OOSADomain domain = new OOSADomain();
 
 		domain.addStateClass(CLASS_AGENT, AgentState.class);
-		domain.addStateClass(CLASS_ASTEROID, PolarState.Asteroid.class);
-		domain.addStateClass(CLASS_SAUCER, PolarState.Saucer.class);
-		domain.addStateClass(CLASS_BULLET, PolarState.Bullet.class);
+		domain.addStateClass(CLASS_OBJECT, PolarState.class);
 
 		domain.addActionTypes(
 				new UniversalActionType(ACTION_FORWARD),
@@ -113,11 +108,11 @@ public class AsteroidsDomain implements DomainGenerator {
 		FourierBasis fourierBasis = featuresFactory.getFourierBasis(2, 2);
 		VFAGenerator fourierBasisVFA = (dq) -> {return fourierBasis.generateVFA(dq);};
 
-		LearningAgentFactory gdSarsa = getSarsaAgentFactory(domain, tileCodingVFA, 0.99, 0.02, 0.5, 0.1);
+		LearningAgentFactory gdSarsa = getSarsaAgentFactory(domain, tileCodingVFA, 0.99, 0.02, 0.5/10, 0.1);
 
 		// explorer(domain, env, v);
 		// episodicView(domain, env, v, agent, 50);
-		expAndPlot(env, 100, 10, gdSarsa);
+		expAndPlot(env, 5, 1000, gdSarsa);
 	}
 
 	public static LearningAgentFactory getSarsaAgentFactory(OOSADomain domain, VFAGenerator vfaGen,

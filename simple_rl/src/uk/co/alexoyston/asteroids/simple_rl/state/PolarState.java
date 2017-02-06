@@ -11,7 +11,7 @@ import burlap.mdp.core.state.annotations.DeepCopyState;
 import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.*;
 
 @DeepCopyState
-public abstract class PolarState implements ObjectInstance, Comparable<PolarState> {
+public class PolarState implements ObjectInstance, Comparable<PolarState> {
 
 	public float dist = 0f;
 	public float angle = 0f;
@@ -72,7 +72,9 @@ public abstract class PolarState implements ObjectInstance, Comparable<PolarStat
 	}
 
 	@Override
-	public abstract PolarState copy();
+	public PolarState copy() {
+		return new PolarState(name, diameter, dist, angle, vx, vy);
+	}
 
 	@Override
 	public PolarState copyWithName(String objectName) {
@@ -87,58 +89,12 @@ public abstract class PolarState implements ObjectInstance, Comparable<PolarStat
 	}
 
 	@Override
+	public String className() {
+		return CLASS_OBJECT;
+	}
+
+	@Override
 	public String toString() {
 		return OOStateUtilities.objectInstanceToString(this);
-	}
-
-	@DeepCopyState
-	public static class Asteroid extends PolarState {
-		public Asteroid(String name, int diameter, float dist, float angle, float vx, float vy) {
-			super(name, diameter, dist, angle, vx, vy);
-		}
-
-		@Override
-		public String className() {
-			return CLASS_ASTEROID;
-		}
-
-		@Override
-		public PolarState.Asteroid copy() {
-			return new Asteroid(name, diameter, dist, angle, vx, vy);
-		}
-	}
-
-	@DeepCopyState
-	public static class Saucer extends PolarState{
-		public Saucer(String name, int diameter, float dist, float angle, float vx, float vy) {
-			super(name, diameter, dist, angle, vx, vy);
-		}
-
-		@Override
-		public String className() {
-			return CLASS_SAUCER;
-		}
-
-		@Override
-		public PolarState.Saucer copy() {
-			return new Saucer(name, diameter, dist, angle, vx, vy);
-		}
-	}
-
-	@DeepCopyState
-	public static class Bullet extends PolarState{
-		public Bullet(String name, int diameter, float dist, float angle, float vx, float vy) {
-			super(name, diameter, dist, angle, vx, vy);
-		}
-
-		@Override
-		public String className() {
-			return CLASS_BULLET;
-		}
-
-		@Override
-		public PolarState.Bullet copy() {
-			return new Bullet(name, diameter, dist, angle, vx, vy);
-		}
 	}
 }

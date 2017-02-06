@@ -23,16 +23,10 @@ public class AsteroidsState implements OOState {
 	public static final int closestSaucersCount = 1;
 	public static final int closestBulletsCount = 1;
 
-	private static final PolarState.Asteroid nullAsteroid = new PolarState.Asteroid("asteroidNull", 0, nullDistance, 0f, 0f, 0f);
-	private static final PolarState.Saucer nullSaucer = new PolarState.Saucer("saucerNull", 0, nullDistance, 0f, 0f, 0f);
-	private static final PolarState.Bullet nullBullet = new PolarState.Bullet("bulletNull", 0, nullDistance, 0f, 0f, 0f);
+	private static final PolarState nullObj = new PolarState("obj", 0, nullDistance, 0f, 0f, 0f);
 
 	public AgentState agent;
-	public List<ObjectInstance> asteroids = new ArrayList<ObjectInstance>();
-	public List<ObjectInstance> saucers = new ArrayList<ObjectInstance>();
-	public List<ObjectInstance> bullets = new ArrayList<ObjectInstance>();
-
-	public List<ObjectInstance> objects = null;
+	public List<ObjectInstance> objs = new ArrayList<ObjectInstance>();
 
 	public AsteroidsState() {
 	}
@@ -41,35 +35,36 @@ public class AsteroidsState implements OOState {
 		this(agent, null, null, null);
 	}
 
-	public AsteroidsState(AgentState agent, List<PolarState.Asteroid> asteroids, List<PolarState.Bullet> bullets, List<PolarState.Saucer> saucers) {
+	public AsteroidsState(AgentState agent, List<ObjectInstance> objs) {
 		this.agent = agent;
-
-		this.asteroids = getClosest(asteroids, closestAsteroidsCount, nullAsteroid);
-		this.saucers = getClosest(saucers, closestSaucersCount, nullSaucer);
-		this.bullets = getClosest(bullets, closestBulletsCount, nullBullet);
+		this.objs = objs;
 	}
 
-	private <T extends PolarState> List<ObjectInstance> getClosest(List<T> array, int desiredSize, T fillerObj) {
-		List<ObjectInstance> out = new ArrayList<ObjectInstance>(desiredSize);
+	public AsteroidsState(AgentState agent, List<PolarState> asteroids, List<PolarState> bullets, List<PolarState> saucers) {
+		this.agent = agent;
 
+		getClosest(objs, asteroids, closestAsteroidsCount, nullObj);
+		getClosest(objs, saucers, closestSaucersCount, nullObj);
+		getClosest(objs, bullets, closestBulletsCount, nullObj);
+	}
+
+	private void getClosest(List<ObjectInstance> out, List<PolarState> array, int desiredSize, PolarState fillerObj) {
 		if (desiredSize == 0)
-			return out;
+			return;
 
 		if (array == null)
-			array = new ArrayList<T>(0);
+			array = new ArrayList<PolarState>(0);
 
 		if (desiredSize > array.size()) {
 			out.addAll(array);
 			for (int i = array.size(); i < desiredSize; i++)
 				out.add(fillerObj);
-			return out;
+			return;
 		}
 
 		Collections.sort(array);
 		for (int i = 0; i < desiredSize; i++)
 			out.add(array.get(i));
-
-		return out;
 	}
 
 	@Override
@@ -84,30 +79,16 @@ public class AsteroidsState implements OOState {
 		if (agent.name().equals(oname))
 			return agent;
 
-		index = OOStateUtilities.objectIndexWithName(asteroids, oname);
+		index = OOStateUtilities.objectIndexWithName(objs, oname);
 		if (index != -1)
-			return asteroids.get(index);
-
-		index = OOStateUtilities.objectIndexWithName(saucers, oname);
-		if (index != -1)
-			return saucers.get(index);
-
-		index = OOStateUtilities.objectIndexWithName(bullets, oname);
-		if (index != -1)
-			return bullets.get(index);
+			return objs.get(index);
 
 		throw new UnknownObjectException(oname);
 	}
 
 	@Override
 	public List<ObjectInstance> objects() {
-		// if (objects == null) {
-		objects = new ArrayList<ObjectInstance>(numObjects());
-		objects.add(agent);
-		objects.addAll(asteroids);
-		objects.addAll(saucers);
-		objects.addAll(bullets);
-		return objects;
+		return objs;
 	}
 
 	@Override
@@ -116,22 +97,8 @@ public class AsteroidsState implements OOState {
 		if(oclass.equals(CLASS_AGENT))
 			return Arrays.<ObjectInstance>asList(agent);
 
-		else if(oclass.equals(CLASS_ASTEROID))
-			return asteroids;
-
-		else if(oclass.equals(CLASS_SAUCER))
-			return saucers;
-
-		else if(oclass.equals(CLASS_BULLET))
-			return bullets;
-
-		else if(oclass.equals(CLASS_OBJECT)) {
-			List<ObjectInstance> objs = new ArrayList<ObjectInstance>();
-			objs.addAll(asteroids);
-			objs.addAll(saucers);
-			objs.addAll(bullets);
+		else if(oclass.equals(CLASS_OBJECT))
 			return objs;
-		}
 
 		throw new UnknownClassException(oclass);
 	}
@@ -148,11 +115,7 @@ public class AsteroidsState implements OOState {
 
 	@Override
 	public AsteroidsState copy() {
-		AsteroidsState copy = new AsteroidsState(agent);
-		copy.asteroids = asteroids;
-		copy.saucers = saucers;
-		copy.bullets = bullets;
-		return copy;
+		return new AsteroidsState(agent, objs);
 	}
 
 	@Override

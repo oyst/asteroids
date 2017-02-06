@@ -46,9 +46,9 @@ public class AsteroidsEnvironment implements Environment {
 		if (sim.players.size() == 0)
 			return new AsteroidsState(new AgentState());
 
-		ArrayList<PolarState.Asteroid> asteroids = new ArrayList<PolarState.Asteroid>();
-		ArrayList<PolarState.Saucer> saucers = new ArrayList<PolarState.Saucer>();
-		ArrayList<PolarState.Bullet> bullets = new ArrayList<PolarState.Bullet>();
+		ArrayList<PolarState> asteroids = new ArrayList<PolarState>();
+		ArrayList<PolarState> saucers = new ArrayList<PolarState>();
+		ArrayList<PolarState> bullets = new ArrayList<PolarState>();
 		Player player = sim.players.get(0);
 
 		final float playerX = (player.location.x + player.center.x);
@@ -87,17 +87,17 @@ public class AsteroidsEnvironment implements Environment {
 			float vy = (entity.velocity.y - player.velocity.y);
 
 			if (entity instanceof Asteroid) {
-				PolarState.Asteroid asteroid = new PolarState.Asteroid("asteroid", diameter, dist, angle, vx, vy);
+				PolarState asteroid = new PolarState("asteroid", diameter, dist, angle, vx, vy);
 				asteroids.add(asteroid);
 			}
 
 			if (entity instanceof Saucer || entity instanceof SmallSaucer) {
-				PolarState.Saucer saucer = new PolarState.Saucer("saucer", diameter, dist, angle, vx, vy);
+				PolarState saucer = new PolarState("saucer", diameter, dist, angle, vx, vy);
 				saucers.add(saucer);
 			}
 
 			if (entity instanceof Bullet) {
-				PolarState.Bullet bullet = new PolarState.Bullet("bullet", diameter, dist, angle, vx, vy);
+				PolarState bullet = new PolarState("bullet", diameter, dist, angle, vx, vy);
 				bullets.add(bullet);
 			}
 		}

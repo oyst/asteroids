@@ -27,9 +27,7 @@ public class PolarFeaturesFactory {
   protected Map<Object, VariableDomain> domains;
   protected DenseStateFeatures inputFeatures;
 
-  protected final static int numAsteroids = AsteroidsState.closestAsteroidsCount;
-  protected final static int numSaucers = AsteroidsState.closestSaucersCount;
-  protected final static int numBullets = AsteroidsState.closestBulletsCount;
+  protected final static int numObjects = AsteroidsState.closestAsteroidsCount + AsteroidsState.closestSaucersCount + AsteroidsState.closestBulletsCount;
 
   protected final static List<Object> polarAgentFeatures = AgentState.keys;
   protected final static List<Object> polarObjectFeatures = PolarState.keys;
@@ -60,23 +58,18 @@ public class PolarFeaturesFactory {
   protected DenseStateFeatures getFeatures() {
     ConcatenatedObjectFeatures inputFeatures = new ConcatenatedObjectFeatures();
     inputFeatures.addObjectVectorizion(CLASS_AGENT, agentNumFeatures);
-    inputFeatures.addObjectVectorizion(CLASS_ASTEROID, objNumFeatures);
-    inputFeatures.addObjectVectorizion(CLASS_SAUCER, objNumFeatures);
-    inputFeatures.addObjectVectorizion(CLASS_BULLET, objNumFeatures);
+    inputFeatures.addObjectVectorizion(CLASS_OBJECT, objNumFeatures);
     return inputFeatures;
   }
 
   protected DenseStateFeatures getNormalizedFeatures() {
     ConcatenatedObjectFeatures inputFeatures = new ConcatenatedObjectFeatures();
     inputFeatures.addObjectVectorizion(CLASS_AGENT, agentNormFeatures);
-    inputFeatures.addObjectVectorizion(CLASS_ASTEROID, objNormFeatures);
-    inputFeatures.addObjectVectorizion(CLASS_SAUCER, objNormFeatures);
-    inputFeatures.addObjectVectorizion(CLASS_BULLET, objNormFeatures);
+    inputFeatures.addObjectVectorizion(CLASS_OBJECT, objNormFeatures);
     return inputFeatures;
   }
 
   public TileCodingFeatures getTileCoding(int resolution) {
-    int numObjects = numAsteroids + numSaucers + numBullets;
     int numFeatures = polarAgentFeatures.size() + numObjects * polarObjectFeatures.size();
     double[] weights = new double[numFeatures];
 

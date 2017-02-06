@@ -2,7 +2,6 @@ package uk.co.alexoyston.asteroids.simple_rl;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.geom.Path2D;
 
 import burlap.mdp.core.oo.state.OOState;
 import burlap.mdp.core.state.State;
@@ -17,7 +16,6 @@ import burlap.visualizer.Visualizer;
 import uk.co.alexoyston.asteroids.simple_rl.state.AgentState;
 import uk.co.alexoyston.asteroids.simple_rl.state.AsteroidsState;
 import uk.co.alexoyston.asteroids.simple_rl.state.PolarState;
-import uk.co.alexoyston.asteroids.simulation.Entity;
 
 import joptsimple.ValueConversionException;
 

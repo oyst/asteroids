@@ -4,12 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import burlap.behavior.functionapproximation.DifferentiableStateActionValue;
-import burlap.behavior.functionapproximation.dense.ConcatenatedObjectFeatures;
-import burlap.behavior.functionapproximation.dense.NumericVariableFeatures;
 import burlap.behavior.functionapproximation.dense.fourier.FourierBasis;
 import burlap.behavior.functionapproximation.sparse.tilecoding.TileCodingFeatures;
-import burlap.behavior.functionapproximation.sparse.tilecoding.TilingArrangement;
 import burlap.behavior.singleagent.Episode;
 import burlap.behavior.singleagent.auxiliary.EpisodeSequenceVisualizer;
 import burlap.behavior.singleagent.auxiliary.performance.PerformanceMetric;
@@ -18,16 +14,12 @@ import burlap.behavior.singleagent.auxiliary.performance.LearningAlgorithmExperi
 import burlap.behavior.singleagent.learning.tdmethods.vfa.GradientDescentSarsaLam;
 import burlap.behavior.singleagent.learning.LearningAgentFactory;
 import burlap.behavior.singleagent.learning.LearningAgent;
-import burlap.behavior.singleagent.learning.tdmethods.SarsaLam;
-import burlap.behavior.singleagent.planning.stochastic.sparsesampling.SparseSampling;
 import burlap.mdp.auxiliary.DomainGenerator;
 import burlap.mdp.core.action.UniversalActionType;
-import burlap.mdp.core.oo.OODomain;
 import burlap.mdp.singleagent.SADomain;
 import burlap.mdp.singleagent.environment.Environment;
 import burlap.mdp.singleagent.oo.OOSADomain;
 import burlap.shell.visual.VisualExplorer;
-import burlap.statehashing.simple.SimpleHashableStateFactory;
 import burlap.visualizer.Visualizer;
 
 import uk.co.alexoyston.asteroids.simple_rl.actions.ShootActionType;

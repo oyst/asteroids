@@ -8,12 +8,9 @@ import java.util.Collections;
 
 import burlap.mdp.core.oo.state.OOState;
 import burlap.mdp.core.oo.state.OOStateUtilities;
-import burlap.mdp.core.oo.state.OOVariableKey;
 import burlap.mdp.core.oo.state.ObjectInstance;
 import burlap.mdp.core.oo.state.exceptions.UnknownClassException;
 import burlap.mdp.core.oo.state.exceptions.UnknownObjectException;
-import burlap.mdp.core.state.StateUtilities;
-import burlap.mdp.core.state.UnknownKeyException;
 import burlap.mdp.core.state.annotations.ShallowCopyState;
 
 import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.*;

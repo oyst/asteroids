@@ -23,7 +23,7 @@ public class AsteroidsState implements OOState {
 	public static final int closestSaucersCount = 1;
 	public static final int closestBulletsCount = 1;
 
-	private static final PolarState nullObj = new PolarState("obj", 0, nullDistance, 0f, 0f, 0f);
+	private static final PolarState nullObj = new PolarState("obj");
 
 	public AgentState agent;
 	public List<ObjectInstance> objs = new ArrayList<ObjectInstance>();

@@ -50,6 +50,7 @@ public class AsteroidsDomain implements DomainGenerator {
 	public static final String VAR_ANGLE = "angle"; // Angle between Agent and Object
 	public static final String VAR_VELOCITY_X = "velocityX"; // Velocity of Object relative to Agent
 	public static final String VAR_VELOCITY_Y = "velocityY";
+	public static final String VAR_PRESENT = "present";
 	public static final String VAR_ACTIVE_SHOTS = "activeShots"; // Current shots made by Agent
 
 	private static final PhysicsParams phys = new PhysicsParams();
@@ -70,6 +71,7 @@ public class AsteroidsDomain implements DomainGenerator {
 		domains.put(VAR_ANGLE, new VariableDomain(-Math.PI, Math.PI));
 		domains.put(VAR_VELOCITY_X, new VariableDomain(-maxVelocity, maxVelocity));
 		domains.put(VAR_VELOCITY_Y, new VariableDomain(-maxVelocity, maxVelocity));
+		domains.put(VAR_PRESENT, new VariableDomain(0, 1));
 		domains.put(VAR_ACTIVE_SHOTS, new VariableDomain(0, phys.playerMaxActiveShots));
 	}
 

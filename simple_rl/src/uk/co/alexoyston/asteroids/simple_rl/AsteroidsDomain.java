@@ -67,7 +67,7 @@ public class AsteroidsDomain implements DomainGenerator {
 		int maxActiveShots = phys.playerMaxActiveShots;
 
 		domains.put(VAR_DIST, new VariableDomain(-maxDist, maxDist));
-		domains.put(VAR_ANGLE, new VariableDomain(0, 2*Math.PI));
+		domains.put(VAR_ANGLE, new VariableDomain(-Math.PI, Math.PI));
 		domains.put(VAR_VELOCITY_X, new VariableDomain(-maxVelocity, maxVelocity));
 		domains.put(VAR_VELOCITY_Y, new VariableDomain(-maxVelocity, maxVelocity));
 		domains.put(VAR_ACTIVE_SHOTS, new VariableDomain(0, phys.playerMaxActiveShots));

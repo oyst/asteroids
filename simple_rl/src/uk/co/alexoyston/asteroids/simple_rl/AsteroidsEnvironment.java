@@ -71,12 +71,7 @@ public class AsteroidsEnvironment implements Environment {
 			if (Math.abs(dY) > phys.worldHeight / 2)
 				dY -= phys.worldHeight * Math.signum(dY);
 
-			// Angle and distance between the agent and object
-			// atan returns principal angle, and we need a full 2PI radians, so subtract PI if the object is behind the agent
-			// Take away the agents rotation to get the angle relative to the agent
-			float angle = (float)(Math.PI/2 + Math.atan(dX/dY)) + (dY < 0 ? (float)Math.PI : 0f) - player.rotation;
-			if (angle < 0) angle += 2*Math.PI;
-			if (angle > 2*Math.PI) angle -= 2*Math.PI;
+			float angle = (float)Math.atan2(dY, dX) + player.rotation - (float)Math.PI/2;
 			float dist = (float)Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2));
 
 			// Get the objects max diameter

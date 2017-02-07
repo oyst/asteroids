@@ -93,9 +93,9 @@ public class AsteroidsVisualizer {
 				if (obj.diameter == 0) continue;
 
 				float dist = obj.dist;
-				float angle = obj.angle;
-				int obj_x = (int)(dist * Math.sin(angle)) + x;
-				int obj_y = (int)(dist * Math.cos(angle)) + y;
+				float angle = obj.angle + (float)Math.PI/2;
+				int obj_x = (int)(dist * Math.cos(angle)) + x;
+				int obj_y = (int)(dist * Math.sin(angle)) + y;
 				paintObject(g2, obj_x, obj_y, obj.diameter);
 
 				g2.drawLine(x, y, obj_x, obj_y);

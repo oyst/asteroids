@@ -82,10 +82,13 @@ public class AsteroidsVisualizer {
 
 			g2.setColor(Color.BLACK);
 			g2.drawRect(offsetX, offsetY, width, height);
+			g2.drawOval(offsetX, offsetY, width, height);
 
 			int x = offsetX + width/2;
 			int y = offsetY + height/2;
 			paintObject(g2, x, y, agent.diameter);
+			g2.setColor(Color.RED);
+			g2.drawLine(x, y, x, y + height/2);
 
 			for (ObjectInstance o : state.objectsOfClass(CLASS_OBJECT)) {
 				PolarState obj = (PolarState)o;
@@ -93,15 +96,15 @@ public class AsteroidsVisualizer {
 				if (obj.diameter == 0) continue;
 
 				float dist = obj.dist;
-				float angle = obj.angle + (float)Math.PI/2;
-				int obj_x = (int)(dist * Math.cos(angle)) + x;
-				int obj_y = (int)(dist * Math.sin(angle)) + y;
+				float angle = obj.angle;
+				int obj_x = (int)(dist * Math.sin(angle)) + x;
+				int obj_y = (int)(dist * Math.cos(angle)) + y;
 				paintObject(g2, obj_x, obj_y, obj.diameter);
 
 				float vDist = obj.vDist;
-				float vAngle = obj.vAngle + (float)Math.PI/2;
-				int vx = (int)(vDist * Math.cos(vAngle));
-				int vy = (int)(vDist * Math.sin(vAngle));
+				float vAngle = obj.vAngle;
+				int vx = (int)(vDist * Math.sin(Math.PI + angle + vAngle));
+				int vy = (int)(vDist * Math.cos(Math.PI + angle + vAngle));
 				g2.setColor(Color.GREEN);
 				g2.drawLine(obj_x, obj_y, obj_x + vx, obj_y + vy);
 

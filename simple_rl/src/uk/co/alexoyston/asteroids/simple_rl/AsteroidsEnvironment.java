@@ -30,8 +30,8 @@ public class AsteroidsEnvironment implements Environment {
 	private int lastReward = 0;
 	private PhysicsParams phys;
 
-	protected int shootReward = -50;
-	protected int collisionReward = -10000;
+	protected int shootReward = -5;
+	protected int collisionReward = -1000;
 
 	public AsteroidsEnvironment(PhysicsParams phys) {
 		this.phys = phys;
@@ -77,7 +77,9 @@ public class AsteroidsEnvironment implements Environment {
 			if (Math.abs(dY) > phys.worldHeight / 2)
 				dY -= phys.worldHeight * Math.signum(dY);
 
-			float angle = (float)Math.atan2(dY, dX) + player.rotation - (float)Math.PI/2;
+			float angle = (float)Math.atan2(dY, dX) + player.rotation - (float)(Math.PI/2);
+			if (angle < -Math.PI) angle += (float)(2*Math.PI);
+			if (angle > Math.PI) angle -= (float)(2*Math.PI);
 			float dist = (float)Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2));
 
 			// Get the objects max diameter
@@ -87,7 +89,9 @@ public class AsteroidsEnvironment implements Environment {
 			float vX = (entity.velocity.x - player.velocity.x);
 			float vY = (entity.velocity.y - player.velocity.y);
 
-			float vAngle = (float)Math.atan2(vY, vX) + player.rotation - (float)Math.PI/2;
+			float vAngle = (float)Math.atan2(vY, vX) - (float)Math.atan2(-dY, -dX);
+			if (vAngle < -Math.PI) vAngle += (float)(2*Math.PI);
+			if (vAngle > Math.PI) vAngle -= (float)(2*Math.PI);
 			float vDist = (float)Math.sqrt(Math.pow(vX, 2) + Math.pow(vY, 2));
 
 			String name;

@@ -53,6 +53,7 @@ public class PolarFeaturesFactory {
     objNumFeatures = new NumericVariableFeatures(polarObjectFeatures);
 
     inputFeatures = getNormalizedFeatures();
+    // inputFeatures = getFeatures();
   }
 
   protected DenseStateFeatures getFeatures() {
@@ -69,23 +70,57 @@ public class PolarFeaturesFactory {
     return inputFeatures;
   }
 
-  public TileCodingFeatures getTileCoding(int resolution) {
+  public TileCodingFeatures getTileCoding(int resolution, int numTilings) {
     int numFeatures = polarAgentFeatures.size() + numObjects * polarObjectFeatures.size();
-    double[] weights = new double[numFeatures];
+    double[] widths = new double[numFeatures];
+    boolean[] dimensions = new boolean[numFeatures];
 
     int j = 0;
 
+    // for (Object key : polarAgentFeatures)
+    //   widths[j++] = domains.get(key).span() / resolution;
+    // for (int i = 0; i < numObjects; i++) {
+    //   for (Object key : polarObjectFeatures)
+    //     widths[j++] = domains.get(key).span() / resolution;
+    // }
     for (Object key : polarAgentFeatures)
-      weights[j++] = domains.get(key).span() / resolution;
+      widths[j++] = 1f / 4;
     for (int i = 0; i < numObjects; i++) {
       for (Object key : polarObjectFeatures)
-        weights[j++] = domains.get(key).span() / resolution;
+        widths[j++] = 1f / resolution;
     }
 
     TileCodingFeatures tilecoding = new TileCodingFeatures(inputFeatures);
-    tilecoding.addTilingsForAllDimensionsWithWidths(
-    weights, weights.length,
-    TilingArrangement.RANDOM_JITTER);
+
+    // Enable the agent features
+    for (int i = 0; i < polarAgentFeatures.size(); i++)
+      dimensions[i] = true;
+
+    tilecoding.addTilingsForDimensionsAndWidths(
+      dimensions, widths, 1,
+      TilingArrangement.UNIFORM
+    );
+
+    // Add object tilings
+    for (int currObject = 0; currObject < numObjects; currObject++) {
+
+      // Set all dimensions to be disabled
+      for (int i = 0; i < dimensions.length; i++)
+        dimensions[i] = false;
+
+      // Jump to the current object we are adding
+      int currDimension = polarAgentFeatures.size() + currObject * polarObjectFeatures.size();
+      // Enable the current objects features
+      for (int i = 0; i < polarObjectFeatures.size(); i++)
+        dimensions[currDimension++] = true;
+
+      // Add this feature tiling
+      tilecoding.addTilingsForDimensionsAndWidths(
+        dimensions, widths, numTilings,
+        TilingArrangement.RANDOM_JITTER
+      );
+    }
+
 
     return tilecoding;
   }

@@ -114,19 +114,21 @@ public class AsteroidsDomain implements DomainGenerator {
 		FourierBasis fourierBasis = featuresFactory.getFourierBasis(2, 2);
 		VFAGenerator fourierBasisVFA = (dq) -> {return fourierBasis.generateVFA(dq);};
 
+		LearningAgentFactory[] factories = new LearningAgentFactory[1];
+		factories[0] = getSarsaAgentFactory(domain, null, tileCodingVFA, 0.999, 0.02, 0.5/3, 0.5);
+
 		// explorer(domain, env, v);
-		// episodicView(domain, env, v, agentFactory, 100);
-		// expAndPlot(env, 5, 5000,
-		// 	getSarsaAgentFactory(domain, tileCodingVFA, 0.999, 0.02, 0.5/3, 0.5)
-		// );
+		// episodicView(domain, env, v, factories[0], 100);
+		// expAndPlot(env, 5, 2000, factories);
 	}
 
-	public static LearningAgentFactory getSarsaAgentFactory(OOSADomain domain, VFAGenerator vfaGen,
+	public static LearningAgentFactory getSarsaAgentFactory(OOSADomain domain, String tag, VFAGenerator vfaGen,
 		double gamma, double learningRate, double defaultQ, double lambda) {
 
+		String tagStr = (tag == null) ? "" : tag + ", ";
 		LearningAgentFactory agentFactory = new LearningAgentFactory() {
 			public String getAgentName() {
-				return String.format("GD-SARSA: (%f, %f, %f, %f)", gamma, learningRate, defaultQ, lambda);
+				return String.format("GD-SARSA: (%s%f, %f, %f, %f)", tagStr, gamma, learningRate, defaultQ, lambda);
 			}
 			public LearningAgent generateAgent() {
 				return new GradientDescentSarsaLam(domain, gamma, vfaGen.generateVFA(defaultQ), learningRate, lambda);

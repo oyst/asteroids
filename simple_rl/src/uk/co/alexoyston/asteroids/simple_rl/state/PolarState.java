@@ -61,12 +61,6 @@ public class PolarState implements ObjectInstance, Comparable<PolarState> {
 		else if(variableKey.equals(VAR_ANGLE))
 			return angle;
 
-		else if(variableKey.equals(VAR_VELOCITY_X))
-			return vx;
-
-		else if(variableKey.equals(VAR_VELOCITY_Y))
-			return vy;
-
 		else if(variableKey.equals(VAR_VELOCITY_DIST))
 			return vDist;
 

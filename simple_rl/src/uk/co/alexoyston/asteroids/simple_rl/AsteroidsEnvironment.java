@@ -29,7 +29,7 @@ public class AsteroidsEnvironment implements Environment {
 	private Simulation sim;
 	private int lastReward = 0;
 	private PhysicsParams phys;
-	
+
 	protected int shootReward = -50;
 	protected int collisionReward = -10000;
 
@@ -42,7 +42,6 @@ public class AsteroidsEnvironment implements Environment {
 	public void resetEnvironment() {
 		sim = new Simulation(phys);
 		sim.addPlayer(phys.worldWidth / 2, phys.worldHeight / 2);
-		totalScore = 0;
 	}
 
 	@Override

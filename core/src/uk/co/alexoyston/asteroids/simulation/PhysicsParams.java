@@ -4,8 +4,8 @@ public class PhysicsParams {
 
 	public static float updateDelta = 0.01f;
 
-	public static int worldWidth = 500;
-	public static int worldHeight = 500;
+	public static int worldWidth = 700;
+	public static int worldHeight = 700;
 
 	public static int asteroidStartCount = 4;
 

@@ -50,6 +50,8 @@ public class AsteroidsDomain implements DomainGenerator {
 	public static final String VAR_ANGLE = "angle"; // Angle between Agent and Object
 	public static final String VAR_VELOCITY_X = "velocityX"; // Velocity of Object relative to Agent
 	public static final String VAR_VELOCITY_Y = "velocityY";
+	public static final String VAR_VELOCITY_DIST = "velocityDist";
+	public static final String VAR_VELOCITY_ANGLE = "velocityAngle";
 	public static final String VAR_PRESENT = "present";
 	public static final String VAR_ACTIVE_SHOTS = "activeShots"; // Current shots made by Agent
 
@@ -71,6 +73,8 @@ public class AsteroidsDomain implements DomainGenerator {
 		domains.put(VAR_ANGLE, new VariableDomain(-Math.PI, Math.PI));
 		domains.put(VAR_VELOCITY_X, new VariableDomain(-maxVelocity, maxVelocity));
 		domains.put(VAR_VELOCITY_Y, new VariableDomain(-maxVelocity, maxVelocity));
+		domains.put(VAR_VELOCITY_DIST, new VariableDomain(-maxVelocity, maxVelocity));
+		domains.put(VAR_VELOCITY_ANGLE, new VariableDomain(-Math.PI, Math.PI));
 		domains.put(VAR_PRESENT, new VariableDomain(0, 1));
 		domains.put(VAR_ACTIVE_SHOTS, new VariableDomain(0, phys.playerMaxActiveShots));
 	}
@@ -104,17 +108,17 @@ public class AsteroidsDomain implements DomainGenerator {
 
 		PolarFeaturesFactory featuresFactory = new PolarFeaturesFactory(domains);
 
-		TileCodingFeatures tileCoding = featuresFactory.getTileCoding(10);
+		TileCodingFeatures tileCoding = featuresFactory.getTileCoding(20, 3);
 		VFAGenerator tileCodingVFA = (dq) -> {return tileCoding.generateVFA(dq);};
 
 		FourierBasis fourierBasis = featuresFactory.getFourierBasis(2, 2);
 		VFAGenerator fourierBasisVFA = (dq) -> {return fourierBasis.generateVFA(dq);};
 
-		LearningAgentFactory gdSarsa = getSarsaAgentFactory(domain, tileCodingVFA, 0.99, 0.02, 0.5/10, 0.1);
-
 		// explorer(domain, env, v);
-		// episodicView(domain, env, v, agent, 50);
-		expAndPlot(env, 5, 1000, gdSarsa);
+		// episodicView(domain, env, v, agentFactory, 100);
+		// expAndPlot(env, 5, 5000,
+		// 	getSarsaAgentFactory(domain, tileCodingVFA, 0.999, 0.02, 0.5/3, 0.5)
+		// );
 	}
 
 	public static LearningAgentFactory getSarsaAgentFactory(OOSADomain domain, VFAGenerator vfaGen,
@@ -122,7 +126,7 @@ public class AsteroidsDomain implements DomainGenerator {
 
 		LearningAgentFactory agentFactory = new LearningAgentFactory() {
 			public String getAgentName() {
-				return String.format("GD-SARSA: (%.2f, %.2f, %.2f, %.2f)", gamma, learningRate, defaultQ, lambda);
+				return String.format("GD-SARSA: (%f, %f, %f, %f)", gamma, learningRate, defaultQ, lambda);
 			}
 			public LearningAgent generateAgent() {
 				return new GradientDescentSarsaLam(domain, gamma, vfaGen.generateVFA(defaultQ), learningRate, lambda);
@@ -164,8 +168,8 @@ public class AsteroidsDomain implements DomainGenerator {
 
 		exp.setUpPlottingConfiguration(500, 250, 2, 1000,
 				TrialMode.MOST_RECENT_AND_AVERAGE,
-				PerformanceMetric.CUMULATIVE_STEPS_PER_EPISODE,
-				PerformanceMetric.AVERAGE_EPISODE_REWARD);
+				PerformanceMetric.STEPS_PER_EPISODE,
+				PerformanceMetric.CUMULATIVE_REWARD_PER_EPISODE);
 
 		exp.startExperiment();
 	}

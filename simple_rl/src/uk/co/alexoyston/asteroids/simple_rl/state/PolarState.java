@@ -15,8 +15,8 @@ public class PolarState implements ObjectInstance, Comparable<PolarState> {
 
 	public float dist = 0f;
 	public float angle = 0f;
-	public float vx = 0f;
-	public float vy = 0f;
+	public float vDist = 0f;
+	public float vAngle = 0f;
 	public byte present = 0;
 
 	public int diameter;
@@ -26,9 +26,8 @@ public class PolarState implements ObjectInstance, Comparable<PolarState> {
 	public static final List<Object> keys = Arrays.<Object>asList(
 			VAR_DIST,
 			VAR_ANGLE,
-			VAR_PRESENT,
-			VAR_VELOCITY_X,
-			VAR_VELOCITY_Y
+			VAR_VELOCITY_DIST,
+			VAR_VELOCITY_ANGLE
 	);
 
 	public PolarState() {
@@ -39,16 +38,16 @@ public class PolarState implements ObjectInstance, Comparable<PolarState> {
 		this.present = 0;
 	}
 
-	public PolarState(String name, int diameter, float dist, float angle, float vx, float vy) {
-		this(name, diameter, dist, angle, vx, vy, 1);
+	public PolarState(String name, int diameter, float dist, float angle, float vDist, float vAngle) {
+		this(name, diameter, dist, angle, vDist, vAngle, 1);
 	}
 
-	public PolarState(String name, int diameter, float dist, float angle, float vx, float vy, int present) {
+	public PolarState(String name, int diameter, float dist, float angle, float vDist, float vAngle, int present) {
 		this.name = name;
 		this.dist = dist;
 		this.angle = angle;
-		this.vx = vx;
-		this.vy = vy;
+		this.vDist = vDist;
+		this.vAngle = vAngle;
 		this.present = (byte)present;
 
 		this.diameter = (short)diameter;
@@ -67,6 +66,12 @@ public class PolarState implements ObjectInstance, Comparable<PolarState> {
 
 		else if(variableKey.equals(VAR_VELOCITY_Y))
 			return vy;
+
+		else if(variableKey.equals(VAR_VELOCITY_DIST))
+			return vDist;
+
+		else if(variableKey.equals(VAR_VELOCITY_ANGLE))
+			return vAngle;
 
 		else if(variableKey.equals(VAR_PRESENT))
 			return present;
@@ -91,7 +96,7 @@ public class PolarState implements ObjectInstance, Comparable<PolarState> {
 
 	@Override
 	public PolarState copy() {
-		return new PolarState(name, diameter, dist, angle, vx, vy, present);
+		return new PolarState(name, diameter, dist, angle, vDist, vAngle, present);
 	}
 
 	@Override

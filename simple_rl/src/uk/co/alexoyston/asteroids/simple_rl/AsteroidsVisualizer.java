@@ -98,6 +98,14 @@ public class AsteroidsVisualizer {
 				int obj_y = (int)(dist * Math.sin(angle)) + y;
 				paintObject(g2, obj_x, obj_y, obj.diameter);
 
+				float vDist = obj.vDist;
+				float vAngle = obj.vAngle + (float)Math.PI/2;
+				int vx = (int)(vDist * Math.cos(vAngle));
+				int vy = (int)(vDist * Math.sin(vAngle));
+				g2.setColor(Color.GREEN);
+				g2.drawLine(obj_x, obj_y, obj_x + vx, obj_y + vy);
+
+				g2.setColor(Color.BLACK);
 				g2.drawLine(x, y, obj_x, obj_y);
 			}
 		}

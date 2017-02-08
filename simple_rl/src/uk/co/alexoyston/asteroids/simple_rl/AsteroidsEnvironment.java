@@ -1,6 +1,7 @@
 package uk.co.alexoyston.asteroids.simple_rl;
 
 import java.awt.Color;
+import java.util.List;
 import java.util.ArrayList;
 
 import burlap.mdp.core.action.Action;
@@ -28,6 +29,9 @@ public class AsteroidsEnvironment implements Environment {
 	private Simulation sim;
 	private int lastReward = 0;
 	private PhysicsParams phys;
+	
+	protected int shootReward = -50;
+	protected int collisionReward = -10000;
 
 	public AsteroidsEnvironment(PhysicsParams phys) {
 		this.phys = phys;
@@ -38,7 +42,7 @@ public class AsteroidsEnvironment implements Environment {
 	public void resetEnvironment() {
 		sim = new Simulation(phys);
 		sim.addPlayer(phys.worldWidth / 2, phys.worldHeight / 2);
-		lastReward = 0;
+		totalScore = 0;
 	}
 
 	@Override
@@ -58,6 +62,9 @@ public class AsteroidsEnvironment implements Environment {
 		AgentState agent = new AgentState(diameter, player.activeShots);
 
 		for (Entity entity : this.sim.entities) {
+			if (entity instanceof Player)
+				continue;
+
 			float objX = (entity.location.x + entity.center.x);
 			float objY = (entity.location.y + entity.center.y);
 
@@ -78,23 +85,33 @@ public class AsteroidsEnvironment implements Environment {
 			diameter = (int)Math.max(entity.bounds.width, entity.bounds.height);
 
 			// Relative velocity of the object to the agent
-			float vx = (entity.velocity.x - player.velocity.x);
-			float vy = (entity.velocity.y - player.velocity.y);
+			float vX = (entity.velocity.x - player.velocity.x);
+			float vY = (entity.velocity.y - player.velocity.y);
+
+			float vAngle = (float)Math.atan2(vY, vX) + player.rotation - (float)Math.PI/2;
+			float vDist = (float)Math.sqrt(Math.pow(vX, 2) + Math.pow(vY, 2));
+
+			String name;
+			List<PolarState> container;
 
 			if (entity instanceof Asteroid) {
-				PolarState asteroid = new PolarState("asteroid", diameter, dist, angle, vx, vy);
-				asteroids.add(asteroid);
+				name = "asteroid";
+				container = asteroids;
+			}
+			else if (entity instanceof Saucer || entity instanceof SmallSaucer) {
+				name = "saucer";
+				container = saucers;
+			}
+			else if (entity instanceof Bullet) {
+				name = "bullet";
+				container = bullets;
+			}
+			else {
+				throw new RuntimeException("Unknown Entity instance encountered: " + entity.toString());
 			}
 
-			if (entity instanceof Saucer || entity instanceof SmallSaucer) {
-				PolarState saucer = new PolarState("saucer", diameter, dist, angle, vx, vy);
-				saucers.add(saucer);
-			}
-
-			if (entity instanceof Bullet) {
-				PolarState bullet = new PolarState("bullet", diameter, dist, angle, vx, vy);
-				bullets.add(bullet);
-			}
+			PolarState obj = new PolarState(name, diameter, dist, angle, vDist, vAngle);
+			container.add(obj);
 		}
 
 		State state = new AsteroidsState(agent, asteroids, bullets, saucers);
@@ -106,6 +123,7 @@ public class AsteroidsEnvironment implements Environment {
 		Player player;
 		State oldState, newState;
 		int oldScore, newScore;
+		boolean shotTaken = false;
 
 		player = this.sim.players.get(0);
 
@@ -117,20 +135,23 @@ public class AsteroidsEnvironment implements Environment {
 		else if (a.actionName().equals(ACTION_ROTATE_RIGHT))
 			this.sim.playerRotRight(0);
 		else if (a.actionName().equals(ACTION_ROTATE_LEFT))
-		this.sim.playerRotLeft(0);
-		else if (a.actionName().equals(ACTION_SHOOT))
+			this.sim.playerRotLeft(0);
+		else if (a.actionName().equals(ACTION_SHOOT)) {
 			this.sim.playerShoot(0);
+			shotTaken = true;
+		}
 
 		this.sim.update(phys.updateDelta);
 
 		newState = currentObservation();
 		newScore = player.getScore();
 
-		if (this.sim.players.size() == 0)
-			lastReward = -1000;
-		else
-			lastReward = newScore - oldScore;
-		// lastReward--;
+		lastReward = (newScore - oldScore);
+
+		if (shotTaken)
+			lastReward += shootReward;
+		if (isInTerminalState())
+			lastReward += collisionReward;
 
 		return new EnvironmentOutcome(oldState, a, newState, lastReward, isInTerminalState());
 	}

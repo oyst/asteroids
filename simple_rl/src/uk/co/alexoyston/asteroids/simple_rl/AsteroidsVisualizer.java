@@ -2,6 +2,9 @@ package uk.co.alexoyston.asteroids.simple_rl;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.util.Map;
+import java.util.HashMap;
 
 import burlap.mdp.core.oo.state.OOState;
 import burlap.mdp.core.state.State;
@@ -57,7 +60,7 @@ public class AsteroidsVisualizer {
 			this.height = height;
 		}
 
-		public void paintObject(Graphics2D g2, int cx, int cy, int diameter) {
+		public void paintObject(Graphics2D g2, int cx, int cy, int diameter, String name) {
 			int x = cx - (diameter/2);
 			int y = cy - (diameter/2);
 
@@ -73,20 +76,24 @@ public class AsteroidsVisualizer {
 			g2.drawOval(x, y, diameter, diameter);
 
 			g2.setColor(Color.BLACK);
+			if (name != null) g2.drawString(name, x, y);
 		}
 
 		@Override
 		public void paint(Graphics2D g2, State s, float cWidth, float cHeight) {
+			Map<String, Integer> nameCounts = new HashMap<String, Integer>();
+
 			AsteroidsState state = (AsteroidsState)s;
 			AgentState agent = (AgentState)state.object(CLASS_AGENT);
 
-			g2.setColor(Color.BLACK);
+			g2.rotate(-agent.rotation, offsetX + width/2, offsetY + height/2);
+			g2.setColor(Color.LIGHT_GRAY);
 			g2.drawRect(offsetX, offsetY, width, height);
-			g2.drawOval(offsetX, offsetY, width, height);
+			g2.setTransform(new AffineTransform());
 
 			int x = offsetX + width/2;
 			int y = offsetY + height/2;
-			paintObject(g2, x, y, agent.diameter);
+			paintObject(g2, x, y, agent.diameter, null);
 			g2.setColor(Color.RED);
 			g2.drawLine(x, y, x, y + height/2);
 
@@ -95,11 +102,17 @@ public class AsteroidsVisualizer {
 
 				if (obj.diameter == 0) continue;
 
+				Integer nameCount = nameCounts.get(obj.name());
+				if (nameCount == null)
+					nameCount = 0;
+				String name = String.format("%s_%d", obj.name(), nameCount);
+				nameCounts.put(obj.name(), nameCount+1);
+
 				float dist = obj.dist;
 				float angle = obj.angle;
 				int obj_x = (int)(dist * Math.sin(angle)) + x;
 				int obj_y = (int)(dist * Math.cos(angle)) + y;
-				paintObject(g2, obj_x, obj_y, obj.diameter);
+				paintObject(g2, obj_x, obj_y, obj.diameter, name);
 
 				float vDist = obj.vDist;
 				float vAngle = obj.vAngle;

@@ -54,8 +54,8 @@ public class AsteroidsEnvironment implements Environment {
 		ArrayList<PolarState> bullets = new ArrayList<PolarState>();
 		Player player = sim.players.get(0);
 
-		final float playerX = (player.location.x + player.center.x);
-		final float playerY = (player.location.y + player.center.y);
+		final float playerX = (player.bounds.x + player.center.x);
+		final float playerY = (player.bounds.y + player.center.y);
 		int diameter = (int)Math.max(player.bounds.width, player.bounds.height);
 
 		AgentState agent = new AgentState(diameter, player.activeShots, player.rotation);
@@ -64,18 +64,18 @@ public class AsteroidsEnvironment implements Environment {
 			if (entity instanceof Player)
 				continue;
 
-			float objX = (entity.location.x + entity.center.x);
-			float objY = (entity.location.y + entity.center.y);
+			float objX = (entity.bounds.x + entity.center.x);
+			float objY = (entity.bounds.y + entity.center.y);
 
 			// Calculate the distance between the agent and object
 			float dX = (objX - playerX);
 			float dY = (objY - playerY);
 
 			// Calculate the shortest distance using wrap around if necessary
-			if (Math.abs(dX) > phys.worldWidth / 2)
-				dX -= phys.worldWidth * Math.signum(dX);
-			if (Math.abs(dY) > phys.worldHeight / 2)
-				dY -= phys.worldHeight * Math.signum(dY);
+			if (Math.abs(dX) > (phys.worldWidth + player.bounds.width) / 2)
+				dX -= (phys.worldWidth + player.bounds.width) * Math.signum(dX);
+			if (Math.abs(dY) > (phys.worldHeight + player.bounds.height) / 2)
+				dY -= (phys.worldHeight + player.bounds.height) * Math.signum(dY);
 
 			float angle = (float)Math.atan2(dY, dX) + player.rotation - (float)(Math.PI/2);
 			if (angle < -Math.PI) angle += (float)(2*Math.PI);

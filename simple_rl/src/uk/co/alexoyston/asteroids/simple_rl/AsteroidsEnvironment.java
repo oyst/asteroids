@@ -63,6 +63,8 @@ public class AsteroidsEnvironment implements Environment {
 		for (Entity entity : this.sim.entities) {
 			if (entity instanceof Player)
 				continue;
+			if (entity instanceof Bullet && ((Bullet)entity).owner == player)
+				continue;
 
 			float objX = (entity.bounds.x + entity.center.x);
 			float objY = (entity.bounds.y + entity.center.y);

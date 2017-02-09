@@ -2,7 +2,7 @@ package uk.co.alexoyston.asteroids.simulation;
 
 public class Bullet extends Entity {
 
-	private BulletShooter owner;
+	public final BulletShooter owner;
 
 	public Bullet(BulletShooter owner) {
 		int width = 2;

@@ -18,10 +18,9 @@ import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.*;
 @ShallowCopyState
 public class AsteroidsState implements OOState {
 
-	private static final float nullDistance = 10000f;
-	public static final int closestAsteroidsCount = 3;
+	public static final int closestAsteroidsCount = 4;
 	public static final int closestSaucersCount = 1;
-	public static final int closestBulletsCount = 1;
+	public static final int closestBulletsCount = 2;
 
 	private static final PolarState nullObj = new PolarState("obj");
 

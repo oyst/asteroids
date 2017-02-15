@@ -56,7 +56,6 @@ public class AsteroidsDomain implements DomainGenerator {
 	public static final String VAR_VELOCITY_DIST = "velocityDist";
 	public static final String VAR_VELOCITY_ANGLE = "velocityAngle";
 	public static final String VAR_PRESENT = "present";
-	// public static final String VAR_ACTIVE_SHOTS = "activeShots"; // Current shots made by Agent
 	public static final String VAR_CAN_SHOOT = "canShoot";
 	public static final String VAR_CAN_WARP = "canWarp";
 
@@ -81,7 +80,6 @@ public class AsteroidsDomain implements DomainGenerator {
 		varDomains.put(VAR_VELOCITY_DIST, new VariableDomain(-maxVelocity, maxVelocity));
 		varDomains.put(VAR_VELOCITY_ANGLE, new VariableDomain(-Math.PI, Math.PI));
 		varDomains.put(VAR_PRESENT, new VariableDomain(0, 1));
-		// varDomains.put(VAR_ACTIVE_SHOTS, new VariableDomain(0, phys.playerMaxActiveShots));
 		varDomains.put(VAR_CAN_SHOOT, new VariableDomain(0, 1));
 		varDomains.put(VAR_CAN_WARP, new VariableDomain(0, 1));
 	}

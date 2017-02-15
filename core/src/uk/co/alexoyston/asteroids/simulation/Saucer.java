@@ -1,6 +1,7 @@
 package uk.co.alexoyston.asteroids.simulation;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Rectangle;
 
 public class Saucer extends Entity implements BulletShooter {
 
@@ -103,5 +104,14 @@ public class Saucer extends Entity implements BulletShooter {
 
 	@Override
 	public void onBulletDecay(Bullet bullet) {
+	}
+
+	@Override
+	public boolean checkBounds(Rectangle worldBounds) {
+		boolean inBounds = super.checkBounds(worldBounds);
+		if (!inBounds)
+			this.decay();
+
+		return inBounds;
 	}
 }

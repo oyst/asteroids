@@ -195,28 +195,7 @@ public class Simulation implements Disposable, EntityListener {
 			entity.velocity.x -= entity.velocity.x * entity.drag * delta;
 			entity.velocity.y -= entity.velocity.y * entity.drag * delta;
 
-			// Bounds check
-			float offsetX = 0;
-			float offsetY = 0;
-			if (entity.bounds.x > bounds.x + bounds.width)
-				offsetX = -(bounds.width + entity.bounds.width);
-			else if (entity.bounds.x + entity.bounds.width < bounds.x)
-				offsetX = (bounds.width + entity.bounds.width);
-
-			if (entity.bounds.y > bounds.y + bounds.height)
-				offsetY = -(bounds.height + entity.bounds.height);
-			else if (entity.bounds.y + entity.bounds.height < bounds.y)
-				offsetY = (bounds.height + entity.bounds.height);
-
-			//TODO: Refactor this
-			// Remove the saucers if they go out of bounds
-			if ((entity instanceof Saucer || entity instanceof SmallSaucer) &&
-				(offsetX != 0 || offsetY != 0)) {
-				i.remove();
-				saucersOnField--;
-			}
-
-			entity.location.add(offsetX, offsetY);
+			entity.checkBounds(bounds);
 
 			entity.update(delta);
 

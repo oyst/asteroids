@@ -177,4 +177,29 @@ public abstract class Entity {
 	public void decay() {
 		alive = false;
 	}
+
+	/**
+	 * Update the entities location with regards to the worlds bounds
+	 * If the entity is out of bounds, they will be wrapped around to the opposite side
+	 *
+	 * @return true if the entity is in bounds, false otherwise
+	 */
+	public boolean checkBounds(Rectangle worldBounds) {
+		float offsetX = 0;
+		float offsetY = 0;
+		if (bounds.x > worldBounds.x + worldBounds.width)
+			offsetX = -(worldBounds.width + bounds.width);
+		else if (bounds.x + bounds.width < worldBounds.x)
+			offsetX = (worldBounds.width + bounds.width);
+
+		if (bounds.y > worldBounds.y + worldBounds.height)
+			offsetY = -(worldBounds.height + bounds.height);
+		else if (bounds.y + bounds.height < worldBounds.y)
+			offsetY = (worldBounds.height + bounds.height);
+
+		location.add(offsetX, offsetY);
+
+		return (offsetX == 0 && offsetY == 0);
+	}
+
 }

@@ -170,33 +170,12 @@ public class Simulation implements Disposable, EntityListener {
 				i.remove();
 				if (entity instanceof Player)
 					players.remove(entity);
-				if (entity instanceof Saucer || entity instanceof SmallSaucer)
+				if (entity instanceof Saucer)
 					saucersOnField--;
 				continue;
 			}
 
-			// Update location, center and velocity
-			float ax_d = entity.acceleration.x * delta;
-			float ay_d = entity.acceleration.y * delta;
-
-			entity.location.x += entity.velocity.x * delta + ax_d * delta * 0.5f;
-			entity.location.y += entity.velocity.y * delta + ay_d * delta * 0.5f;
-
-			entity.velocity.x += ax_d;
-			entity.velocity.y += ay_d;
-
-			entity.rotation += entity.rotationSpeed * delta;
-			entity.rotation %= (Math.PI) * 2;
-
-			// Reset acceleration to 0 after each update
-			entity.acceleration.set(0, 0);
-			entity.rotationSpeed = 0;
-
-			entity.velocity.x -= entity.velocity.x * entity.drag * delta;
-			entity.velocity.y -= entity.velocity.y * entity.drag * delta;
-
 			entity.checkBounds(bounds);
-
 			entity.update(delta);
 
 			entity.updateVertices();

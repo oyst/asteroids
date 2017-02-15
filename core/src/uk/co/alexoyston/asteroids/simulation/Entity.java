@@ -99,12 +99,31 @@ public abstract class Entity {
 	}
 
 	/**
-	 * A personal update for any non-standard updates covered by the Simulation
+	 * Update the entities location, velocity and rotation
 	 *
 	 * @param delta
 	 * 			Seconds since last update
 	 */
 	public void update(float delta) {
+		// Update location, center and velocity
+		float ax_d = acceleration.x * delta;
+		float ay_d = acceleration.y * delta;
+
+		location.x += velocity.x * delta + ax_d * delta * 0.5f;
+		location.y += velocity.y * delta + ay_d * delta * 0.5f;
+
+		velocity.x += ax_d;
+		velocity.y += ay_d;
+
+		rotation += rotationSpeed * delta;
+		rotation %= (Math.PI) * 2;
+
+		// Reset acceleration to 0 after each update
+		acceleration.set(0, 0);
+		rotationSpeed = 0;
+
+		velocity.x -= velocity.x * drag * delta;
+		velocity.y -= velocity.y * drag * delta;
 	}
 
 	/**

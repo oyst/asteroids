@@ -87,6 +87,7 @@ public class Player extends Entity implements BulletShooter {
 
 	@Override
 	public void update(float delta) {
+		super.update(delta);
 		spawnProtectRemaining = Math.max(spawnProtectRemaining - delta, 0);
 	}
 
@@ -107,10 +108,10 @@ public class Player extends Entity implements BulletShooter {
 	public void addHitScore(Entity hit) {
 		if (hit instanceof Asteroid)
 			score += asteroidScore;
-		if (hit instanceof Saucer)
-			score += saucerScore;
-		if (hit instanceof SmallSaucer)
+		else if (hit instanceof SmallSaucer)
 			score += smallSaucerScore;
+		else if (hit instanceof Saucer)
+			score += saucerScore;
 	}
 
 	public int getScore() {

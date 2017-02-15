@@ -32,6 +32,7 @@ public class AsteroidsEnvironment implements Environment {
 
 	protected int shootReward = -5;
 	protected int collisionReward = -1000;
+	protected int warpReward = -50;
 
 	public AsteroidsEnvironment(PhysicsParams phys) {
 		this.phys = phys;
@@ -128,9 +129,10 @@ public class AsteroidsEnvironment implements Environment {
 		Player player;
 		State oldState, newState;
 		int oldScore, newScore;
-		boolean shotTaken = false;
 
 		player = this.sim.players.get(0);
+
+		lastReward = 0;
 
 		oldState = currentObservation();
 		oldScore = player.getScore();
@@ -141,11 +143,13 @@ public class AsteroidsEnvironment implements Environment {
 			this.sim.playerRotRight(0);
 		else if (a.actionName().equals(ACTION_ROTATE_LEFT))
 			this.sim.playerRotLeft(0);
-		else if (a.actionName().equals(ACTION_WARP))
+		else if (a.actionName().equals(ACTION_WARP)) {
 			this.sim.playerWarp(0);
+			lastReward += warpReward;
+		}
 		else if (a.actionName().equals(ACTION_SHOOT)) {
 			this.sim.playerShoot(0);
-			shotTaken = true;
+			lastReward += shootReward;
 		}
 
 		this.sim.update(phys.updateDelta);
@@ -153,10 +157,8 @@ public class AsteroidsEnvironment implements Environment {
 		newState = currentObservation();
 		newScore = player.getScore();
 
-		lastReward = (newScore - oldScore);
+		lastReward += (newScore - oldScore);
 
-		if (shotTaken)
-			lastReward += shootReward;
 		if (isInTerminalState())
 			lastReward += collisionReward;
 

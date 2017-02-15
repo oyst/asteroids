@@ -71,43 +71,45 @@ public class PolarFeaturesFactory {
   }
 
   public TileCodingFeatures getTileCodedFeatures(int resolution, int numTilings) {
-    int numFeatures = polarAgentFeatures.size() + numObjects * polarObjectFeatures.size();
+    int numFeatures = polarAgentFeatures.size() + (numObjects * polarObjectFeatures.size());
     double[] widths = new double[numFeatures];
     boolean[] dimensions = new boolean[numFeatures];
 
-    // Apply TileCoding to the continuous features. i.e. the features
-    //  belonging to a non-Agent (henceforth known as an object)
-    int currWidth = 0;
-    for (int obj = 0; obj < numObjects; obj++) {
-      for (Object featureKey : polarObjectFeatures) {
-        // widths[currWidth++] = domains.get(featureKey).span() / resolution;
-        widths[currWidth++] = 1f / resolution;
-      }
-    }
+    int currFeature = 0;
 
     TileCodingFeatures tilecoding = new TileCodingFeatures(inputFeatures);
 
-    // Add object tilings
-    for (int currObject = 0; currObject < numObjects; currObject++) {
-
-      // Set all dimensions to be disabled
-      for (int i = 0; i < dimensions.length; i++)
-        dimensions[i] = false;
-
-      // Jump to the current object we are adding
-      int currDimension = polarAgentFeatures.size() + currObject * polarObjectFeatures.size();
-      // Enable the current objects features
-      for (int i = 0; i < polarObjectFeatures.size(); i++)
-        dimensions[currDimension++] = true;
-
-      // Add tilings for this object
-      // Not necessary at the moment as all objects are using the same jittering and
-      //  numTilings - but future work could apply different params for each object
-      tilecoding.addTilingsForDimensionsAndWidths(
-        dimensions, widths, numTilings,
-        TilingArrangement.RANDOM_JITTER
-      );
+    // Add tiling for Agent features
+    // All features are discrete, so set the width to either 1 or the span
+    for (Object featureKey : polarAgentFeatures) {
+      // widths[currFeature] = domains.get(featureKey).span();
+      widths[currFeature] = 1;
+      dimensions[currFeature] = true;
+      currFeature++;
     }
+    // Only 1 tiling needed since all are discrete
+    tilecoding.addTilingsForDimensionsAndWidths(
+      dimensions, widths, 1,
+      TilingArrangement.UNIFORM
+    );
+
+    // Reset all dimensions to false
+    for (int i = 0; i < dimensions.length; i++)
+      dimensions[i] = false;
+
+    // Apply TileCoding to the features belonging to a non-Agent
+    for (int obj = 0; obj < numObjects; obj++) {
+      for (Object featureKey : polarObjectFeatures) {
+        // widths[currFeature] = domains.get(featureKey).span() / resolution;
+        widths[currFeature] = 1f / resolution;
+        dimensions[currFeature] = true;
+        currFeature++;
+      }
+    }
+    tilecoding.addTilingsForDimensionsAndWidths(
+      dimensions, widths, numTilings,
+      TilingArrangement.RANDOM_JITTER
+    );
 
     return tilecoding;
   }

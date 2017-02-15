@@ -23,6 +23,7 @@ public class PhysicsParams {
 	public static float playerThrustPower = 120f;
 	public static int playerMaxActiveShots = 3;
 	public static float playerShotSpeed = 600f;
+	public static int playerWarpCount = 1;
 	public static float playerSpawnProtectDuration = 1f;
 	public static int playerAsteroidHitScore = 100;
 	public static int playerSaucerHitScore = 300;

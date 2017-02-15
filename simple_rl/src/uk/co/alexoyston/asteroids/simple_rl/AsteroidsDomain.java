@@ -26,6 +26,7 @@ import burlap.visualizer.Visualizer;
 import burlap.mdp.core.state.vardomain.VariableDomain;
 
 import uk.co.alexoyston.asteroids.simple_rl.actions.ShootActionType;
+import uk.co.alexoyston.asteroids.simple_rl.actions.WarpActionType;
 import uk.co.alexoyston.asteroids.simple_rl.algorithms.PolarFeaturesFactory;
 import uk.co.alexoyston.asteroids.simple_rl.algorithms.VFAGenerator;
 import uk.co.alexoyston.asteroids.simple_rl.state.AgentState;
@@ -39,9 +40,11 @@ public class AsteroidsDomain implements DomainGenerator {
 	public static final String ACTION_ROTATE_RIGHT = "rotateRight";
 	public static final String ACTION_ROTATE_LEFT = "rotateLeft";
 	public static final String ACTION_SHOOT = "shoot";
+	public static final String ACTION_WARP = "warp";
 	public static final String ACTION_NONE = "none";
 
 	public static final String ACTIONTYPE_SHOOT = "typeShoot";
+	public static final String ACTIONTYPE_WARP = "typeWarp";
 
 	public static final String CLASS_AGENT = "agent";
 	public static final String CLASS_OBJECT = "object";
@@ -53,10 +56,12 @@ public class AsteroidsDomain implements DomainGenerator {
 	public static final String VAR_VELOCITY_DIST = "velocityDist";
 	public static final String VAR_VELOCITY_ANGLE = "velocityAngle";
 	public static final String VAR_PRESENT = "present";
-	public static final String VAR_ACTIVE_SHOTS = "activeShots"; // Current shots made by Agent
+	// public static final String VAR_ACTIVE_SHOTS = "activeShots"; // Current shots made by Agent
+	public static final String VAR_CAN_SHOOT = "canShoot";
+	public static final String VAR_CAN_WARP = "canWarp";
 
 	private static final PhysicsParams phys = new PhysicsParams();
-	protected static final Map<Object, VariableDomain> domains = new HashMap<Object, VariableDomain>();
+	protected static final Map<Object, VariableDomain> varDomains = new HashMap<Object, VariableDomain>();
 
 	static {
 		double maxDist = Math.max(phys.worldWidth, phys.worldHeight) / 2;
@@ -69,14 +74,16 @@ public class AsteroidsDomain implements DomainGenerator {
 
 		int maxActiveShots = phys.playerMaxActiveShots;
 
-		domains.put(VAR_DIST, new VariableDomain(-maxDist, maxDist));
-		domains.put(VAR_ANGLE, new VariableDomain(-Math.PI, Math.PI));
-		domains.put(VAR_VELOCITY_X, new VariableDomain(-maxVelocity, maxVelocity));
-		domains.put(VAR_VELOCITY_Y, new VariableDomain(-maxVelocity, maxVelocity));
-		domains.put(VAR_VELOCITY_DIST, new VariableDomain(-maxVelocity, maxVelocity));
-		domains.put(VAR_VELOCITY_ANGLE, new VariableDomain(-Math.PI, Math.PI));
-		domains.put(VAR_PRESENT, new VariableDomain(0, 1));
-		domains.put(VAR_ACTIVE_SHOTS, new VariableDomain(0, phys.playerMaxActiveShots));
+		varDomains.put(VAR_DIST, new VariableDomain(-maxDist, maxDist));
+		varDomains.put(VAR_ANGLE, new VariableDomain(-Math.PI, Math.PI));
+		varDomains.put(VAR_VELOCITY_X, new VariableDomain(-maxVelocity, maxVelocity));
+		varDomains.put(VAR_VELOCITY_Y, new VariableDomain(-maxVelocity, maxVelocity));
+		varDomains.put(VAR_VELOCITY_DIST, new VariableDomain(-maxVelocity, maxVelocity));
+		varDomains.put(VAR_VELOCITY_ANGLE, new VariableDomain(-Math.PI, Math.PI));
+		varDomains.put(VAR_PRESENT, new VariableDomain(0, 1));
+		// varDomains.put(VAR_ACTIVE_SHOTS, new VariableDomain(0, phys.playerMaxActiveShots));
+		varDomains.put(VAR_CAN_SHOOT, new VariableDomain(0, 1));
+		varDomains.put(VAR_CAN_WARP, new VariableDomain(0, 1));
 	}
 
 	@Override
@@ -91,7 +98,8 @@ public class AsteroidsDomain implements DomainGenerator {
 				new UniversalActionType(ACTION_FORWARD),
 				new UniversalActionType(ACTION_ROTATE_RIGHT),
 				new UniversalActionType(ACTION_ROTATE_LEFT),
-				new ShootActionType(ACTIONTYPE_SHOOT, ACTION_SHOOT, phys),
+				new ShootActionType(ACTIONTYPE_SHOOT, ACTION_SHOOT),
+				new WarpActionType(ACTIONTYPE_WARP, ACTION_WARP),
 				new UniversalActionType(ACTION_NONE));
 
 		domain.setModel(null);
@@ -106,20 +114,20 @@ public class AsteroidsDomain implements DomainGenerator {
 
 		Visualizer v = AsteroidsVisualizer.getVisualizer(50, 50, phys.worldWidth, phys.worldHeight);
 
-		PolarFeaturesFactory featuresFactory = new PolarFeaturesFactory(domains);
+		PolarFeaturesFactory featuresFactory = new PolarFeaturesFactory(varDomains);
 
-		TileCodingFeatures tileCoding = featuresFactory.getTileCoding(20, 3);
-		VFAGenerator tileCodingVFA = (dq) -> {return tileCoding.generateVFA(dq);};
+		TileCodingFeatures tileCodedFeatures = featuresFactory.getTileCodedFeatures(20, 3);
+		VFAGenerator tileCodedVFA = (dq) -> {return tileCodedFeatures.generateVFA(dq);};
 
-		FourierBasis fourierBasis = featuresFactory.getFourierBasis(2, 2);
-		VFAGenerator fourierBasisVFA = (dq) -> {return fourierBasis.generateVFA(dq);};
+		// FourierBasis fourierBasis = featuresFactory.getFourierBasis(2, 2);
+		// VFAGenerator fourierBasisVFA = (dq) -> {return fourierBasis.generateVFA(dq);};
 
 		LearningAgentFactory[] factories = new LearningAgentFactory[1];
-		factories[0] = getSarsaAgentFactory(domain, null, tileCodingVFA, 0.999, 0.02, 0.5/3, 0.5);
+		factories[0] = getSarsaAgentFactory(domain, null, tileCodedVFA, 0.999, 0.02, 0.5/3, 0.5);
 
 		// explorer(domain, env, v);
-		// episodicView(domain, env, v, factories[0], 100);
-		// expAndPlot(env, 5, 2000, factories);
+		// episodicView(domain, env, v, factories[0], 50);
+		expAndPlot(env, 5, 2000, factories);
 	}
 
 	public static LearningAgentFactory getSarsaAgentFactory(OOSADomain domain, String tag, VFAGenerator vfaGen,

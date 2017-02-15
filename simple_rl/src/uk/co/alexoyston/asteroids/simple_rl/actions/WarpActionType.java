@@ -13,12 +13,12 @@ import uk.co.alexoyston.asteroids.simple_rl.state.AsteroidsState;
 
 import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.*;
 
-public class ShootActionType implements ActionType {
+public class WarpActionType implements ActionType {
 
 	private String name;
 	private String actionName;
 
-	public ShootActionType(String actionTypeName, String actionName) {
+	public WarpActionType(String actionTypeName, String actionName) {
 		this.name = actionTypeName;
 		this.actionName = actionName;
 	}
@@ -29,9 +29,9 @@ public class ShootActionType implements ActionType {
 
 		AsteroidsState state = (AsteroidsState)s;
 		AgentState agent = (AgentState)state.object(CLASS_AGENT);
-		int canShoot = (int)agent.get(VAR_CAN_SHOOT);
+		int canWarp = (int)agent.get(VAR_CAN_WARP);
 
-		if (canShoot != 0)
+		if (canWarp != 0)
 			actions.add(new SimpleAction(actionName));
 
 		return actions;

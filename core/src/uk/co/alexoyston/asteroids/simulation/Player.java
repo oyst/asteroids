@@ -1,12 +1,17 @@
 package uk.co.alexoyston.asteroids.simulation;
 
+import java.util.Random;
+
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Rectangle;
 
 public class Player extends Entity implements BulletShooter {
 
-	public int activeShots = 0;
+	protected int activeShots = 0;
 	protected final float shotSpeed;
 	protected final int maxActiveShots;
+
+	protected int remainingWarps;
 
 	protected final int asteroidScore;
 	protected final int saucerScore;
@@ -27,6 +32,7 @@ public class Player extends Entity implements BulletShooter {
 		smallSaucerScore = params.playerSmallSaucerHitScore;
 		drag = params.playerDrag;
 		maxActiveShots = params.playerMaxActiveShots;
+		remainingWarps = params.playerWarpCount;
 
 		float width = 20;
 		float height = 20;
@@ -116,5 +122,23 @@ public class Player extends Entity implements BulletShooter {
 
 	public int getScore() {
 		return score;
+	}
+
+	public void warp(Rectangle worldBounds) {
+		if (remainingWarps == 0)
+			return;
+		remainingWarps--;
+
+		Random rand = new Random();
+		location.x = worldBounds.x + (worldBounds.width - worldBounds.x) * rand.nextFloat();
+		location.y = worldBounds.y + (worldBounds.height - worldBounds.y) * rand.nextFloat();
+	}
+
+	public int remainingShots() {
+		return maxActiveShots - activeShots;
+	}
+
+	public int remainingWarps() {
+		return remainingWarps;
 	}
 }

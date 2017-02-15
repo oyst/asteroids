@@ -58,7 +58,7 @@ public class AsteroidsEnvironment implements Environment {
 		final float playerY = (player.bounds.y + player.center.y);
 		int diameter = (int)Math.max(player.bounds.width, player.bounds.height);
 
-		AgentState agent = new AgentState(diameter, player.activeShots, player.rotation);
+		AgentState agent = new AgentState(diameter, player.remainingShots(), player.remainingWarps(), player.rotation);
 
 		for (Entity entity : this.sim.entities) {
 			if (entity instanceof Player)
@@ -141,6 +141,8 @@ public class AsteroidsEnvironment implements Environment {
 			this.sim.playerRotRight(0);
 		else if (a.actionName().equals(ACTION_ROTATE_LEFT))
 			this.sim.playerRotLeft(0);
+		else if (a.actionName().equals(ACTION_WARP))
+			this.sim.playerWarp(0);
 		else if (a.actionName().equals(ACTION_SHOOT)) {
 			this.sim.playerShoot(0);
 			shotTaken = true;

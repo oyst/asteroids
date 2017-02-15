@@ -36,11 +36,11 @@ public class GameLoop extends BaseScreen {
 
 	public GameLoop(Game game) {
 		super(game);
-		
+
 		PhysicsParams params = new PhysicsParams();
 		params.worldWidth = Gdx.graphics.getWidth();
 		params.worldHeight = Gdx.graphics.getHeight();
-		
+
 		simulation = new Simulation(params);
 		renderer = new Renderer(simulation);
 
@@ -95,7 +95,7 @@ public class GameLoop extends BaseScreen {
 
 	/**
 	 * Update the simulation
-	 * 
+	 *
 	 * @param delta
 	 *            The time in ms since the last update
 	 */
@@ -114,6 +114,8 @@ public class GameLoop extends BaseScreen {
 			simulation.playerRotRight(0);
 		if (Gdx.input.isKeyJustPressed(Keys.SPACE))
 			simulation.playerShoot(0);
+		if (Gdx.input.isKeyJustPressed(Keys.W))
+			simulation.playerWarp(0);
 
 		simulation.update(delta);
 
@@ -123,7 +125,7 @@ public class GameLoop extends BaseScreen {
 
 	/**
 	 * Draw the simulations state
-	 * 
+	 *
 	 * @param delta
 	 *            The time in ms since the last update
 	 */
@@ -132,7 +134,7 @@ public class GameLoop extends BaseScreen {
 		renderer.clear();
 		renderer.renderEntities(simulation, delta);
 		renderer.renderDebug(simulation, delta);
-		
+
 		if (paused) {
 			float width;
 			float height;

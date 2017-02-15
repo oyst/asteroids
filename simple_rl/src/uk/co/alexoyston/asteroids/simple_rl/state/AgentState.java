@@ -15,7 +15,8 @@ import static uk.co.alexoyston.asteroids.simple_rl.AsteroidsDomain.*;
 @DeepCopyState
 public class AgentState implements ObjectInstance {
 
-	public int activeShots = 0;
+	public int remainingShots = 0;
+	public int remainingWarps = 0;
 
 	protected final String name = CLASS_AGENT;
 
@@ -23,14 +24,16 @@ public class AgentState implements ObjectInstance {
 	public float rotation = 0f;
 
 	public static final List<Object> keys = Arrays.<Object>asList(
-		VAR_ACTIVE_SHOTS
+		VAR_CAN_SHOOT,
+		VAR_CAN_WARP
 	);
 
 	public AgentState() {
 	}
 
-	public AgentState(int diameter, int activeShots, float rotation) {
-		this.activeShots = activeShots;
+	public AgentState(int diameter, int remainingShots, int remainingWarps, float rotation) {
+		this.remainingShots = remainingShots;
+		this.remainingWarps = remainingWarps;
 		this.rotation = rotation;
 		this.diameter = (short)diameter;
 	}
@@ -42,15 +45,18 @@ public class AgentState implements ObjectInstance {
 
 	@Override
 	public Object get(Object variableKey) {
-		if (variableKey.equals(VAR_ACTIVE_SHOTS)) {
-			return activeShots;
+		if (variableKey.equals(VAR_CAN_SHOOT)) {
+			return (remainingShots == 0) ? 0 : 1;
+		}
+		else if (variableKey.equals(VAR_CAN_WARP)) {
+			return (remainingWarps == 0) ? 0 : 1;
 		}
 		throw new UnknownKeyException(variableKey);
 	}
 
 	@Override
 	public AgentState copy() {
-		return new AgentState(diameter, activeShots, rotation);
+		return new AgentState(diameter, remainingShots, remainingWarps, rotation);
 	}
 
 	@Override

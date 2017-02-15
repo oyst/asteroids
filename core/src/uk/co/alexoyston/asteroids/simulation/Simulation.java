@@ -246,6 +246,11 @@ public class Simulation implements Disposable, EntityListener {
 		 player.shoot();
 	}
 
+	public void playerWarp(int playerId) {
+			Player player = players.get(playerId);
+			player.warp(bounds);
+	}
+
 	public int getScore(int playerId) {
 		Player player = players.get(playerId);
 		return player.getScore();

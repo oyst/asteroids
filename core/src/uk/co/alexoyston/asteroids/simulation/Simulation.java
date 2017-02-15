@@ -147,8 +147,8 @@ public class Simulation implements Disposable, EntityListener {
 		i = entities.listIterator();
 		while (i.hasNext()) {
 			Entity entity = i.next();
-			if (entity instanceof SmallSaucer) {
-				SmallSaucer saucer = (SmallSaucer)entity;
+			if (entity instanceof Saucer) {
+				Saucer saucer = (Saucer)entity;
 				if (!players.isEmpty()) {
 					int index = (int) (Math.random() * players.size());
 					Player player = players.get(index);

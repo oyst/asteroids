@@ -37,6 +37,6 @@ public class PhysicsParams {
 	public static float smallSaucerTurnFreq = 1f;
 	public static float smallSaucerReloadTime = 0.7f;
 	public static float smallSaucerShotSpeed = 250f;
-	//TODO: public static float smallSaucerShotAccuracy = ?;
+	public static float smallSaucerShotAccuracy = 0.95f;
 
 }

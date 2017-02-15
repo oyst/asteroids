@@ -103,7 +103,7 @@ public class AsteroidsEnvironment implements Environment {
 				name = "asteroid";
 				container = asteroids;
 			}
-			else if (entity instanceof Saucer || entity instanceof SmallSaucer) {
+			else if (entity instanceof Saucer) {
 				name = "saucer";
 				container = saucers;
 			}

@@ -41,7 +41,7 @@ public class Asteroid extends Entity {
 	}
 
 	public Asteroid(PhysicsParams params) {
-		this(params.asteroidStartSize, params.asteroidSplitBoost);
+		this(params.asteroidStartSize + 1, params.asteroidSplitBoost);
 	}
 
 	public Asteroid(int numSplits, float splitBoost) {
@@ -54,7 +54,7 @@ public class Asteroid extends Entity {
 		System.arraycopy(asteroidShapes.get(index), 0, vertices, 0, asteroidShapes.get(index).length);
 
 		for (int i = 0; i < vertices.length; i++)
-			vertices[i] *= (this.numSplits + 1);
+			vertices[i] *= this.numSplits;
 
 		setVertices(vertices);
 
@@ -65,7 +65,7 @@ public class Asteroid extends Entity {
 		numSplits--;
 		alive = false;
 
-		if (numSplits < 0)
+		if (numSplits <= 0)
 			return;
 
 		for (int i = 0; i < 2; i++) {
@@ -91,5 +91,9 @@ public class Asteroid extends Entity {
 	@Override
 	public void collision(Entity other) {
 		split();
+	}
+
+	public int size() {
+		return numSplits + 1;
 	}
 }

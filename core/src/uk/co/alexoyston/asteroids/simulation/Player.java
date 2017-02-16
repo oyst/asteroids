@@ -113,7 +113,7 @@ public class Player extends Entity implements BulletShooter {
 
 	public void addHitScore(Entity hit) {
 		if (hit instanceof Asteroid)
-			score += asteroidScore;
+			score += asteroidScore / ((Asteroid)hit).size();
 		else if (hit instanceof SmallSaucer)
 			score += smallSaucerScore;
 		else if (hit instanceof Saucer)

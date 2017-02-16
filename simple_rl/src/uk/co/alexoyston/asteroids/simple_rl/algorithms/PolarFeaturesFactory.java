@@ -11,7 +11,9 @@ import burlap.behavior.functionapproximation.dense.NumericVariableFeatures;
 import burlap.behavior.functionapproximation.dense.NormalizedVariableFeatures;
 import burlap.behavior.functionapproximation.dense.fourier.FourierBasis;
 import burlap.behavior.functionapproximation.sparse.tilecoding.TileCodingFeatures;
+import burlap.behavior.functionapproximation.sparse.tilecoding.ExtTileCodingFeatures;
 import burlap.behavior.functionapproximation.sparse.tilecoding.TilingArrangement;
+import burlap.behavior.functionapproximation.sparse.tilecoding.Tiling;
 import burlap.mdp.core.state.vardomain.VariableDomain;
 
 import uk.co.alexoyston.asteroids.simulation.PhysicsParams;
@@ -70,46 +72,25 @@ public class PolarFeaturesFactory {
     return inputFeatures;
   }
 
-  public TileCodingFeatures getTileCodedFeatures(int resolution, int numTilings) {
+  public ExtTileCodingFeatures getExtTileCodedFeatures(int resolution, int numTilings) {
     int numFeatures = polarAgentFeatures.size() + (numObjects * polarObjectFeatures.size());
     double[] widths = new double[numFeatures];
     boolean[] dimensions = new boolean[numFeatures];
 
     int currFeature = 0;
 
-    TileCodingFeatures tilecoding = new TileCodingFeatures(inputFeatures);
+    ExtTileCodingFeatures tilecoding = new ExtTileCodingFeatures(inputFeatures);
 
-    // Add tiling for Agent features
-    // All features are discrete, so set the width to either 1 or the span
-    for (Object featureKey : polarAgentFeatures) {
-      // widths[currFeature] = domains.get(featureKey).span();
-      widths[currFeature] = 1;
-      dimensions[currFeature] = true;
-      currFeature++;
-    }
-    // Only 1 tiling needed since all are discrete
-    tilecoding.addTilingsForDimensionsAndWidths(
-      dimensions, widths, 1,
-      TilingArrangement.UNIFORM
-    );
+    TilingBuilder tb = new TilingBuilder(numFeatures);
 
-    // Reset all dimensions to false
-    for (int i = 0; i < dimensions.length; i++)
-      dimensions[i] = false;
+    for (Object featureKey : polarAgentFeatures)
+      tb.nextDimension(new TilingDimension.Discrete());
 
-    // Apply TileCoding to the features belonging to a non-Agent
-    for (int obj = 0; obj < numObjects; obj++) {
-      for (Object featureKey : polarObjectFeatures) {
-        // widths[currFeature] = domains.get(featureKey).span() / resolution;
-        widths[currFeature] = 1f / resolution;
-        dimensions[currFeature] = true;
-        currFeature++;
-      }
-    }
-    tilecoding.addTilingsForDimensionsAndWidths(
-      dimensions, widths, numTilings,
-      TilingArrangement.RANDOM_JITTER
-    );
+    for (Object featureKey : polarObjectFeatures)
+      tb.nextDimension(new TilingDimension.Uniform(resolution, 0, 1));
+
+    Tiling[] tilings = tb.build(numTilings, new RandomJitterOffset());
+    tilecoding.addTilings(tilings);
 
     return tilecoding;
   }

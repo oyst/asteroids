@@ -5,7 +5,6 @@ import burlap.behavior.functionapproximation.sparse.tilecoding.Tiling;
 public abstract class TilingDimension {
 
   public abstract int getReceptiveTile(double input);
-  public double offsetRange = 0;
 
   public static class Uniform extends TilingDimension {
     protected double lowerVal;
@@ -15,7 +14,6 @@ public abstract class TilingDimension {
     public Uniform(int numTiles, double lowerVal, double upperVal) {
       this.lowerVal = lowerVal;
       this.width = (upperVal - lowerVal) / numTiles;
-      this.offsetRange = (upperVal - lowerVal);
     }
 
     @Override
@@ -35,7 +33,6 @@ public abstract class TilingDimension {
       scale = (newUpper - newLower) / (upperVal - lowerVal);
       shift = -lowerVal*scale + newLower;
       lnRate = Math.log(rate);
-      this.offsetRange = (upperVal - lowerVal);
     }
 
     @Override
@@ -46,11 +43,18 @@ public abstract class TilingDimension {
   }
 
   public static class Discrete extends TilingDimension {
-    public Discrete() {}
+    protected int minVal;
+    protected int maxVal;
+
+    public Discrete(int minVal, int maxVal) {
+      this.minVal = minVal;
+      this.maxVal = maxVal;
+    }
 
     @Override
     public int getReceptiveTile(double input) {
-      return (int)input;
+      int intInput = (int)input;
+      return Math.max(Math.min(intInput, maxVal), minVal);
     }
   }
 

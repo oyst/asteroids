@@ -17,6 +17,7 @@ public class PolarState implements ObjectInstance, Comparable<PolarState> {
 	public float angle = 0f;
 	public float vDist = 0f;
 	public float vAngle = 0f;
+	public int type = 0;
 	public byte present = 0;
 
 	public int diameter;
@@ -27,7 +28,8 @@ public class PolarState implements ObjectInstance, Comparable<PolarState> {
 			VAR_DIST,
 			VAR_ANGLE,
 			VAR_VELOCITY_DIST,
-			VAR_VELOCITY_ANGLE
+			VAR_VELOCITY_ANGLE,
+			VAR_TYPE
 	);
 
 	public PolarState() {
@@ -38,16 +40,17 @@ public class PolarState implements ObjectInstance, Comparable<PolarState> {
 		this.present = 0;
 	}
 
-	public PolarState(String name, int diameter, float dist, float angle, float vDist, float vAngle) {
-		this(name, diameter, dist, angle, vDist, vAngle, 1);
+	public PolarState(String name, int diameter, float dist, float angle, float vDist, float vAngle, int type) {
+		this(name, diameter, dist, angle, vDist, vAngle, type, 1);
 	}
 
-	public PolarState(String name, int diameter, float dist, float angle, float vDist, float vAngle, int present) {
+	public PolarState(String name, int diameter, float dist, float angle, float vDist, float vAngle, int type, int present) {
 		this.name = name;
 		this.dist = dist;
 		this.angle = angle;
 		this.vDist = vDist;
 		this.vAngle = vAngle;
+		this.type = type;
 		this.present = (byte)present;
 
 		this.diameter = (short)diameter;
@@ -70,6 +73,9 @@ public class PolarState implements ObjectInstance, Comparable<PolarState> {
 		else if(variableKey.equals(VAR_PRESENT))
 			return present;
 
+		else if(variableKey.equals(VAR_TYPE))
+			return type;
+
 		throw new UnknownKeyException(variableKey);
 	}
 
@@ -90,7 +96,7 @@ public class PolarState implements ObjectInstance, Comparable<PolarState> {
 
 	@Override
 	public PolarState copy() {
-		return new PolarState(name, diameter, dist, angle, vDist, vAngle, present);
+		return new PolarState(name, diameter, dist, angle, vDist, vAngle, type, present);
 	}
 
 	@Override

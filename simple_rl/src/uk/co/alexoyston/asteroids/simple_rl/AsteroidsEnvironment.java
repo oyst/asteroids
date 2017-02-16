@@ -99,24 +99,31 @@ public class AsteroidsEnvironment implements Environment {
 
 			String name;
 			List<PolarState> container;
+			int type;
 
 			if (entity instanceof Asteroid) {
 				name = "asteroid";
 				container = asteroids;
+				type = TYPE_ASTEROID(((Asteroid)entity).size());
 			}
 			else if (entity instanceof Saucer) {
 				name = "saucer";
 				container = saucers;
+				if (entity instanceof SmallSaucer)
+					type = TYPE_SMALL_SAUCER;
+				else
+					type = TYPE_SAUCER;
 			}
 			else if (entity instanceof Bullet) {
 				name = "bullet";
 				container = bullets;
+				type = TYPE_BULLET;
 			}
 			else {
 				throw new RuntimeException("Unknown Entity instance encountered: " + entity.toString());
 			}
 
-			PolarState obj = new PolarState(name, diameter, dist, angle, vDist, vAngle);
+			PolarState obj = new PolarState(name, diameter, dist, angle, vDist, vAngle, type);
 			container.add(obj);
 		}
 

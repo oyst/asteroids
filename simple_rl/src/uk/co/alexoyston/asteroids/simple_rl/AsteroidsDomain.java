@@ -58,6 +58,12 @@ public class AsteroidsDomain implements DomainGenerator {
 	public static final String VAR_PRESENT = "present";
 	public static final String VAR_CAN_SHOOT = "canShoot";
 	public static final String VAR_CAN_WARP = "canWarp";
+	public static final String VAR_TYPE = "type";
+
+	public static final int TYPE_BULLET = 1;
+	public static final int TYPE_SAUCER = 2;
+	public static final int TYPE_SMALL_SAUCER = 3;
+	public static final int TYPE_ASTEROID(int size) { return 3 + size; };
 
 	private static final PhysicsParams phys = new PhysicsParams();
 	protected static final Map<Object, VariableDomain> varDomains = new HashMap<Object, VariableDomain>();

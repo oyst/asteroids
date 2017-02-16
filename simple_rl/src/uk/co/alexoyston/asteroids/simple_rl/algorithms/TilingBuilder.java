@@ -25,15 +25,20 @@ public class TilingBuilder {
     return this;
   }
 
-  public Tiling build() {
-    return new MixedTiling(tilingDimensions);
+  public Tiling[] build(int numTilings, TilingOffsetGenerator offsetGenerator) {
+    Tiling[] tilings = new Tiling[numTilings];
+    for (int i = 0; i < numTilings; i++) {
+      double[] offset = offsetGenerator.generate(numTilings, i, tilingDimensions);
+      tilings[i] = new MixedTiling(tilingDimensions, offset);
+    }
+    return tilings;
   }
 
   protected class MixedTiling extends Tiling {
     protected TilingDimension[] dimensions;
 
-    public MixedTiling(TilingDimension[] dimensions) {
-      super(new double[0], new double[0], new boolean[dimensions.length]);
+    public MixedTiling(TilingDimension[] dimensions, double[] offset) {
+      super(new double[0], offset, new boolean[dimensions.length]);
 
       int i = 0;
       for (TilingDimension td : dimensions)
@@ -50,7 +55,7 @@ public class TilingBuilder {
       int [] tiledVector = new int[input.length];
       for (int i = 0; i < input.length; i++) {
         if (this.dimensions[i] != null)
-          tiledVector[i] = this.dimensions[i].getReceptiveTile(input[i]);
+          tiledVector[i] = this.dimensions[i].getReceptiveTile(input[i] - this.offset[i]);
       }
       Tiling.FVTile tile = new Tiling.FVTile(tiledVector);
       return tile;

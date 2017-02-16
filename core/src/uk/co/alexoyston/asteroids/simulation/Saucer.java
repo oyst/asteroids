@@ -57,6 +57,8 @@ public class Saucer extends Entity implements BulletShooter {
 
 	@Override
 	public void update(float delta) {
+		super.update(delta);
+		
 		deltaSinceShot += delta;
 		deltaSinceTurn += delta;
 

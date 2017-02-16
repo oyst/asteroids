@@ -97,7 +97,7 @@ public class AsteroidsDomain implements DomainGenerator {
 				new UniversalActionType(ACTION_ROTATE_RIGHT),
 				new UniversalActionType(ACTION_ROTATE_LEFT),
 				new ShootActionType(ACTIONTYPE_SHOOT, ACTION_SHOOT),
-				new WarpActionType(ACTIONTYPE_WARP, ACTION_WARP),
+				// new WarpActionType(ACTIONTYPE_WARP, ACTION_WARP),
 				new UniversalActionType(ACTION_NONE));
 
 		domain.setModel(null);

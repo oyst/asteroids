@@ -24,8 +24,8 @@ public class AgentState implements ObjectInstance {
 	public float rotation = 0f;
 
 	public static final List<Object> keys = Arrays.<Object>asList(
-		VAR_CAN_SHOOT,
-		VAR_CAN_WARP
+		VAR_CAN_SHOOT
+		// VAR_CAN_WARP
 	);
 
 	public AgentState() {

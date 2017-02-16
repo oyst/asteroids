@@ -10,8 +10,10 @@ public class PhysicsParams {
 	public static int asteroidStartCount = 4;
 
 	public static int saucersMax = 1;
-	public static float saucersProbSmall = 0.3f;
-	public static float saucersFreq = 0.5f;
+	public static float saucersProbSmallInitial = 0.2f;
+	public static float saucersProbSmallIncrease = 0.05f;
+	public static float saucersFreqInitial = 0.3f;
+	public static float saucersFreqIncrease = 0.01f;
 
 	public static int asteroidStartSize = 2;
 	public static float asteroidMinSpeed = 15f;
@@ -26,7 +28,7 @@ public class PhysicsParams {
 	public static int playerWarpCount = 1;
 	public static float playerSpawnProtectDuration = 1f;
 	public static int playerAsteroidHitScore = 100;
-	public static int playerSaucerHitScore = 300;
+	public static int playerSaucerHitScore = 200;
 	public static int playerSmallSaucerHitScore = 500;
 
 	public static float saucerSpeed = 35f;
@@ -38,6 +40,6 @@ public class PhysicsParams {
 	public static float smallSaucerTurnFreq = 1f;
 	public static float smallSaucerReloadTime = 0.7f;
 	public static float smallSaucerShotSpeed = 250f;
-	public static float smallSaucerShotAccuracy = 0.95f;
+	public static float smallSaucerShotAccuracy = 0.97f;
 
 }

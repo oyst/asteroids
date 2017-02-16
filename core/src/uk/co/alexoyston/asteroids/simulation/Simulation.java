@@ -19,21 +19,21 @@ public class Simulation implements Disposable, EntityListener {
 
 	private int level = 0;
 
-	private int asteroidStartNum;
-	private int asteroidStartSize;
-	private float asteroidMinSpeed;
-	private float asteroidMaxSpeed;
+	private final int asteroidStartNum;
+	private final int asteroidStartSize;
+	private final float asteroidMinSpeed;
+	private final float asteroidMaxSpeed;
 
 	private int saucersOnField = 0;
-	private int saucersMax;
+	private final int saucersMax;
 	private float saucersProbSmall;
 	private float saucersFreq;
 
-	private float updateLimiter;
+	private final float updateLimiter;
 
 	public final Rectangle bounds;
 
-	private PhysicsParams params;
+	private final PhysicsParams params;
 
 	public Simulation(PhysicsParams params) {
 		this.params = params;
@@ -49,8 +49,6 @@ public class Simulation implements Disposable, EntityListener {
 		asteroidMaxSpeed = this.params.asteroidMaxSpeed;
 
 		saucersMax = this.params.saucersMax;
-		saucersProbSmall = this.params.saucersProbSmall;
-		saucersFreq = this.params.saucersFreq;
 
 		updateLimiter = this.params.updateDelta;
 
@@ -61,6 +59,13 @@ public class Simulation implements Disposable, EntityListener {
 
 	public void nextLevel() {
 		level++;
+
+		saucersFreq = params.saucersFreqInitial + (params.saucersFreqIncrease * level);
+		saucersFreq = Math.min(1, saucersFreq);
+
+		saucersProbSmall = params.saucersProbSmallInitial + (params.saucersProbSmallIncrease * level);
+		saucersProbSmall = Math.min(1, saucersProbSmall);
+
 		for (int i = 0; i < (asteroidStartNum - 1 + level); i++) {
 			Asteroid asteroid = new Asteroid(params);
 			float x, y, vx, vy;

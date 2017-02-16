@@ -114,18 +114,20 @@ public class AsteroidsDomain implements DomainGenerator {
 
 		PolarFeaturesFactory featuresFactory = new PolarFeaturesFactory(varDomains);
 
-		TileCodingFeatures tileCodedFeatures = featuresFactory.getTileCodedFeatures(20, 3);
+		TileCodingFeatures tileCodedFeatures = featuresFactory.getExtTileCodedFeatures(10, 6);
 		VFAGenerator tileCodedVFA = (dq) -> {return tileCodedFeatures.generateVFA(dq);};
 
 		// FourierBasis fourierBasis = featuresFactory.getFourierBasis(2, 2);
 		// VFAGenerator fourierBasisVFA = (dq) -> {return fourierBasis.generateVFA(dq);};
 
-		LearningAgentFactory[] factories = new LearningAgentFactory[1];
-		factories[0] = getSarsaAgentFactory(domain, null, tileCodedVFA, 0.999, 0.02, 0.5/3, 0.5);
+		List<LearningAgentFactory> factories = new ArrayList<LearningAgentFactory>();
+		factories.add(getSarsaAgentFactory(domain, null, tileCodedVFA, 0.999, 0.02, 0.5/6, 0.5));
+
+		LearningAgentFactory[] factoriesArray = factories.toArray(new LearningAgentFactory[factories.size()]);
 
 		// explorer(domain, env, v);
-		// episodicView(domain, env, v, factories[0], 50);
-		expAndPlot(env, 5, 2000, factories);
+		// episodicView(domain, env, v, factories.get(0), 50);
+		expAndPlot(env, 5, 1000, factoriesArray);
 	}
 
 	public static LearningAgentFactory getSarsaAgentFactory(OOSADomain domain, String tag, VFAGenerator vfaGen,

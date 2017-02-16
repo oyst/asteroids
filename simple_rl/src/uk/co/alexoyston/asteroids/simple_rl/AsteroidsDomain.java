@@ -85,9 +85,6 @@ public class AsteroidsDomain implements DomainGenerator {
 		varDomains.put(VAR_VELOCITY_Y, new VariableDomain(-maxVelocity, maxVelocity));
 		varDomains.put(VAR_VELOCITY_DIST, new VariableDomain(-maxVelocity, maxVelocity));
 		varDomains.put(VAR_VELOCITY_ANGLE, new VariableDomain(-Math.PI, Math.PI));
-		varDomains.put(VAR_PRESENT, new VariableDomain(0, 1));
-		varDomains.put(VAR_CAN_SHOOT, new VariableDomain(0, 1));
-		varDomains.put(VAR_CAN_WARP, new VariableDomain(0, 1));
 	}
 
 	@Override

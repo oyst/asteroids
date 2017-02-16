@@ -54,8 +54,8 @@ public class PolarFeaturesFactory {
     agentNumFeatures = new NumericVariableFeatures(polarAgentFeatures);
     objNumFeatures = new NumericVariableFeatures(polarObjectFeatures);
 
-    inputFeatures = getNormalizedFeatures();
-    // inputFeatures = getFeatures();
+    // inputFeatures = getNormalizedFeatures();
+    inputFeatures = getFeatures();
   }
 
   protected DenseStateFeatures getFeatures() {
@@ -86,8 +86,13 @@ public class PolarFeaturesFactory {
     for (Object featureKey : polarAgentFeatures)
       tb.nextDimension(new TilingDimension.Discrete());
 
-    for (Object featureKey : polarObjectFeatures)
-      tb.nextDimension(new TilingDimension.Uniform(resolution, 0, 1));
+    for (Object featureKey : polarObjectFeatures) {
+      VariableDomain vd = domains.get(featureKey);
+      if (vd == null)
+        tb.nextDimension(new TilingDimension.Discrete());
+      else
+        tb.nextDimension(new TilingDimension.Uniform(resolution, vd.lower, vd.upper));
+    }
 
     Tiling[] tilings = tb.build(numTilings, new RandomJitterOffset());
     tilecoding.addTilings(tilings);

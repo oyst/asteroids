@@ -28,8 +28,8 @@ public class PolarState implements ObjectInstance, Comparable<PolarState> {
 			VAR_DIST,
 			VAR_ANGLE,
 			VAR_VELOCITY_DIST,
-			VAR_VELOCITY_ANGLE,
-			VAR_TYPE
+			VAR_VELOCITY_ANGLE
+			// VAR_TYPE
 	);
 
 	public PolarState() {

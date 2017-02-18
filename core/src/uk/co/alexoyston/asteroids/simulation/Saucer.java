@@ -1,7 +1,5 @@
 package uk.co.alexoyston.asteroids.simulation;
 
-import java.util.Random;
-
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Rectangle;
 
@@ -58,7 +56,7 @@ public class Saucer extends Entity implements BulletShooter {
 	@Override
 	public void update(float delta) {
 		super.update(delta);
-		
+
 		deltaSinceShot += delta;
 		deltaSinceTurn += delta;
 
@@ -67,7 +65,7 @@ public class Saucer extends Entity implements BulletShooter {
 
 		deltaSinceTurn = 0;
 
-		float r = (float)Math.random();
+		float r = Simulation.rand.nextFloat();
 		if (r < 0.33f)
 			angle = (float)Math.PI / 6;
 		else if (r < 0.66f)
@@ -87,8 +85,7 @@ public class Saucer extends Entity implements BulletShooter {
 		Bullet bullet = new Bullet(this);
 		float angle = (float)(Math.atan2(targetX - location.x, targetY - location.y));
 
-		Random rand = new Random();
-		angle += (1f - shotAccuracy) * (-Math.PI + (2*Math.PI) * rand.nextDouble());
+		angle += (1f - shotAccuracy) * (-Math.PI + (2*Math.PI) * Simulation.rand.nextDouble());
 
 		Vector2 shotVelocity = new Vector2(shotSpeed, 0).setAngleRad((float)Math.PI/2 - angle);
 		bullet.velocity.set(shotVelocity);

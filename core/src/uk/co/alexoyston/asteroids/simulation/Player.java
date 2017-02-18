@@ -1,7 +1,5 @@
 package uk.co.alexoyston.asteroids.simulation;
 
-import java.util.Random;
-
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Rectangle;
 
@@ -129,9 +127,8 @@ public class Player extends Entity implements BulletShooter {
 			return;
 		remainingWarps--;
 
-		Random rand = new Random();
-		location.x = worldBounds.x + (worldBounds.width - worldBounds.x) * rand.nextFloat();
-		location.y = worldBounds.y + (worldBounds.height - worldBounds.y) * rand.nextFloat();
+		location.x = worldBounds.x + (worldBounds.width - worldBounds.x) * Simulation.rand.nextFloat();
+		location.y = worldBounds.y + (worldBounds.height - worldBounds.y) * Simulation.rand.nextFloat();
 	}
 
 	public int remainingShots() {

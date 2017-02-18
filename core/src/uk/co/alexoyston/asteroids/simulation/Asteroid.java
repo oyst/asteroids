@@ -48,7 +48,7 @@ public class Asteroid extends Entity {
 		this.splitBoost = splitBoost;
 		this.numSplits = numSplits;
 
-		int index = (int) (Math.random() * asteroidShapes.size());
+		int index = Simulation.rand.nextInt(asteroidShapes.size());
 
 		float[] vertices = new float[asteroidShapes.get(index).length];
 		System.arraycopy(asteroidShapes.get(index), 0, vertices, 0, asteroidShapes.get(index).length);
@@ -72,7 +72,7 @@ public class Asteroid extends Entity {
 			Asteroid child = new Asteroid(numSplits, splitBoost);
 
 			// Get an extra boost in a random direction
-			float angle = (float) (Math.random() * 2 * Math.PI);
+			float angle = (float) (Simulation.rand.nextDouble() * 2 * Math.PI);
 			child.location.set(location);
 			child.velocity.set(velocity).add(splitBoost, splitBoost).setAngleRad(angle);
 			child.rotation = angle;

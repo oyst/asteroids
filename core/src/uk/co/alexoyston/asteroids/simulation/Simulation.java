@@ -3,6 +3,7 @@ package uk.co.alexoyston.asteroids.simulation;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ListIterator;
+import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
@@ -14,6 +15,8 @@ public class Simulation implements Disposable, EntityListener {
 	public LinkedList<Entity> entities = new LinkedList<Entity>();
 	private LinkedList<Entity> waitingEntities = new LinkedList<Entity>();
 	public ArrayList<Player> players = new ArrayList<Player>();
+
+	public static final Random rand = new Random();
 
 	private boolean paused = false;
 
@@ -36,6 +39,14 @@ public class Simulation implements Disposable, EntityListener {
 	private final PhysicsParams params;
 
 	public Simulation(PhysicsParams params) {
+		this(params, System.currentTimeMillis());
+	}
+
+	public Simulation(PhysicsParams params, long seed) {
+		rand.setSeed(seed);
+
+		System.out.format("Seed: %d", seed);
+
 		this.params = params;
 
 		// TODO: Having the x,y of bounds == 0, 0 causes a problem with the
@@ -71,25 +82,25 @@ public class Simulation implements Disposable, EntityListener {
 			float x, y, vx, vy;
 
 			// Start in a random direction
-			double angle = Math.random() * 2 * Math.PI;
+			double angle = rand.nextDouble() * 2 * Math.PI;
 			float sinAngle = (float) Math.sin(angle);
 			float cosAngle = (float) Math.cos(angle);
 
 			// Random bounded velocity
-			vx = sinAngle * (asteroidMinSpeed + (float) Math.random() * (asteroidMaxSpeed - asteroidMinSpeed));
-			vy = cosAngle * (asteroidMinSpeed + (float) Math.random() * (asteroidMaxSpeed - asteroidMinSpeed));
+			vx = sinAngle * (asteroidMinSpeed + rand.nextFloat() * (asteroidMaxSpeed - asteroidMinSpeed));
+			vy = cosAngle * (asteroidMinSpeed + rand.nextFloat() * (asteroidMaxSpeed - asteroidMinSpeed));
 
 			// We want to come from either the top/bottom or left/right
 			// The stochasticity of the velocity should even out the left:right
 			// and top:bottom pairs
-			if (Math.random() > 0.5) {
+			if (rand.nextFloat() > 0.5) {
 				// From the top/bottom so y is fixed
-				x = bounds.getX() + (float) Math.random() * bounds.getWidth();
+				x = bounds.getX() + rand.nextFloat() * bounds.getWidth();
 				y = bounds.getHeight();
 			} else {
 				// From the left/right so x is fixed
 				x = bounds.getWidth();
-				y = bounds.getY() + (float) Math.random() * bounds.getHeight();
+				y = bounds.getY() + rand.nextFloat() * bounds.getHeight();
 			}
 
 			asteroid.location.set(x, y);
@@ -136,14 +147,14 @@ public class Simulation implements Disposable, EntityListener {
 		ListIterator<Entity> j;
 
 		// Add saucers
-		if (Math.random() < saucersFreq * delta && saucersOnField < saucersMax) {
+		if (rand.nextFloat() < saucersFreq * delta && saucersOnField < saucersMax) {
 			Entity saucer;
-			if (Math.random() < saucersProbSmall)
+			if (rand.nextFloat() < saucersProbSmall)
 				saucer = new SmallSaucer(params);
 			else
 				saucer = new Saucer(params);
-			saucer.location.y = bounds.y + (float)Math.random() * bounds.height;
-			saucer.location.x = (Math.random() < 0.5) ? bounds.x - saucer.bounds.width : bounds.width;
+			saucer.location.y = bounds.y + rand.nextFloat() * bounds.height;
+			saucer.location.x = (rand.nextFloat() < 0.5) ? bounds.x - saucer.bounds.width : bounds.width;
 			requestEntity(saucer);
 			saucersOnField++;
 		}
@@ -155,7 +166,7 @@ public class Simulation implements Disposable, EntityListener {
 			if (entity instanceof Saucer) {
 				Saucer saucer = (Saucer)entity;
 				if (!players.isEmpty()) {
-					int index = (int) (Math.random() * players.size());
+					int index = rand.nextInt(players.size());
 					Player player = players.get(index);
 					saucer.shoot(player.location.x, player.location.y);
 				}

@@ -172,6 +172,15 @@ public class AsteroidsDomain implements DomainGenerator {
 			new EpisodeSequenceVisualizer(v, domain, episodes);
 	}
 
+	public static LearningAgent trainAgent(LearningAgent agent, int numEpisodes, Environment env) {
+		for (int i = 0; i < numEpisodes; i++) {
+			agent.runLearningEpisode(env);
+			System.out.println(i);
+			env.resetEnvironment();
+		}
+		return agent;
+	}
+
 	public static void expAndPlot(Environment env, int numTrials, int trialLength, LearningAgentFactory... agentFactories){
 		LearningAlgorithmExperimenter exp = new LearningAlgorithmExperimenter(
 			env, numTrials, trialLength, agentFactories

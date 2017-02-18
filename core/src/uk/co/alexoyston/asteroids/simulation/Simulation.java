@@ -17,6 +17,7 @@ public class Simulation implements Disposable, EntityListener {
 	public ArrayList<Player> players = new ArrayList<Player>();
 
 	public static final Random rand = new Random();
+	protected static long seed;
 
 	private boolean paused = false;
 
@@ -43,9 +44,8 @@ public class Simulation implements Disposable, EntityListener {
 	}
 
 	public Simulation(PhysicsParams params, long seed) {
+		this.seed = seed;
 		rand.setSeed(seed);
-
-		System.out.format("Seed: %d", seed);
 
 		this.params = params;
 
@@ -276,5 +276,9 @@ public class Simulation implements Disposable, EntityListener {
 	public void requestEntity(Entity entity) {
 		waitingEntities.add(entity);
 		entity.registerListener(this);
+	}
+
+	public long getSeed() {
+		return seed;
 	}
 }

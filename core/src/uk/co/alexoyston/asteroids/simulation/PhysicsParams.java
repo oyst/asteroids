@@ -9,7 +9,7 @@ public class PhysicsParams {
 
 	public static int asteroidStartCount = 4;
 
-	public static int saucersMax = 1;
+	public static int saucersMax = 0;
 	public static float saucersProbSmallInitial = 0.2f;
 	public static float saucersProbSmallIncrease = 0.05f;
 	public static float saucersFreqInitial = 0.3f;

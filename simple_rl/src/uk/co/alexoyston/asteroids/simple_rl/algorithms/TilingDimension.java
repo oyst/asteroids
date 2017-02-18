@@ -54,4 +54,20 @@ public abstract class TilingDimension {
     }
   }
 
+  public static class TwoWayExp extends Exponential {
+    protected double midVal;
+
+    public TwoWayExp(int numTiles, double lowerVal, double upperVal, double rate) {
+      super(numTiles, (upperVal + lowerVal)/2, upperVal, rate);
+      midVal = (upperVal + lowerVal)/2;
+    }
+
+    @Override
+    public int getReceptiveTile(double input) {
+      if (input < midVal)
+        input += (midVal - input)*2;
+      return super.getReceptiveTile(input);
+    }
+  }
+
 }

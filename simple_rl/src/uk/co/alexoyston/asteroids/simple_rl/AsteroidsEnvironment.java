@@ -6,6 +6,8 @@ import java.util.ArrayList;
 
 import burlap.mdp.core.action.Action;
 import burlap.mdp.core.state.State;
+import burlap.mdp.core.oo.state.OOState;
+import burlap.mdp.core.oo.state.ObjectInstance;
 import burlap.mdp.singleagent.environment.Environment;
 import burlap.mdp.singleagent.environment.EnvironmentOutcome;
 
@@ -33,6 +35,8 @@ public class AsteroidsEnvironment implements Environment {
 	protected int shootReward = -5;
 	protected int collisionReward = -1000;
 	protected int warpReward = -50;
+
+	protected int closeAsteroidReward = -50;
 
 	public AsteroidsEnvironment(PhysicsParams phys) {
 		this.phys = phys;
@@ -169,6 +173,8 @@ public class AsteroidsEnvironment implements Environment {
 		if (isInTerminalState())
 			lastReward += collisionReward;
 
+		lastReward += domainKnowledgeRewards(newState);
+
 		return new EnvironmentOutcome(oldState, a, newState, lastReward, isInTerminalState());
 	}
 
@@ -180,6 +186,35 @@ public class AsteroidsEnvironment implements Environment {
 	@Override
 	public boolean isInTerminalState() {
 		return this.sim.players.size() == 0;
+	}
+
+	protected int domainKnowledgeRewards(State state) {
+		int reward = 0;
+
+		reward += nearbyAsteroidsRewardFixed((OOState)state);
+
+		return reward;
+	}
+
+	protected int nearbyAsteroidsRewardFixed(OOState state) {
+		float minGoodDist = 50;
+		int maxRewardsGiven = 1;
+		int reward = 0;
+
+		List<ObjectInstance> asteroidObjs = state.objectsOfClass(CLASS_ASTEROID);
+
+		for (ObjectInstance obj : asteroidObjs) {
+			PolarState asteroid = (PolarState)obj;
+
+			// == instead of <= so -1 can represent quick 'all' functionality
+			if (maxRewardsGiven == 0)
+				break;
+
+			if (asteroid.dist <= minGoodDist)
+				reward += closeAsteroidReward;
+		}
+
+		return reward;
 	}
 
 }

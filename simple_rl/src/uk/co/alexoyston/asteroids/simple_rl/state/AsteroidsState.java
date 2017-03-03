@@ -92,12 +92,29 @@ public class AsteroidsState implements OOState {
 
 	@Override
 	public List<ObjectInstance> objectsOfClass(String oclass) {
+		int objTypeStart = 0;
+		int objTypeEnd = 0;
 
-		if(oclass.equals(CLASS_AGENT))
+		if (oclass.equals(CLASS_AGENT))
 			return Arrays.<ObjectInstance>asList(agent);
 
-		else if(oclass.equals(CLASS_OBJECT))
+		if (oclass.equals(CLASS_OBJECT))
 			return objs;
+
+		objTypeStart = objTypeEnd;
+		objTypeEnd += closestAsteroidsCount;
+		if (oclass.equals(CLASS_ASTEROID))
+			return objs.subList(objTypeStart, objTypeEnd);
+
+		objTypeStart = objTypeEnd;
+		objTypeEnd += closestSaucersCount;
+		if (oclass.equals(CLASS_SAUCER))
+			return objs.subList(objTypeStart, objTypeEnd);
+
+		objTypeStart = objTypeEnd;
+		objTypeEnd += closestBulletsCount;
+		if (oclass.equals(CLASS_BULLET))
+			return objs.subList(objTypeStart, objTypeEnd);
 
 		throw new UnknownClassException(oclass);
 	}

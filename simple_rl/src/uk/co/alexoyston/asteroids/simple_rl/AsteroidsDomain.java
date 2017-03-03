@@ -48,6 +48,9 @@ public class AsteroidsDomain implements DomainGenerator {
 
 	public static final String CLASS_AGENT = "agent";
 	public static final String CLASS_OBJECT = "object";
+	public static final String CLASS_ASTEROID = "asteroid";
+	public static final String CLASS_SAUCER = "saucer";
+	public static final String CLASS_BULLET = "bullet";
 
 	public static final String VAR_DIST = "dist";
 	public static final String VAR_ANGLE = "angle";
@@ -128,7 +131,7 @@ public class AsteroidsDomain implements DomainGenerator {
 
 		// explorer(domain, env, v);
 		// episodicView(domain, env, v, factories.get(0), 50);
-		expAndPlot(env, 5, 1000, factoriesArray);
+		expAndPlot(env, 5, 2000, factoriesArray);
 	}
 
 	public static LearningAgentFactory getSarsaAgentFactory(OOSADomain domain, String tag, VFAGenerator vfaGen,

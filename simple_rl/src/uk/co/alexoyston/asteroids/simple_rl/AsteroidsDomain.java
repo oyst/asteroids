@@ -68,10 +68,12 @@ public class AsteroidsDomain implements DomainGenerator {
 	public static final int TYPE_SMALL_SAUCER = 3;
 	public static final int TYPE_ASTEROID(int size) { return 3 + size; };
 
-	private static final PhysicsParams phys = new PhysicsParams();
+	private PhysicsParams phys;
 	protected static final Map<Object, VariableDomain> varDomains = new HashMap<Object, VariableDomain>();
 
-	static {
+	protected static void initVariableDomains(PhysicsParams phys) {
+		Map<Object, VariableDomain> varDom = new HashMap<Object, VariableDomain>();
+
 		double maxDist = Math.max(phys.worldWidth, phys.worldHeight) / 2;
 
 		double maxPlayerVelocity = Math.sqrt(2 * phys.playerThrustPower / phys.playerDrag);
@@ -110,6 +112,9 @@ public class AsteroidsDomain implements DomainGenerator {
 	}
 
 	public static void main(String [] args){
+		PhysicsParams phys = new PhysicsParams();
+		initVariableDomains(phys);
+
 		AsteroidsDomain asteroids = new AsteroidsDomain();
 		OOSADomain domain = asteroids.generateDomain();
 		Environment env = new AsteroidsEnvironment(phys);

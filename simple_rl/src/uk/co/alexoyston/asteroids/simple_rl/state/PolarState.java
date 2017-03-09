@@ -22,7 +22,7 @@ public class PolarState implements ObjectInstance, Comparable<PolarState> {
 
 	public int diameter;
 
-	protected String name;
+	protected String name = "";
 
 	public static final List<Object> keys = Arrays.<Object>asList(
 			VAR_DIST,

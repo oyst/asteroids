@@ -3,6 +3,8 @@ package uk.co.alexoyston.asteroids.simple_rl;
 import java.awt.Color;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 import burlap.mdp.core.action.Action;
 import burlap.mdp.core.state.State;
@@ -37,6 +39,8 @@ public class AsteroidsEnvironment implements Environment {
 	protected int warpReward = -50;
 
 	protected int closeAsteroidReward = -50;
+
+	private Map<String, Integer> asteroidStateRewards = new HashMap<String, Integer>();
 
 	public AsteroidsEnvironment(PhysicsParams phys) {
 		this.phys = phys;
@@ -127,6 +131,8 @@ public class AsteroidsEnvironment implements Environment {
 				throw new RuntimeException("Unknown Entity instance encountered: " + entity.toString());
 			}
 
+			name = String.format("%s_%d", name, System.nanoTime());
+
 			PolarState obj = new PolarState(name, diameter, dist, angle, vDist, vAngle, type);
 			container.add(obj);
 		}
@@ -173,7 +179,8 @@ public class AsteroidsEnvironment implements Environment {
 		if (isInTerminalState())
 			lastReward += collisionReward;
 
-		lastReward += domainKnowledgeRewards(newState);
+		// lastReward += domainKnowledgeRewards(newState);
+		lastReward += nearbyAsteroidsRewardDynamic((OOState)oldState, (OOState)newState);
 
 		return new EnvironmentOutcome(oldState, a, newState, lastReward, isInTerminalState());
 	}
@@ -192,8 +199,70 @@ public class AsteroidsEnvironment implements Environment {
 		int reward = 0;
 
 		reward += nearbyAsteroidsRewardFixed((OOState)state);
+		// reward +=
 
 		return reward;
+	}
+
+	private int calcNearbyAsteroidReward(float distance) {
+		if (distance == 0)
+			return 0;
+
+		if (distance >= 150)
+			return 0;
+
+		return (int)((distance - 150) * 0.1f);
+	}
+
+	protected int nearbyAsteroidsRewardDynamic(OOState oldState, OOState newState) {
+		List<ObjectInstance> oldAsteroidObjs = oldState.objectsOfClass(CLASS_ASTEROID);
+		List<ObjectInstance> newAsteroidObjs = newState.objectsOfClass(CLASS_ASTEROID);
+
+		int reward = 0;
+
+		for (ObjectInstance newObj : newAsteroidObjs) {
+			// Asteroid is joining state
+			if (!asteroidStateRewards.containsKey(newObj.name())) {
+				PolarState newAsteroid = (PolarState)newObj;
+				int subReward = calcNearbyAsteroidReward(newAsteroid.dist);
+				asteroidStateRewards.put(newObj.name(), subReward);
+				reward += subReward;
+			}
+
+		}
+
+		for (ObjectInstance oldObj : oldAsteroidObjs) {
+			boolean objRemained = false;
+
+			for (ObjectInstance newObj : newAsteroidObjs) {
+
+				// Asteroid remained in state
+				if (newObj.name().equals(oldObj.name())) {
+					PolarState newAsteroid = (PolarState)newObj;
+					PolarState oldAsteroid = (PolarState)oldObj;
+
+					int subReward = calcNearbyAsteroidReward(newAsteroid.dist);
+					reward -= asteroidStateRewards.get(newObj.name());
+					asteroidStateRewards.put(newObj.name(), subReward);
+					reward += subReward;
+
+					objRemained = true;
+					break;
+				}
+			}
+
+			// Asteroid has left
+			if (!objRemained) {
+				String name = oldObj.name();
+				if (asteroidStateRewards.containsKey(name))
+					reward += asteroidStateRewards.get(name);
+				asteroidStateRewards.remove(name);
+			}
+
+		}
+
+		return reward;
+
 	}
 
 	protected int nearbyAsteroidsRewardFixed(OOState state) {
